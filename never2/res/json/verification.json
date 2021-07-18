@@ -1,0 +1,12 @@
+{
+  "Verification methodology": {
+    "Complete": {},
+    "Over-approximated": {},
+    "Mixed": {
+      "Neurons number": {
+        "name": "n_neurons",
+        "type": "int"
+      }
+    }
+  }
+}

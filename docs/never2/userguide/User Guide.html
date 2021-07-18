@@ -1,0 +1,156 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <title>
+        NeVer 2 :: User Guide
+    </title>
+</head>
+
+<body>
+<h1>User Guide</h1>
+<h2 id="edit_net">Editing the network</h2>
+<h3 id="add_node">Adding a node to the network</h3>
+<p>
+    <b>1.</b> On the toolbar on the left, click on the type of node to draw.<br>
+    <b>2.</b> The desired block will appear on the blank space with default and valid values
+</p>
+<div>
+    <img src="docs/never2/userguide/img/img_01.png" alt="">
+    <img src="docs/never2/userguide/img/img_02.png" alt=""></div>
+
+<h3 id="edit_node">Editing a node in the network</h3>
+<p>
+    <b>1.</b> Do one of the following operations:<br>
+    <b>1.1</b> By right-clicking on a selected node<br>
+    <b>1.2</b> Or selecting a node and using the shortcut Ctrl+E<br>
+    <b>1.3</b> Or selecting a node and going on Edit > Edit on the menu bar<br>
+    <b>2.</b> A dialog will appear with all parameters of that node.<br>
+    <b>3.</b> Some parameter will not be editable, such as weight and bias attributes which depend on the input, or the
+    input itself if there is a node above the one to change.<br>
+    <b>4.</b> Type the new values of the editable parameters.<br>
+    <b>5.</b> Changes will be applied pushing "Apply" button, and they will be visible on the scene. <br>
+    If an error occurs, the node will not be changed, and a specific message will appear.<br>
+    Pressing "Cancel" or closing the dialog instead of pressing "Apply", the node will not change.
+</p>
+<div>
+    <img src="docs/never2/userguide/img/img_03.png" alt="">
+    <img src="docs/never2/userguide/img/img_04.png" alt=""></div>
+
+<h3 id="copy_node">Copying a node</h3>
+<p>
+    <b>1.</b> Select one or more (with Ctrl key) nodes to copy.<br>
+    <b>2.</b> Copy the node by:<br>
+    <b>1.1</b> Using the shortcut Ctrl+C<br>
+    <b>1.2</b> Right-clicking on one of the selected nodes and clicking on "Copy"<br>
+    <b>1.3</b> Selecting Edit > Copy on the menu bar<br>
+    <b>3.</b> The selected items will be copied to clipboard.</p>
+
+<h3 id="paste_node">Pasting a node</h3>
+<p>
+    <b>1.</b> Paste one or more copied nodes by:<br>
+    <b>1.1</b> Using the shortcut Ctrl+V<br>
+    <b>1.2</b> Selecting Edit > Paste on the menu bar</p>
+
+<h3 id="cut_node">Cutting a node</h3>
+<p>
+    <b>1.</b> Select one or more (with Ctrl key) nodes to cut.<br>
+    <b>2.</b> Cur the node by:<br>
+    <b>1.1</b> Using the shortcut Ctrl+X<br>
+    <b>1.2</b> Right-clicking on one of the selected nodes and clicking on "Cut"<br>
+    <b>1.3</b> Selecting Edit > Cut on the menu bar<br>
+    <b>3.</b> The selected items will be deleted from the scene and copied to clipboard.<br>
+    Alert: all the connections of the deleted item will be deleted, and if it was on the middle of the network, a new
+    connection will be automatically drawn substituting the deleted node (if logically possible). If a new connection is
+    not legal for the network, it will be split into two networks.</p>
+
+<h3 id="delete_node">Deleting a node</h3>
+<p>
+    <b>1.</b> Select one or more (with Ctrl key) nodes to delete.<br>
+    <b>2.</b> Delete the node by:<br>
+    <b>1.1</b> Using the shortcut Del<br>
+    <b>1.2</b> Right-clicking on one of the selected nodes and clicking on "Delete"<br>
+    <b>1.3</b> Selecting Edit > Delete on the menu bar<br>
+    <b>3.</b> The selected items will be deleted from the scene.
+    Alert: all the connections of the deleted item will be deleted, and if it was on the middle of the network, a new
+    connection will be automatically drawn substituting the deleted node (if logically possible). If a new connection is
+    not legal for the network, it will be split into two networks. </p>
+<div>
+    <img src="docs/never2/userguide/img/img_05.png" alt="">
+    <img src="docs/never2/userguide/img/img_06.png" alt="">
+</div>
+
+<h3 id="draw_connection">Drawing a connection</h3>
+<p>
+    <b>1.</b> Enter in the drawing mode by:<br>
+    <b>1.1</b> Clicking on the "Draw Line" button on the toolbar on the left<br>
+    <b>1.2</b> Using the shortcut Ctrl+D<br>
+    <b>1.3</b> Selecting Edit > Draw Connection on the menu bar<br>
+    <b>2.</b> Click on the first node of the connection: clicking on a node which already have a connection starting
+    from it will cause an error.<br>
+    <b>3.</b> Click on the second node of the connection: clicking on a node which have a connection going into it will
+    cause an error.<br>
+    <b>4.</b> A line will be drawn between the two nodes (showing the output of the first node) if the logical
+    connection between them is legal, otherwise the connection will not be drawn, and a specific message will appear
+</p>
+<div>
+    <img src="docs/never2/userguide/img/img_07.png" alt="">
+    <img src="docs/never2/userguide/img/img_08.png" alt="">
+</div>
+
+<h3 id="delete_connection">Deleting a connection</h3>
+<p>
+    <b>1.</b> Click on the connection do delete<br>
+    <b>2.</b> Delete the connection by:<br>
+    <b>2.1</b> Using the shortcut Del or Ctrl+X<br>
+    <b>2.2</b> Selecting Edit > Delete or Edit > Cut on the menu bar<br>
+    <b>3.</b> The connection will be deleted from the network
+    Alert: if deleting a connection involves splitting the network in two networks, it will not be possible to save the
+    network until it becomes again a connected sequential network. </p>
+<div>
+    <img src="docs/never2/userguide/img/img_09.png" alt="">
+    <img src="docs/never2/userguide/img/img_10.png" alt="">
+</div>
+
+<h3 id="insert_node">Insert a node between two connected nodes</h3>
+<p>
+    <b>1.</b> Enter in the drawing mode by:<br>
+    <b>1.1</b> Clicking on the "Insert block" button on the toolbar on the left<br>
+    <b>1.2</b> Using the shortcut Ctrl+I<br>
+    <b>1.3</b> Selecting Edit > Insert Block in Connection on the menu bar<br>
+    <b>2.</b> Click the node to insert in a connection or in the connection itself<br>
+    <b>3.</b> Click on the connection or in the node to insert in it<br>
+    <b>4.</b> If the new connections are legal, the clicked <br>connection will disappear, and two new connections will
+    be drawn to insert the clicked block in the network.</p>
+<div>
+    <img src="docs/never2/userguide/img/img_11.png" alt="">
+    <img src="docs/never2/userguide/img/img_12.png" alt="">
+</div>
+
+<h3 id="clear_network">Clearing the network</h3>
+<p>
+    <b>1.</b> Clear the network by:<br>
+    <b>1.1</b> Using the shortcut Ctrl+Shift+C<br>
+    <b>1.2</b> Selecting Edit > Clear on the menu bar<br>
+    <b>2.</b> All nodes and connection will be deleted from the network.</p>
+
+<h2 id="edit_interface">Editing the interface</h2>
+<h3 id="zoom">Zoom in and Zoom out</h3>
+<p>
+    <b>1.</b> Zoom in/out by:<br>
+    <b>1.1</b> Using the shortcut Ctrl++/Ctrl+-<br>
+    <b>1.2</b> Selecting View > Zoom in/Zoom out<br>
+    <b>2.</b> The blocks in the scene are bigger/smaller of a 1.5 factor</p>
+
+<h3 id="show_hide">Show and hide toolbars</h3>
+<p>
+    <b>1.</b> Show or hide Tools bar or Nodes bas selecting View > Show > Tools/Blocks Library<br>
+
+<h3 id="show_parameters">Show node parameters</h3>
+<b>1.</b> Select the node whose details are required<br>
+<b>2.</b> Complete the operation by:<br>
+<b>2.1</b> Using the shortcut Ctrl+P<br>
+<b>2.2</b> Selecting View > Properties<br>
+<b>2.3</b> Right clicking on the node and clicking "Properties"<br>
+<b>3.</b> A toolbar on the right of the window will appear with the complete description of the node type.
+</body>
+</html>

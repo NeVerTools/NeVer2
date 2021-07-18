@@ -1,0 +1,6 @@
+build/
+dist/
+*.pyc
+.idea/*
+**/logs/*
+!**/logs/placeholder.txt
