@@ -16,6 +16,7 @@ from pynever.strategies import reading, verification
 from pynever.strategies.training import PytorchTraining, PytorchMetrics
 
 import never2.view.styles as style
+from never2 import ROOT_DIR
 from never2.view.util import utility
 from never2.view.widget.custom import CustomLabel, CustomComboBox, CustomTextBox, CustomButton
 from never2.view.widget.dialog.dialogs import MessageDialog, MessageType, GenericDatasetDialog, ArithmeticValidator, \
@@ -186,7 +187,7 @@ class TrainingWindow(NeVerWindow):
         self.dataset_path = ""
         self.dataset_params = dict()
         self.dataset_transform = None
-        self.params = utility.read_json('never2/res/json/training.json')
+        self.params = utility.read_json(ROOT_DIR + '/res/json/training.json')
         self.gui_params = dict()
         self.loss_f = ''
         self.metric = ''
@@ -395,9 +396,9 @@ class TrainingWindow(NeVerWindow):
         """
 
         if name == "MNIST":
-            self.dataset_path = "data/MNIST/"
+            self.dataset_path = ROOT_DIR + "/data/MNIST/"
         elif name == "Fashion MNIST":
-            self.dataset_path = "data/fMNIST/"
+            self.dataset_path = ROOT_DIR + "/data/fMNIST/"
         else:
             datapath = QFileDialog.getOpenFileName(None, "Select data source...", "")
             self.dataset_path = datapath[0]
@@ -424,9 +425,9 @@ class TrainingWindow(NeVerWindow):
             The dataset object.
 
         """
-        if self.dataset_path == "data/MNIST/":
+        if self.dataset_path == ROOT_DIR + "/data/MNIST/":
             return dt.TorchMNIST(self.dataset_path, True, self.dataset_transform)
-        elif self.dataset_path == "data/fMNIST/":
+        elif self.dataset_path == ROOT_DIR + "/data/fMNIST/":
             return dt.TorchFMNIST(self.dataset_path, True, self.dataset_transform)
         elif self.dataset_path != "":
             return dt.GenericFileDataset(self.dataset_path,
@@ -543,7 +544,7 @@ class VerificationWindow(NeVerWindow):
         self.properties = properties
         self.strategy = None
 
-        self.params = utility.read_json('never2/res/json/verification.json')
+        self.params = utility.read_json(ROOT_DIR + '/res/json/verification.json')
 
         def activation_cb(methodology: str):
             return lambda: self.update_methodology(self.widgets["Verification methodology"].currentText())

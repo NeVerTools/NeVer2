@@ -10,12 +10,11 @@ from pynever.tensor import Tensor
 
 import never2.view.styles as style
 import never2.view.util.utility as u
+from never2 import ROOT_DIR
 from never2.core.model.network import NetworkNode
 from never2.view.drawing.element import PropertyBlock, NodeBlock
 from never2.view.widget.custom import CustomLabel, CustomComboBox, CustomTextBox, CustomTextArea, CustomButton
 from never2.view.widget.misc import ProgressBar
-
-UNEDITABLE = ["weight", "bias", "in_features"]
 
 
 class ArithmeticValidator:
@@ -205,7 +204,7 @@ class HelpDialog(NeVerDialog):
         self.setStyleSheet("background-color: " + style.GREY_3 + ";")
 
         # The dialogs contains a text area reading the user guide file
-        text = open('docs/never2/userguide/User Guide.html', encoding="utf8").read()
+        text = open(ROOT_DIR.replace('/never2', '') + '/docs/never2/userguide/User Guide.html', encoding="utf8").read()
         text_area = QTextEdit(text)
         text_area.setReadOnly(True)
 

@@ -1,4 +1,5 @@
 import json
+import os
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
@@ -6,6 +7,7 @@ from PyQt5.QtWidgets import QDockWidget, QScrollArea, QSizePolicy, QWidget, QVBo
 from PyQt5.QtWidgets import QToolBar, QToolButton
 
 import never2.view.styles as style
+from never2 import ROOT_DIR
 from never2.core.model.network import NetworkNode
 from never2.view.drawing.element import NodeBlock
 from never2.view.widget.custom import CustomLabel, CustomButton
@@ -464,13 +466,13 @@ class BlocksToolbar(QToolBar):
 
         # DrawLine mode button
         draw_line_button = CustomButton()
-        draw_line_button.setIcon(QIcon("never2/res/icons/line.png"))
+        draw_line_button.setIcon(QIcon(ROOT_DIR + "/res/icons/line.png"))
         draw_line_button.setFixedSize(40, 40)
         draw_line_button.setToolTip("Draw line")
 
         # Insert block button
         insert_block_button = CustomButton()
-        insert_block_button.setIcon(QIcon("never2/res/icons/insert.png"))
+        insert_block_button.setIcon(QIcon(ROOT_DIR + "/res/icons/insert.png"))
         insert_block_button.setFixedSize(40, 40)
         insert_block_button.setToolTip("Insert block in edge")
 

@@ -7,6 +7,7 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QStatusBar, QAction, QGraphicsRectItem, QPushButton
 
 import never2.view.styles as style
+from never2 import ROOT_DIR
 from never2.view.drawing.element import GraphicLine, NodeBlock
 from never2.view.drawing.scene import DrawingMode, Canvas
 from never2.view.widget.custom import CustomLabel
@@ -66,7 +67,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # Init window appearance
         self.SYSNAME = "NeVer 2"
         self.setWindowTitle(self.SYSNAME)
-        self.setWindowIcon(QtGui.QIcon('never2/res/icons/logo.svg'))
+        self.setWindowIcon(QtGui.QIcon(ROOT_DIR + '/res/icons/logo.svg'))
         self.setStyleSheet("background-color: " + style.GREY_1)
 
         # Navigation menu
@@ -74,7 +75,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.init_nav_menu_bar()
 
         # Blocks toolbar
-        self.toolbar = BlocksToolbar('never2/res/json/blocks.json')
+        self.toolbar = BlocksToolbar(ROOT_DIR + '/res/json/blocks.json')
 
         # Parameters toolbar
         self.parameters = ParamToolbar()
@@ -142,7 +143,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setContextMenuPolicy(Qt.PreventContextMenu)
         actions_dict = dict()
 
-        with open('never2/res/json/menu.json') as json_menu:
+        with open(ROOT_DIR + '/res/json/menu.json') as json_menu:
             menu = json.loads(json_menu.read())
 
         for menu_item, actions in menu.items():
