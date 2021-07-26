@@ -6,6 +6,7 @@ from PyQt5.QtWidgets import QFileDialog, QApplication
 from pynever.strategies.conversion import ONNXNetwork, \
     ONNXConverter, PyTorchConverter, TensorflowConverter, PyTorchNetwork, TensorflowNetwork, AlternativeRepresentation
 from pynever.strategies.processing import ExpressionTreeConverter
+from pysmt.exceptions import PysmtException
 from pysmt.smtlib.parser import SmtLibParser
 
 from never2.view.drawing.element import PropertyBlock
@@ -282,7 +283,13 @@ class InputHandler:
         """
 
         parser = SmtLibParser()
-        script = parser.get_script_fname(path)
+        try:
+            script = parser.get_script_fname(path)
+        except PysmtException:
+            dialog = MessageDialog("Failed to parse SMT property.", MessageType.ERROR)
+            dialog.exec()
+            return dict()
+
         declarations = script.filter_by_command_name(['declare-fun', 'declare-const'])
         assertions = script.filter_by_command_name('assert')
         var_set = []

@@ -1,7 +1,6 @@
 from pynever.nodes import LayerNode, ReLUNode, FullyConnectedNode, BatchNormNode, \
     AveragePoolNode, ConvNode, MaxPoolNode, LRNNode, SoftMaxNode, UnsqueezeNode, FlattenNode, DropoutNode, \
     ReshapeNode, SigmoidNode
-from pynever.tensor import Tensor
 
 
 class NodeOps:
@@ -41,16 +40,16 @@ class NodeOps:
             node = FullyConnectedNode(node_id,
                                       in_dim,
                                       data["out_features"],
-                                      data["weight"], data["bias"],
-                                      data["has_bias"])
+                                      weight=None, bias=None,
+                                      has_bias=data["has_bias"])
         elif class_name == 'BatchNormNode':
             node = BatchNormNode(node_id,
-                                 in_dim, data["weight"],
-                                 data["bias"],
-                                 data["running_mean"],
-                                 data["running_var"], data["eps"],
-                                 data["momentum"], data["affine"],
-                                 data["track_running_stats"])
+                                 in_dim, weight=None,
+                                 bias=None,
+                                 running_mean=None,
+                                 running_var=None, eps=data["eps"],
+                                 momentum=data["momentum"], affine=data["affine"],
+                                 track_running_stats=data["track_running_stats"])
         elif class_name == 'AveragePoolNode':
             node = AveragePoolNode(node_id,
                                    in_dim,
@@ -69,8 +68,7 @@ class NodeOps:
                             data["dilation"],
                             data["groups"],
                             data["has_bias"],
-                            data["bias"],
-                            data["weight"])
+                            bias=None, weight=None)
         elif class_name == 'MaxPoolNode':
             node = MaxPoolNode(node_id,
                                in_dim,

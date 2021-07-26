@@ -6,12 +6,13 @@ import numpy as np
 from PyQt5 import QtWidgets, QtGui
 from PyQt5.QtCore import Qt, QLineF, QRectF, QPointF, pyqtSignal
 from PyQt5.QtGui import QBrush, QColor, QPen, QPolygonF
-from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsRectItem, QGraphicsTextItem, QGraphicsPolygonItem, QLabel, \
+from PyQt5.QtWidgets import QGraphicsLineItem, QGraphicsRectItem, QGraphicsTextItem, QGraphicsPolygonItem, \
     QVBoxLayout, QWidget, QGridLayout, QGraphicsProxyWidget, QAction
 from pynever.tensor import Tensor
 
 import never2.view.styles as style
 import never2.view.util.utility as u
+from never2.view.widget.custom import CustomLabel
 
 MAX_FLOAT_LABEL_LENGTH = 5
 
@@ -266,7 +267,7 @@ class GraphicBlock(QtWidgets.QWidget):
         pyQt rectangle object associated to the block.
     proxy_control : QGraphicsProxyWidget
         pyQt proxy holding the widget inside the scene.
-    title_label : QLabel
+    title_label : CustomLabel
         pyQt label for the block head.
     context_actions : dict
         Dictionary of context menu actions.
@@ -295,7 +296,7 @@ class GraphicBlock(QtWidgets.QWidget):
         self.block_id = block_id
         self.main_layout = QVBoxLayout()
         self.main_layout.setSpacing(0)
-        self.title_label = QLabel("Graphic block")
+        self.title_label = CustomLabel("Graphic block")
         self.content_layout = QGridLayout()
         self.rect = None
         self.proxy_control = None
@@ -489,11 +490,11 @@ class NodeBlock(GraphicBlock):
         count = 1
         for name, param in self.node.param.items():
             # Set the label
-            par_labels[name] = QLabel(name)
+            par_labels[name] = CustomLabel(name)
             par_labels[name].setAlignment(Qt.AlignLeft)
             par_labels[name].setStyleSheet(style.PAR_NODE_STYLE)
 
-            self.dim_labels[name] = QLabel()
+            self.dim_labels[name] = CustomLabel()
             self.dim_labels[name].setAlignment(Qt.AlignCenter)
             self.dim_labels[name].setStyleSheet(style.DIM_NODE_STYLE)
 
@@ -621,9 +622,9 @@ class PropertyBlock(GraphicBlock):
         The property type (SMT, Polyhedral...).
     smt_string : str
         The SMT-LIB expression of the property.
-    property_label : QLabel
+    property_label : CustomLabel
         The visible label of the property.
-    condition_label : QLabel
+    condition_label : CustomLabel
         The POST or PRE label of the property.
     variables : list
         The list of admissible variables
@@ -641,8 +642,8 @@ class PropertyBlock(GraphicBlock):
         elif p_type == "Polyhedral":
             self.label_string = "Ax - b <= 0"
 
-        self.condition_label = QLabel("PRE")
-        self.property_label = QLabel(self.label_string)
+        self.condition_label = CustomLabel("PRE")
+        self.property_label = CustomLabel(self.label_string)
         self.variables = []
         self.init_layout()
         self.init_context_menu()
@@ -663,7 +664,7 @@ class PropertyBlock(GraphicBlock):
 
         self.init_grid()
 
-        formula_label = QLabel("Formula")
+        formula_label = CustomLabel("Formula")
         formula_label.setStyleSheet(style.PAR_NODE_STYLE)
         self.property_label.setStyleSheet(style.DIM_NODE_STYLE)
         self.content_layout.addWidget(formula_label, 1, 0)

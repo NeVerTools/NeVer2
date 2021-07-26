@@ -1,14 +1,16 @@
 import logging
 from random import randint
 
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtCore
 from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QProgressBar
+
+from never2.view.widget.custom import CustomTextArea
 
 
 class LoggerTextBox(logging.Handler, QtCore.QObject):
     """
-    This class represents a QPlainTextEdit widget
+    This class represents a CustomTextArea widget
     used to display logging info. By extending
     logging.Handler it can be used for any logging
     purpose.
@@ -17,7 +19,7 @@ class LoggerTextBox(logging.Handler, QtCore.QObject):
 
     Attributes
     ----------
-    widget : QPlainTextEdit
+    widget : CustomTextArea
         The widget on which the logs are displayed.
 
     Methods
@@ -32,7 +34,8 @@ class LoggerTextBox(logging.Handler, QtCore.QObject):
     def __init__(self, parent):
         super().__init__()
         QtCore.QObject.__init__(self)
-        self.widget = QtWidgets.QPlainTextEdit(parent)
+        self.widget = CustomTextArea()
+        self.widget.setParent(parent)
         self.widget.setReadOnly(True)
         self.widget.setFixedHeight(150)
         self.append.connect(self.widget.appendPlainText)

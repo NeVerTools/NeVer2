@@ -19,7 +19,7 @@ from never2.view.drawing.element import NodeBlock, GraphicLine, PropertyBlock, G
 from never2.view.drawing.renderer import SequentialNetworkRenderer
 from never2.view.util import utility
 from never2.view.widget.dialog.dialogs import MessageDialog, MessageType, EditSmtPropertyDialog, \
-    EditPolyhedralPropertyDialog, EditNodeInputDialog, EditNodeDialog
+    EditPolyhedralPropertyDialog, EditNodeInputDialog, EditNodeDialog, FuncDialog
 from never2.view.widget.dialog.windows import TrainingWindow, VerificationWindow
 
 
@@ -832,6 +832,9 @@ class Canvas(QWidget):
         else:
             window = TrainingWindow(self.renderer.NN)
             window.exec()
+            if window.nn is not None:
+                dialog = FuncDialog("Save network?", self.project.save)
+                dialog.exec()
 
     def verify_network(self):
         if not self.renderer.NN.nodes:

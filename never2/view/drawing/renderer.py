@@ -390,9 +390,10 @@ class SequentialNetworkRenderer:
         node = self.NN.nodes[block_id]
 
         try:
-            NodeOps.update_node_data(node, data)
             if in_dim is not None:
                 NodeOps.update_node_input(node, in_dim)
+
+            NodeOps.update_node_data(node, data)
 
             if node is not self.NN.get_last_node():
                 next_node = self.NN.get_next_node(node)

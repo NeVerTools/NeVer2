@@ -2,22 +2,22 @@ import logging
 import os
 from typing import Callable
 
+import pynever.datasets as dt
 import torch
 import torch.nn.functional as fun
 import torch.optim as opt
 import torchvision.transforms as tr
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QVBoxLayout, QLabel, QHBoxLayout, QComboBox, QGridLayout, QLineEdit, QPushButton, \
-    QFileDialog
-
-import pynever.datasets as dt
-import never2.view.styles as style
+from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QFileDialog
 from pynever.datasets import Dataset
 from pynever.networks import NeuralNetwork
 from pynever.strategies import reading, verification
 from pynever.strategies.training import PytorchTraining, PytorchMetrics
+
+import never2.view.styles as style
 from never2.view.util import utility
+from never2.view.widget.custom import CustomLabel, CustomComboBox, CustomTextBox, CustomButton
 from never2.view.widget.dialog.dialogs import MessageDialog, MessageType, GenericDatasetDialog, ArithmeticValidator, \
     MixedVerificationDialog
 from never2.view.widget.misc import LoggerTextBox
@@ -100,7 +100,7 @@ class NeVerWindow(QtWidgets.QDialog):
 
             if type(widget_dict[first_level][sub_key]) == dict:
 
-                self.widgets[first_level] = QComboBox()
+                self.widgets[first_level] = CustomComboBox()
                 for second_level in widget_dict[first_level].keys():
                     self.widgets[first_level].addItem(second_level)
                 self.widgets[first_level].setCurrentIndex(-1)
@@ -111,12 +111,12 @@ class NeVerWindow(QtWidgets.QDialog):
 
                 if widget_dict[first_level]["type"] == "bool":
 
-                    self.widgets[first_level] = QComboBox()
+                    self.widgets[first_level] = CustomComboBox()
                     self.widgets[first_level].addItems([str(widget_dict[first_level]["value"]),
                                                         str(not widget_dict[first_level]["value"])])
                 else:
 
-                    self.widgets[first_level] = QLineEdit()
+                    self.widgets[first_level] = CustomTextBox()
                     self.widgets[first_level].setText(str(widget_dict[first_level].get("value", "")))
 
                     if line_f is not None:
@@ -130,7 +130,7 @@ class NeVerWindow(QtWidgets.QDialog):
                             widget_dict[first_level]["type"] == "tuple":
                         self.widgets[first_level].setValidator(ArithmeticValidator.TENSOR)
 
-            w_label = QLabel(first_level)
+            w_label = CustomLabel(first_level)
             if 'optional' in widget_dict[first_level].keys():
                 w_label.setText(first_level + ' (opt)')
             w_label.setToolTip(widget_dict[first_level].get("description"))
@@ -194,28 +194,28 @@ class TrainingWindow(NeVerWindow):
 
         # Dataset
         dataset_layout = QHBoxLayout()
-        self.widgets["dataset"] = QComboBox()
+        self.widgets["dataset"] = CustomComboBox()
         self.widgets["dataset"].addItems(["MNIST", "Fashion MNIST", "Custom data source..."])
         self.widgets["dataset"].setCurrentIndex(-1)
         self.widgets["dataset"].activated \
             .connect(lambda: self.setup_dataset(self.widgets["dataset"].currentText()))
-        dataset_layout.addWidget(QLabel("Dataset"))
+        dataset_layout.addWidget(CustomLabel("Dataset"))
         dataset_layout.addWidget(self.widgets["dataset"])
         self.layout.addLayout(dataset_layout)
 
         transform_layout = QHBoxLayout()
-        self.widgets["transform"] = QComboBox()
+        self.widgets["transform"] = CustomComboBox()
         self.widgets["transform"] \
             .addItem("Compose(ToTensor, Normalize(1, 0.5), Flatten)")
         self.widgets["transform"].setCurrentIndex(-1)
         self.widgets["transform"].activated \
             .connect(lambda: self.setup_transform(self.widgets["transform"].currentText()))
-        transform_layout.addWidget(QLabel("Dataset transform"))
+        transform_layout.addWidget(CustomLabel("Dataset transform"))
         transform_layout.addWidget(self.widgets["transform"])
         self.layout.addLayout(transform_layout)
 
         # Separator
-        sep_label = QLabel("Training parameters")
+        sep_label = CustomLabel("Training parameters")
         sep_label.setAlignment(Qt.AlignCenter)
         sep_label.setStyleSheet(style.NODE_LABEL_STYLE)
         self.layout.addWidget(sep_label)
@@ -235,9 +235,9 @@ class TrainingWindow(NeVerWindow):
 
         # Buttons
         btn_layout = QHBoxLayout()
-        self.train_btn = QPushButton("Train network")
+        self.train_btn = CustomButton("Train network")
         self.train_btn.clicked.connect(self.train_network)
-        self.cancel_btn = QPushButton("Cancel")
+        self.cancel_btn = CustomButton("Cancel")
         self.cancel_btn.clicked.connect(self.close)
         btn_layout.addWidget(self.train_btn)
         btn_layout.addWidget(self.cancel_btn)
@@ -295,7 +295,7 @@ class TrainingWindow(NeVerWindow):
 
         """
 
-        title = QLabel(name)
+        title = CustomLabel(name)
         title.setAlignment(Qt.AlignCenter)
         self.grid_layout.addWidget(title, 0, 0, 1, 2)
         widgets_2level = dict()
@@ -313,20 +313,20 @@ class TrainingWindow(NeVerWindow):
                                                       key,
                                                       widgets_2level[f"{super_key}:{key}"][1].text())
 
-            w_label = QLabel(k)
+            w_label = CustomLabel(k)
             w_label.setToolTip(v.get("description"))
             if v["type"] == "bool":
-                cb = QComboBox()
+                cb = CustomComboBox()
                 cb.addItems([str(v["value"]), str(not v["value"])])
                 widgets_2level[f"{name}:{k}"] = (w_label, cb)
                 widgets_2level[f"{name}:{k}"][1].activated.connect(activation_combo(name, k))
             elif "allowed" in v.keys():
-                cb = QComboBox()
+                cb = CustomComboBox()
                 cb.addItems(v["allowed"])
                 widgets_2level[f"{name}:{k}"] = (w_label, cb)
                 widgets_2level[f"{name}:{k}"][1].activated.connect(activation_combo(name, k))
             else:
-                widgets_2level[f"{name}:{k}"] = (w_label, QLineEdit(str(v["value"])))
+                widgets_2level[f"{name}:{k}"] = (w_label, CustomTextBox(str(v["value"])))
                 widgets_2level[f"{name}:{k}"][1].textChanged.connect(activation_line(name, k))
                 if v["type"] == "int":
                     widgets_2level[f"{name}:{k}"][1].setValidator(ArithmeticValidator.INT)
@@ -505,20 +505,25 @@ class TrainingWindow(NeVerWindow):
             metrics = None  # TODO which is MSE metric?
 
         # Init train strategy
-        train = PytorchTraining(opt.Adam, opt_params,
-                                loss,
-                                self.params["Epochs"]["value"],
-                                self.params["Validation percentage"]["value"],
-                                self.params["Training batch size"]["value"],
-                                self.params["Validation batch size"]["value"],
-                                opt.lr_scheduler.ReduceLROnPlateau,
-                                sched_params,
-                                metrics,
-                                cuda=self.params["Cuda"]["value"],
-                                train_patience=self.params["Train patience"].get("value", None),
-                                checkpoints_root=self.params["Checkpoints root"].get("value", ''),
-                                verbose_rate=self.params["Verbosity level"].get("value", None))
-        train.train(self.nn, data)
+        train_strategy = PytorchTraining(opt.Adam, opt_params,
+                                         loss,
+                                         self.params["Epochs"]["value"],
+                                         self.params["Validation percentage"]["value"],
+                                         self.params["Training batch size"]["value"],
+                                         self.params["Validation batch size"]["value"],
+                                         opt.lr_scheduler.ReduceLROnPlateau,
+                                         sched_params,
+                                         metrics,
+                                         cuda=self.params["Cuda"]["value"],
+                                         train_patience=self.params["Train patience"].get("value", None),
+                                         checkpoints_root=self.params["Checkpoints root"].get("value", ''),
+                                         verbose_rate=self.params["Verbosity level"].get("value", None))
+        try:
+            self.nn = train_strategy.train(self.nn, data)
+        except Exception:
+            self.nn = None
+            self.close()
+
         self.train_btn.setEnabled(False)
         self.cancel_btn.setText("Close")
 
@@ -548,9 +553,9 @@ class VerificationWindow(NeVerWindow):
 
         # Buttons
         btn_layout = QHBoxLayout()
-        self.verify_btn = QPushButton("Verify network")
+        self.verify_btn = CustomButton("Verify network")
         self.verify_btn.clicked.connect(self.verify_network)
-        self.cancel_btn = QPushButton("Cancel")
+        self.cancel_btn = CustomButton("Cancel")
         self.cancel_btn.clicked.connect(self.close)
         btn_layout.addWidget(self.verify_btn)
         btn_layout.addWidget(self.cancel_btn)

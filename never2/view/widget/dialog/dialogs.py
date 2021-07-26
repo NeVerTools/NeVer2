@@ -1,17 +1,18 @@
 from enum import Enum
+from typing import Callable
 
 import numpy as np
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import QRegExp, Qt, QSize
 from PyQt5.QtGui import QIntValidator, QRegExpValidator, QDoubleValidator
-from PyQt5.QtWidgets import QVBoxLayout, QLabel, QPushButton, QHBoxLayout, QWidget, QLineEdit, QGridLayout, QComboBox, \
-    QTextEdit, QPlainTextEdit
+from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QGridLayout, QTextEdit
 from pynever.tensor import Tensor
 
 import never2.view.styles as style
 import never2.view.util.utility as u
 from never2.core.model.network import NetworkNode
 from never2.view.drawing.element import PropertyBlock, NodeBlock
+from never2.view.widget.custom import CustomLabel, CustomComboBox, CustomTextBox, CustomTextArea, CustomButton
 from never2.view.widget.misc import ProgressBar
 
 UNEDITABLE = ["weight", "bias", "in_features"]
@@ -122,6 +123,40 @@ class NeVerDialog(QtWidgets.QDialog):
         self.setLayout(self.layout)
 
 
+class FuncDialog(NeVerDialog):
+    """
+    This class is a parametric Dialog displaying a message
+    to the user and executing a function if the user clicks
+    'Ok'.
+
+    """
+
+    def __init__(self, message: str, ok_fun: Callable):
+        super().__init__("", message)
+        title_label = CustomLabel("Message")
+        title_label.setAlignment(Qt.AlignCenter)
+
+        # Set content label
+        mess_label = CustomLabel("\n" + self.content + "\n")
+        mess_label.setAlignment(Qt.AlignCenter)
+
+        # Buttons
+        btn_layout = QHBoxLayout()
+        ok_btn = CustomButton("Ok")
+        ok_btn.clicked.connect(lambda: ok_fun(False))
+        ok_btn.clicked.connect(self.close)
+        cancel_btn = CustomButton("Cancel")
+        cancel_btn.clicked.connect(self.close)
+        btn_layout.addWidget(ok_btn)
+        btn_layout.addWidget(cancel_btn)
+
+        self.layout.addWidget(title_label)
+        self.layout.addWidget(mess_label)
+        self.layout.addLayout(btn_layout)
+
+        self.render_layout()
+
+
 class MessageDialog(NeVerDialog):
     """
     This class is a Dialog displaying a message to the user.
@@ -133,23 +168,21 @@ class MessageDialog(NeVerDialog):
 
         # Set the dialog stile depending on message_type
         if message_type == MessageType.MESSAGE:
-            title_label = QLabel("Message")
+            title_label = CustomLabel("Message")
             title_label.setStyleSheet(style.NODE_LABEL_STYLE)
         else:
-            title_label = QLabel("Error")
+            title_label = CustomLabel("Error")
             title_label.setStyleSheet(style.ERROR_LABEL_STYLE)
 
         title_label.setAlignment(Qt.AlignCenter)
 
         # Set content label
-        mess_label = QLabel("\n" + self.content + "\n")
-        mess_label.setStyleSheet(style.PARAM_LABEL_STYLE)
+        mess_label = CustomLabel("\n" + self.content + "\n")
         mess_label.setAlignment(Qt.AlignCenter)
 
         # Add a button to close the dialog
-        ok_button = QPushButton("Ok")
-        ok_button.clicked.connect(lambda: self.close())
-        ok_button.setStyleSheet(style.BUTTON_STYLE)
+        ok_button = CustomButton("Ok")
+        ok_button.clicked.connect(self.close)
 
         # Compose widgets
         self.layout.addWidget(title_label)
@@ -204,25 +237,22 @@ class ConfirmDialog(NeVerDialog):
         super().__init__(title, message)
 
         # Set title label
-        title_label = QLabel(self.title)
+        title_label = CustomLabel(self.title)
         title_label.setStyleSheet(style.NODE_LABEL_STYLE)
         title_label.setAlignment(Qt.AlignCenter)
 
         # Set message label
-        mess_label = QLabel("\n" + self.content + "\n")
-        mess_label.setStyleSheet(style.PARAM_LABEL_STYLE)
+        mess_label = CustomLabel("\n" + self.content + "\n")
         mess_label.setAlignment(Qt.AlignCenter)
 
         self.confirm = False
 
         # Add buttons to close the dialog
-        confirm_button = QPushButton("Yes")
-        confirm_button.clicked.connect(lambda: self.ok())
-        confirm_button.setStyleSheet(style.BUTTON_STYLE)
+        confirm_button = CustomButton("Yes")
+        confirm_button.clicked.connect(self.ok)
 
-        no_button = QPushButton("No")
-        no_button.clicked.connect(lambda: self.deny())
-        no_button.setStyleSheet(style.BUTTON_STYLE)
+        no_button = CustomButton("No")
+        no_button.clicked.connect(self.deny)
 
         buttons_layout = QHBoxLayout()
         buttons_layout.addWidget(confirm_button)
@@ -280,31 +310,27 @@ class InputDialog(NeVerDialog):
         super().__init__("", message)
 
         # Set title label
-        title_label = QLabel("Input required")
+        title_label = CustomLabel("Input required")
         title_label.setStyleSheet(style.NODE_LABEL_STYLE)
         title_label.setAlignment(Qt.AlignCenter)
 
         # Set message label
-        mess_label = QLabel("\n" + self.content + "\n")
-        mess_label.setStyleSheet(style.PARAM_LABEL_STYLE)
+        mess_label = CustomLabel("\n" + self.content + "\n")
         mess_label.setAlignment(Qt.AlignCenter)
 
         # Set input reading
         self.input = None
-        input_line = QLineEdit()
-        input_line.setStyleSheet(style.VALUE_LABEL_STYLE)
+        input_line = CustomTextBox()
         input_line.setValidator(QRegExpValidator(QRegExp(
             ArithmeticValidator.TENSOR.regExp().pattern() + "|" +
             ArithmeticValidator.TENSOR_LIST.regExp().pattern())))
 
         # Add buttons to close the dialog
-        confirm_button = QPushButton("Ok")
-        confirm_button.clicked.connect(lambda: self.save_input())
-        confirm_button.setStyleSheet(style.BUTTON_STYLE)
+        confirm_button = CustomButton("Ok")
+        confirm_button.clicked.connect(self.save_input)
 
-        cancel_button = QPushButton("Cancel")
-        cancel_button.clicked.connect(lambda: self.cancel())
-        cancel_button.setStyleSheet(style.BUTTON_STYLE)
+        cancel_button = CustomButton("Cancel")
+        cancel_button.clicked.connect(self.cancel)
 
         buttons = QWidget()
         buttons_layout = QHBoxLayout()
@@ -361,7 +387,7 @@ class LoadingDialog(NeVerDialog):
         self.setWindowTitle("Wait...")
 
         # Set content label
-        message_label = QLabel(self.content)
+        message_label = CustomLabel(self.content)
         message_label.setStyleSheet(style.LOADING_LABEL_STYLE)
 
         # Set loading bar
@@ -404,33 +430,30 @@ class GenericDatasetDialog(NeVerDialog):
                        "data_type": float,
                        "delimiter": ","}
 
-        target_label = QLabel("Target index")
-        target_label.setStyleSheet(style.PARAM_LABEL_STYLE)
-        target_edit = QLineEdit()
+        target_label = CustomLabel("Target index")
+        target_edit = CustomTextBox()
         target_edit.textChanged.connect(lambda: self.update_dict("target_idx", target_edit.text()))
         self.layout.addWidget(target_label, 0, 0)
         self.layout.addWidget(target_edit, 0, 1)
 
-        data_type_label = QLabel("Data type")
-        data_type_label.setStyleSheet(style.PARAM_LABEL_STYLE)
-        data_type_edit = QLineEdit()
+        data_type_label = CustomLabel("Data type")
+        data_type_edit = CustomTextBox()
         data_type_edit.setText("float")
         data_type_edit.textChanged.connect(lambda: self.update_dict("data_type", data_type_edit.text()))
         self.layout.addWidget(data_type_label, 1, 0)
         self.layout.addWidget(data_type_edit, 1, 1)
 
-        delimiter_label = QLabel("Delimiter character")
-        delimiter_label.setStyleSheet(style.PARAM_LABEL_STYLE)
-        delimiter_edit = QLineEdit()
+        delimiter_label = CustomLabel("Delimiter character")
+        delimiter_edit = CustomTextBox()
         delimiter_edit.setText(",")
         delimiter_edit.textChanged.connect(lambda: self.update_dict("delimiter", delimiter_edit.text()))
         self.layout.addWidget(delimiter_label, 2, 0)
         self.layout.addWidget(delimiter_edit, 2, 1)
 
         # Buttons
-        ok_btn = QPushButton("Ok")
+        ok_btn = CustomButton("Ok")
         ok_btn.clicked.connect(self.ok)
-        cancel_btn = QPushButton("Cancel")
+        cancel_btn = CustomButton("Cancel")
         cancel_btn.clicked.connect(self.exit)
         self.layout.addWidget(ok_btn, 3, 0)
         self.layout.addWidget(cancel_btn, 3, 1)
@@ -460,18 +483,17 @@ class MixedVerificationDialog(NeVerDialog):
         self.layout = QGridLayout()
         self.n_neurons = 0
 
-        target_label = QLabel("Neurons number")
-        target_label.setStyleSheet(style.PARAM_LABEL_STYLE)
-        target_edit = QLineEdit()
+        target_label = CustomLabel("Neurons number")
+        target_edit = CustomTextBox()
         target_edit.textChanged.connect(lambda: self.update_neurons(target_edit.text()))
         target_edit.setValidator(ArithmeticValidator.INT)
         self.layout.addWidget(target_label, 0, 0)
         self.layout.addWidget(target_edit, 0, 1)
 
         # Buttons
-        ok_btn = QPushButton("Ok")
+        ok_btn = CustomButton("Ok")
         ok_btn.clicked.connect(self.ok)
-        cancel_btn = QPushButton("Cancel")
+        cancel_btn = CustomButton("Cancel")
         cancel_btn.clicked.connect(self.exit)
         self.layout.addWidget(ok_btn, 1, 0)
         self.layout.addWidget(cancel_btn, 1, 1)
@@ -498,22 +520,21 @@ class EditNodeInputDialog(NeVerDialog):
         # Connect node
         self.node = node_block
         self.new_in_dim = ','.join(map(str, node_block.in_dim))
-        self.in_dim_box = QLineEdit()
+        self.in_dim_box = CustomTextBox()
         self.has_edits = False
 
         # Build main_layout
-        title_label = QLabel("Edit network input")
+        title_label = CustomLabel("Edit network input")
         title_label.setStyleSheet(style.NODE_LABEL_STYLE)
         title_label.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(title_label, 0, 0, 1, 2)
 
         # Input box
-        in_dim_label = QLabel("Input shape")
+        in_dim_label = CustomLabel("Input shape")
         in_dim_label.setStyleSheet(style.IN_DIM_LABEL_STYLE)
         in_dim_label.setAlignment(Qt.AlignRight)
         self.layout.addWidget(in_dim_label, 1, 0)
 
-        self.in_dim_box.setStyleSheet(style.VALUE_LABEL_STYLE)
         self.in_dim_box.setText(self.new_in_dim)
         self.in_dim_box.setValidator(ArithmeticValidator.TENSOR)
 
@@ -523,15 +544,13 @@ class EditNodeInputDialog(NeVerDialog):
             self.in_dim_box.setReadOnly(True)
 
         # "Apply" button which saves changes
-        apply_button = QPushButton("Apply")
-        apply_button.setStyleSheet(style.BUTTON_STYLE)
-        apply_button.clicked.connect(lambda: self.save_data())
+        apply_button = CustomButton("Apply")
+        apply_button.clicked.connect(self.save_data)
         self.layout.addWidget(apply_button, 2, 0)
 
         # "Cancel" button which closes the dialog without saving
-        cancel_button = QPushButton("Cancel")
-        cancel_button.setStyleSheet(style.BUTTON_STYLE)
-        cancel_button.clicked.connect(lambda: self.close())
+        cancel_button = CustomButton("Cancel")
+        cancel_button.clicked.connect(self.close)
         self.layout.addWidget(cancel_button, 2, 1)
 
         self.layout.setColumnStretch(0, 1)
@@ -566,7 +585,7 @@ class EditNodeDialog(NeVerDialog):
         display and their types.
     parameters: dict
         Dictionary which connects the name of each parameter to its editable
-        field, which can be a QLineEdit or a QComboBox.
+        field, which can be a CustomTextBox or a CustomComboBox.
     edited_data: dict
         Dictionary which contains the edited parameters of the node.
     has_edits: bool
@@ -593,19 +612,18 @@ class EditNodeDialog(NeVerDialog):
         self.has_edits = False
 
         # Build main_layout
-        title_label = QLabel("Edit parameters")
+        title_label = CustomLabel("Edit parameters")
         title_label.setStyleSheet(style.NODE_LABEL_STYLE)
         title_label.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(title_label, 0, 0, 1, 2)
 
         # Input box
-        in_dim_label = QLabel("Input")
+        in_dim_label = CustomLabel("Input")
         in_dim_label.setStyleSheet(style.IN_DIM_LABEL_STYLE)
         in_dim_label.setAlignment(Qt.AlignRight)
         self.layout.addWidget(in_dim_label, 1, 0)
 
-        in_dim_box = QLineEdit()
-        in_dim_box.setStyleSheet(style.VALUE_LABEL_STYLE)
+        in_dim_box = CustomTextBox()
         in_dim_box.setText(','.join(map(str, node_block.in_dim)))
         in_dim_box.setValidator(ArithmeticValidator.TENSOR)
 
@@ -621,15 +639,13 @@ class EditNodeDialog(NeVerDialog):
             counter = self.append_node_params(node_block.node, node_block.block_data)
 
         # "Apply" button which saves changes
-        apply_button = QPushButton("Apply")
-        apply_button.setStyleSheet(style.BUTTON_STYLE)
-        apply_button.clicked.connect(lambda: self.save_data())
+        apply_button = CustomButton("Apply")
+        apply_button.clicked.connect(self.save_data)
         self.layout.addWidget(apply_button, counter, 0)
 
         # "Cancel" button which closes the dialog without saving
-        cancel_button = QPushButton("Cancel")
-        cancel_button.setStyleSheet(style.BUTTON_STYLE)
-        cancel_button.clicked.connect(lambda: self.close())
+        cancel_button = CustomButton("Cancel")
+        cancel_button.clicked.connect(self.close)
         self.layout.addWidget(cancel_button, counter, 1)
 
         self.layout.setColumnStretch(0, 1)
@@ -661,24 +677,22 @@ class EditNodeDialog(NeVerDialog):
 
         # Display parameter labels
         for param, value in node.param.items():
-            param_label = QLabel(param)
-            if param in UNEDITABLE:
+            param_label = CustomLabel(param)
+            if node.param[param]["editable"] == "false":
                 param_label.setStyleSheet(style.UNEDITABLE_PARAM_LABEL_STYLE)
-            else:
-                param_label.setStyleSheet(style.PARAM_LABEL_STYLE)
 
             param_label.setAlignment(Qt.AlignRight)
             self.layout.addWidget(param_label, counter, 0)
 
             # Display parameter values
             if value["type"] == "boolean":
-                line = QComboBox()
+                line = CustomComboBox()
                 line.addItem("True")
                 line.addItem("False")
                 line.setPlaceholderText(str(current_data[param]))
             else:
-                line = QLineEdit()
-                if param in UNEDITABLE:
+                line = CustomTextBox()
+                if node.param[param]["editable"] == "false":
                     line.setReadOnly(True)
                 if isinstance(current_data[param], Tensor) or isinstance(current_data[param], np.ndarray):
                     line.setText("(" + ','.join(map(str, current_data[param].shape)) + ")")
@@ -703,13 +717,11 @@ class EditNodeDialog(NeVerDialog):
             line.setToolTip("<" + value["type"] + ">: "
                             + value["description"])
 
-            if param in UNEDITABLE:
+            if node.param[param]["editable"] == "false":
                 line.setStyleSheet(style.UNEDITABLE_VALUE_LABEL_STYLE)
-            else:
-                line.setStyleSheet(style.VALUE_LABEL_STYLE)
             self.layout.addWidget(line, counter, 1)
 
-            # Keep trace of QLineEdit objects
+            # Keep trace of CustomTextBox objects
             self.parameters[param] = line
             counter += 1
 
@@ -726,7 +738,7 @@ class EditNodeDialog(NeVerDialog):
 
         for key, line in self.parameters.items():
             try:
-                if type(line) == QLineEdit:
+                if type(line) == CustomTextBox:
                     if line.isModified() and len(line.text()) != 0:
                         if key == "in_dim":
                             self.edited_data["in_dim"] = tuple(
@@ -749,7 +761,7 @@ class EditNodeDialog(NeVerDialog):
                                 self.edited_data[key] = u.text_to_tensor_set(
                                     line.text())
 
-                elif type(line) == QComboBox:
+                elif type(line) == CustomComboBox:
                     if line.currentText() == "True":
                         self.edited_data[key] = True
                     else:
@@ -774,7 +786,7 @@ class EditSmtPropertyDialog(NeVerDialog):
         Current property to edit.
     new_property : str
         New SMT-LIB property string.
-    smt_box : QPlainTextEdit
+    smt_box : CustomTextArea
         Input box.
     has_edits : bool
         Flag signaling if the property was edited.
@@ -794,31 +806,28 @@ class EditSmtPropertyDialog(NeVerDialog):
         self.layout = QGridLayout()
 
         # Build main_layout
-        title_label = QLabel("SMT property")
+        title_label = CustomLabel("SMT property")
         title_label.setStyleSheet(style.NODE_LABEL_STYLE)
         title_label.setAlignment(Qt.AlignCenter)
         self.layout.addWidget(title_label, 0, 0, 1, 2)
 
         # Input box
-        smt_label = QLabel("SMT-LIB definition")
+        smt_label = CustomLabel("SMT-LIB definition")
         smt_label.setStyleSheet(style.IN_DIM_LABEL_STYLE)
         smt_label.setAlignment(Qt.AlignRight)
         self.layout.addWidget(smt_label, 1, 0)
 
-        self.smt_box = QPlainTextEdit()
-        self.smt_box.setStyleSheet(style.VALUE_LABEL_STYLE)
+        self.smt_box = CustomTextArea()
         self.smt_box.insertPlainText(self.new_property)
         self.layout.addWidget(self.smt_box, 1, 1)
 
         # "Apply" button which saves changes
-        apply_button = QPushButton("Apply")
-        apply_button.setStyleSheet(style.BUTTON_STYLE)
+        apply_button = CustomButton("Apply")
         apply_button.clicked.connect(self.save_data)
         self.layout.addWidget(apply_button, 2, 0)
 
         # "Cancel" button which closes the dialog without saving
-        cancel_button = QPushButton("Cancel")
-        cancel_button.setStyleSheet(style.BUTTON_STYLE)
+        cancel_button = CustomButton("Cancel")
         cancel_button.clicked.connect(self.close)
         self.layout.addWidget(cancel_button, 2, 1)
 
@@ -861,67 +870,61 @@ class EditPolyhedralPropertyDialog(NeVerDialog):
         self.property_block = property_block
         self.has_edits = False
         self.property_list = []
-        self.viewer = QPlainTextEdit()
+        self.viewer = CustomTextArea()
         self.viewer.setReadOnly(True)
         self.viewer.setFixedHeight(100)
         grid = QGridLayout()
 
         # Build main_layout
-        title_label = QLabel("Polyhedral property")
+        title_label = CustomLabel("Polyhedral property")
         title_label.setStyleSheet(style.NODE_LABEL_STYLE)
         title_label.setAlignment(Qt.AlignCenter)
         grid.addWidget(title_label, 0, 0, 1, 3)
 
         # Labels
-        var_label = QLabel("Variable")
+        var_label = CustomLabel("Variable")
         var_label.setStyleSheet(style.IN_DIM_LABEL_STYLE)
         var_label.setAlignment(Qt.AlignRight)
         grid.addWidget(var_label, 1, 0)
 
-        relop_label = QLabel("Operator")
+        relop_label = CustomLabel("Operator")
         relop_label.setStyleSheet(style.IN_DIM_LABEL_STYLE)
         relop_label.setAlignment(Qt.AlignCenter)
         grid.addWidget(relop_label, 1, 1)
 
-        value_label = QLabel("Value")
+        value_label = CustomLabel("Value")
         value_label.setStyleSheet(style.IN_DIM_LABEL_STYLE)
         value_label.setAlignment(Qt.AlignLeft)
         grid.addWidget(value_label, 1, 2)
 
-        self.var_cb = QComboBox()
+        self.var_cb = CustomComboBox()
         for v in property_block.variables:
             self.var_cb.addItem(v)
-        self.var_cb.setStyleSheet(style.VALUE_LABEL_STYLE)
         grid.addWidget(self.var_cb, 2, 0)
 
-        self.op_cb = QComboBox()
+        self.op_cb = CustomComboBox()
         operators = ["<=", "<", ">", ">="]
         for o in operators:
             self.op_cb.addItem(o)
-        self.op_cb.setStyleSheet(style.VALUE_LABEL_STYLE)
         grid.addWidget(self.op_cb, 2, 1)
 
-        self.val = QLineEdit()
-        self.val.setStyleSheet(style.VALUE_LABEL_STYLE)
+        self.val = CustomTextBox()
         self.val.setValidator(ArithmeticValidator.FLOAT)
         grid.addWidget(self.val, 2, 2)
 
         # "Add" button which adds the constraint
-        add_button = QPushButton("Add")
-        add_button.setStyleSheet(style.BUTTON_STYLE)
+        add_button = CustomButton("Add")
         add_button.clicked.connect(
             lambda: self.add_entry(str(self.var_cb.currentText()), str(self.op_cb.currentText()), self.val.text()))
         grid.addWidget(add_button, 3, 0)
 
         # "Save" button which saves the state
-        save_button = QPushButton("Save")
-        save_button.setStyleSheet(style.BUTTON_STYLE)
+        save_button = CustomButton("Save")
         save_button.clicked.connect(self.save_property)
         grid.addWidget(save_button, 3, 1)
 
         # "Cancel" button which closes the dialog without saving
-        cancel_button = QPushButton("Cancel")
-        cancel_button.setStyleSheet(style.BUTTON_STYLE)
+        cancel_button = CustomButton("Cancel")
         cancel_button.clicked.connect(self.close)
         grid.addWidget(cancel_button, 3, 2)
 

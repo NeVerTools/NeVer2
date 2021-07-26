@@ -56,11 +56,11 @@
   },
   "View": {
     "Zoom in": {
-      "Shortcut": "Ctrl+",
+      "Shortcut": "Ctrl++",
       "checkable": "False"
     },
     "Zoom out": {
-      "Shortcut": "Ctrl-",
+      "Shortcut": "Ctrl+-",
       "checkable": "False"
     },
     "Dimensions": {

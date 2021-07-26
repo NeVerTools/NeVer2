@@ -4,11 +4,12 @@ from typing import Optional
 
 from PyQt5 import QtCore, QtWidgets, QtGui
 from PyQt5.QtCore import Qt
-from PyQt5.QtWidgets import QStatusBar, QAction, QLabel, QGraphicsRectItem, QPushButton
+from PyQt5.QtWidgets import QStatusBar, QAction, QGraphicsRectItem, QPushButton
 
 import never2.view.styles as style
 from never2.view.drawing.element import GraphicLine, NodeBlock
 from never2.view.drawing.scene import DrawingMode, Canvas
+from never2.view.widget.custom import CustomLabel
 from never2.view.widget.dialog.dialogs import ConfirmDialog, MessageDialog, MessageType, HelpDialog
 from never2.view.widget.toolbar import BlocksToolbar, NodeButton, PropertyButton
 from never2.view.widget.toolbar import ParamToolbar
@@ -86,9 +87,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.status_bar.setSizeGripEnabled(False)
         self.setStatusBar(self.status_bar)
         self.status_bar.setStyleSheet(style.STATUS_BAR_STYLE)
-        self.status_bar_mode_label = QLabel()
+        self.status_bar_mode_label = CustomLabel()
         self.status_bar_mode_label.setStyleSheet(style.STATUS_BAR_WIDGET_STYLE)
-        self.status_bar_selections_label = QLabel()
+        self.status_bar_selections_label = CustomLabel()
         self.status_bar_selections_label.setStyleSheet(style.STATUS_BAR_WIDGET_STYLE)
         self.status_bar.addPermanentWidget(self.status_bar_selections_label)
         self.status_bar.addPermanentWidget(self.status_bar_mode_label)
@@ -172,7 +173,8 @@ class MainWindow(QtWidgets.QMainWindow):
         actions_dict["Edit:Delete"].triggered.connect(lambda: self.canvas.delete_selected())
         actions_dict["Edit:Clear canvas"].triggered.connect(lambda: self.clear())
         actions_dict["Edit:Draw connection"].triggered.connect(lambda: self.change_draw_mode(DrawingMode.DRAW_LINE))
-        actions_dict["Edit:Edit node"].triggered.connect(lambda: self.canvas.scene.edit_node(self.edit_action_validation()))
+        actions_dict["Edit:Edit node"].triggered.connect(
+            lambda: self.canvas.scene.edit_node(self.edit_action_validation()))
 
         actions_dict["View:Zoom in"].triggered.connect(lambda: self.canvas.zoom_in())
         actions_dict["View:Zoom out"].triggered.connect(lambda: self.canvas.zoom_out())

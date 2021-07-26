@@ -2,13 +2,13 @@ import json
 
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QIcon
-from PyQt5.QtWidgets import QDockWidget, QScrollArea, QSizePolicy, QWidget, QVBoxLayout, QLabel, QHBoxLayout, \
-    QPushButton
+from PyQt5.QtWidgets import QDockWidget, QScrollArea, QSizePolicy, QWidget, QVBoxLayout, QHBoxLayout
 from PyQt5.QtWidgets import QToolBar, QToolButton
 
 import never2.view.styles as style
 from never2.core.model.network import NetworkNode
 from never2.view.drawing.element import NodeBlock
+from never2.view.widget.custom import CustomLabel, CustomButton
 
 
 class ParamToolbar(QDockWidget):
@@ -82,25 +82,25 @@ class BlockInspector(QWidget):
     ----------
     layout : QVBoxLayout
         Vertical main_layout of the widget.
-    title_label : QLabel
+    title_label : CustomLabel
         Title of the widget.
-    description_label : QLabel
+    description_label : CustomLabel
         Description of the block.
     parameters : QWidget
         Container of parameters.
-    parameters_label : QLabel
+    parameters_label : CustomLabel
         Label of parameters.
     parameters_layout : QVBoxLayout
         Vertical main_layout of parameters.
     inputs : QWidget
         Container of inputs.
-    inputs_label : QLabel
+    inputs_label : CustomLabel
         Label of inputs.
     inputs_layout : QVBoxLayout
         Vertical main_layout of inputs.
     outputs : QWidget
         Container of outputs.
-    outputs_label : QLabel
+    outputs_label : CustomLabel
         Label of outputs.
     outputs_layout : QVBoxLayout
         Vertical main_layout of outputs.
@@ -119,12 +119,12 @@ class BlockInspector(QWidget):
                            QSizePolicy.Maximum)
 
         # Widget title
-        self.title_label = QLabel()
+        self.title_label = CustomLabel()
         self.title_label.setStyleSheet(style.TITLE_LABEL_STYLE)
         self.title_label.setText(block.block_id + ":" + block.node.name)
 
         # NodeBlock description
-        self.description_label = QLabel()
+        self.description_label = CustomLabel()
         self.description_label.setStyleSheet(style.DESCRIPTION_STYLE)
         self.description_label.setWordWrap(True)
         self.description_label.setAlignment(Qt.AlignLeft)
@@ -134,7 +134,7 @@ class BlockInspector(QWidget):
 
         # Parameters section
         if block.node.param:
-            self.parameters_label = QLabel("Parameters")
+            self.parameters_label = CustomLabel("Parameters")
             self.parameters_label.setStyleSheet(style.NODE_LABEL_STYLE)
             self.parameters = QWidget()
             self.parameters_layout = QVBoxLayout()
@@ -147,7 +147,7 @@ class BlockInspector(QWidget):
 
         # Inputs section
         if block.node.input:
-            self.inputs_label = QLabel("Input")
+            self.inputs_label = CustomLabel("Input")
             self.inputs_label.setStyleSheet(style.NODE_LABEL_STYLE)
             self.inputs = QWidget()
             self.inputs_layout = QVBoxLayout()
@@ -160,7 +160,7 @@ class BlockInspector(QWidget):
 
         # Outputs section
         if block.node.output:
-            self.outputs_label = QLabel("Output")
+            self.outputs_label = CustomLabel("Output")
             self.outputs_label.setStyleSheet(style.NODE_LABEL_STYLE)
             self.outputs = QWidget()
             self.outputs_layout = QVBoxLayout()
@@ -203,15 +203,15 @@ class DropDownLabel(QWidget):
         parameter.
     top_layout : QHBoxLayout
         Horizontal main_layout of the top of the widget.
-    name_label : QLabel
+    name_label : CustomLabel
         Id and type of the object.
-    type_label : QLabel
+    type_label : CustomLabel
         Object type.
-    default_label : QLabel
+    default_label : CustomLabel
         Eventual default value.
-    down_button : QPushButton
+    down_button : CustomButton
         Arrow button to show/hide the description of the parameter.
-    description : QLabel
+    description : CustomLabel
         Description of the parameter.
 
     Methods
@@ -238,32 +238,32 @@ class DropDownLabel(QWidget):
         self.top_layout.setContentsMargins(0, 0, 0, 0)
         self.top.setLayout(self.top_layout)
 
-        self.name_label = QLabel(name)
+        self.name_label = CustomLabel(name)
         self.name_label.setAlignment(Qt.AlignLeft)
         self.name_label.setStyleSheet(style.DROPDOWN_NAME_STYLE)
         self.top_layout.addWidget(self.name_label, Qt.AlignLeft)
 
-        self.type_label = QLabel(parameters["type"])
+        self.type_label = CustomLabel(parameters["type"])
         self.type_label.setAlignment(Qt.AlignLeft)
         self.type_label.setToolTip("Type")
         self.type_label.setStyleSheet(style.DROPDOWN_TYPE_STYLE)
         self.top_layout.addWidget(self.type_label, Qt.AlignLeft)
 
         if "default" in parameters:
-            self.default_label = QLabel(parameters["default"])
+            self.default_label = CustomLabel(parameters["default"])
             self.default_label.setStyleSheet(style.DROPDOWN_DEFAULT_STYLE)
             self.default_label.setToolTip("Default value")
             self.default_label.setAlignment(Qt.AlignCenter)
             self.top_layout.addWidget(self.default_label, Qt.AlignRight)
 
-        self.down_button = QPushButton("\u25bc")
+        self.down_button = CustomButton("\u25bc")
         self.down_button.setStyleSheet(style.DROPDOWN_ARROW_STYLE)
         self.down_button.clicked.connect(lambda: self.__toggle_visibility())
         self.top_layout.addWidget(self.down_button, Qt.AlignRight)
 
         self.layout.addWidget(self.top)
 
-        self.description = QLabel(parameters["description"])
+        self.description = CustomLabel(parameters["description"])
         self.description.setSizePolicy(QSizePolicy.Minimum,
                                        QSizePolicy.Maximum)
         self.description.setWordWrap(True)
@@ -286,7 +286,7 @@ class DropDownLabel(QWidget):
             self.down_button.setText("\u25bc")
 
 
-class NodeButton(QPushButton):
+class NodeButton(CustomButton):
     """
     Graphical button that carries information related to a type of node.
 
@@ -306,7 +306,7 @@ class NodeButton(QPushButton):
         super(NodeButton, self).__init__(name)
 
 
-class PropertyButton(QPushButton):
+class PropertyButton(CustomButton):
     """
     Graphic button that carries information related to a property.
 
@@ -338,18 +338,18 @@ class BlocksToolbar(QToolBar):
     properties : dict
         Dictionary of properties connecting each property name with a NetworkProperty.
     f_buttons : dict
-        Dictionary of buttons connecting a function name to a QPushButton.
+        Dictionary of buttons connecting a function name to a CustomButton.
     b_buttons : dict
-        Dictionary connecting each block name to a QPushButton, which
+        Dictionary connecting each block name to a CustomButton, which
         makes the corresponding node appear.
     p_buttons : dict
-        Dictionary connecting each property name to a QPushButton, which
+        Dictionary connecting each property name to a CustomButton, which
         makes the corresponding property appear.
-    toolbar_tools_label : QLabel
+    toolbar_tools_label : CustomLabel
         Label of the toolbar introducing tools.
-    toolbar_blocks_label : QLabel
+    toolbar_blocks_label : CustomLabel
         Label of the toolbar introducing blocks types.
-    toolbar_properties_label : QLabel
+    toolbar_properties_label : CustomLabel
         Label of the toolbar introducing property names.
     isToolbar_tools_label_visible : bool
         Tells if the tools button are visible in the toolbar.
@@ -361,7 +361,7 @@ class BlocksToolbar(QToolBar):
     Methods
     ----------
     __display_tools()
-        This method displays on the toolbar the QPushButtons related to
+        This method displays on the toolbar the CustomButtons related to
         available tools.
     __init_blocks()
         This method reads from file all types of blocks storing them.
@@ -372,9 +372,9 @@ class BlocksToolbar(QToolBar):
         This method changes the visibility of the tools section of the toolbar.
     change_blocks_mode()
         This method changes the visibility of the blocks section of the toolbar.
-    show_section(QLabel, dict)
+    show_section(CustomLabel, dict)
         This method shows the given objects.
-    hide_section(QLabel, dict)
+    hide_section(CustomLabel, dict)
         This method hides the given objects.
 
     """
@@ -392,9 +392,9 @@ class BlocksToolbar(QToolBar):
         self.p_buttons = dict()
 
         # Labels
-        self.toolbar_tools_label = QLabel("Tools")
-        self.toolbar_blocks_label = QLabel("Nodes")
-        self.toolbar_properties_label = QLabel("Properties")
+        self.toolbar_tools_label = CustomLabel("Tools")
+        self.toolbar_blocks_label = CustomLabel("Nodes")
+        self.toolbar_properties_label = CustomLabel("Properties")
         self.isToolbar_tools_label_visible = True
         self.isToolbar_blocks_label_visible = True
         self.isToolbar_properties_label_visible = True
@@ -431,7 +431,6 @@ class BlocksToolbar(QToolBar):
                                          b["output"], b["description"])
             button = NodeButton(k, self.blocks[k])
             button.setToolTip(b["description"])
-            button.setStyleSheet(style.BUTTON_STYLE)
             self.b_buttons[k] = button
 
     def __init_properties(self):
@@ -440,7 +439,6 @@ class BlocksToolbar(QToolBar):
         for k in props:
             button = PropertyButton(k)
             button.setToolTip(k)
-            button.setStyleSheet(style.BUTTON_STYLE)
             self.p_buttons[k] = button
 
     def __display_tools(self):
@@ -465,15 +463,13 @@ class BlocksToolbar(QToolBar):
         row_1.setLayout(row_1_layout)
 
         # DrawLine mode button
-        draw_line_button = QPushButton()
-        draw_line_button.setStyleSheet(style.BUTTON_STYLE)
+        draw_line_button = CustomButton()
         draw_line_button.setIcon(QIcon("never2/res/icons/line.png"))
         draw_line_button.setFixedSize(40, 40)
         draw_line_button.setToolTip("Draw line")
 
         # Insert block button
-        insert_block_button = QPushButton()
-        insert_block_button.setStyleSheet(style.BUTTON_STYLE)
+        insert_block_button = CustomButton()
         insert_block_button.setIcon(QIcon("never2/res/icons/insert.png"))
         insert_block_button.setFixedSize(40, 40)
         insert_block_button.setToolTip("Insert block in edge")
@@ -562,13 +558,13 @@ class BlocksToolbar(QToolBar):
                 self.hide()
 
     @staticmethod
-    def show_section(label: QLabel, buttons: dict):
+    def show_section(label: CustomLabel, buttons: dict):
         """
         This method shows the given dictionary of buttons with its label.
 
         Parameters
         ----------
-        label: QLabel
+        label: CustomLabel
         buttons: dict
 
         """
@@ -577,17 +573,15 @@ class BlocksToolbar(QToolBar):
         label.setStyleSheet(style.NODE_LABEL_STYLE)
         for tool in buttons.values():
             tool.show()
-            if type(tool) is NodeButton:
-                tool.setStyleSheet(style.BUTTON_STYLE)
 
     @staticmethod
-    def hide_section(label: QLabel, buttons: dict):
+    def hide_section(label: CustomLabel, buttons: dict):
         """
         This method hides the given dictionary of buttons with its label.
 
         Parameters
         ----------
-        label: QLabel
+        label: CustomLabel
         buttons: dict
 
         """
