@@ -392,7 +392,7 @@
         "editable": "true"
       },
       "dilation": {
-        "type": "int",
+        "type": "list of ints",
         "description": "Dilation value along each spatial axis of filter. If not present, the dilation defaults to 1 along each spatial axis.",
         "required": "false",
         "default": "1",
