@@ -572,7 +572,6 @@ class EditNodeInputDialog(NeVerDialog):
         self.close()
 
 
-# deprecated
 class EditNodeDialog(NeVerDialog):
     """
     This dialog allows to edit the selected node in the canvas.
@@ -681,6 +680,9 @@ class EditNodeDialog(NeVerDialog):
                 param_label.setStyleSheet(style.UNEDITABLE_PARAM_LABEL_STYLE)
 
             param_label.setAlignment(Qt.AlignRight)
+            # Set the tooltip of the input with the description
+            param_label.setToolTip("<" + value["type"] + ">: "
+                                   + value["description"])
             self.layout.addWidget(param_label, counter, 0)
 
             # Display parameter values
@@ -711,10 +713,6 @@ class EditNodeDialog(NeVerDialog):
                 elif value["type"] == "list of Tensors":
                     validator = ArithmeticValidator.TENSOR_LIST
                 line.setValidator(validator)
-
-            # Set the tooltip of the input with the description
-            line.setToolTip("<" + value["type"] + ">: "
-                            + value["description"])
 
             if node.param[param]["editable"] == "false":
                 line.setStyleSheet(style.UNEDITABLE_VALUE_LABEL_STYLE)

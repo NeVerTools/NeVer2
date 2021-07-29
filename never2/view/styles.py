@@ -157,7 +157,7 @@ BUTTON_STYLE = ("NodeButton, QPushButton { "
                 "border: 2px solid " + GREY_1 + ";" +
                 "padding: 6px;"
                 "color: #CFCFCF;"
-                "font-family: consolas;"
+                "font-family: georgia;"
                 "border-radius: 5px;"
                 "margin: 2px;"
                 "}"
@@ -187,7 +187,7 @@ TITLE_LABEL_STYLE = ("color: white;"
                      "font-size: 15px;"
                      "margin-bottom: 3px;"
                      "font-weight: bold;"
-                     "font-family: consolas;"
+                     "font-family: georgia;"
                      "padding: 5px;"
                      "border-bottom: 2px solid " + GREY_2 + ";")
 
@@ -261,7 +261,7 @@ STATUS_BAR_STYLE = ("QStatusBar {"
                     "}")
 
 STATUS_BAR_WIDGET_STYLE = ("color: " + GREY_4 + ";" +
-                           "font-family: consolas;"
+                           "font-family: georgia;"
                            "padding: 1px;"
                            "border-right: 1px solid " + GREY_2)
 
@@ -282,7 +282,7 @@ CLOSE_BUTTON_STYLE = ("QPushButton {"
 PAR_NAME_LABEL = ("color: white;"
                   "background-color: " + GREY_2 + ";" +
                   "font-weight: bold;"
-                  "font-family: consolas;"
+                  "font-family: calibri;"
                   "font-size: 13px;"
                   "margin: 5px")
 
@@ -317,21 +317,21 @@ DROPDOWN_TOP_STYLE = ("padding: 0px;"
                       "vertical-align: center;")
 
 DROPDOWN_NAME_STYLE = ("color: white;"
-                       "font-family: consolas;"
+                       "font-family: georgia;"
                        "font-weight: bold;"
                        "padding-top: 2px;"
                        "text-transform: uppercase;"
                        "background-color: " + GREY_3 + ";")
 
 DROPDOWN_TYPE_STYLE = ("color: white;"
-                       "font-family: consolas;"
+                       "font-family: georgia;"
                        "height: auto;"
                        "padding: 0px;"
                        "max-width: 90%;")
 
 DROPDOWN_DEFAULT_STYLE = ("color: " + GREY_1 + ";" +
                           "background-color: " + GREEN_2 + ";" +
-                          "font-family: consolas;"
+                          "font-family: georgia;"
                           "max-width: 60%;"
                           "height: auto;"
                           "font-weight: bold;"
@@ -344,7 +344,7 @@ DROPDOWN_ARROW_STYLE = ("background-color: none;"
 
 """ LOADING DIALOG """
 LOADING_LABEL_STYLE = ("text-align: center;"
-                       "font-family: consolas;"
+                       "font-family: georgia;"
                        "color: white;")
 
 PROGRESS_BAR_STYLE = ("#ProgressBar {"

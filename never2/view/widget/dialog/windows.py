@@ -154,6 +154,9 @@ class TrainingWindow(NeVerWindow):
     nn : NeuralNetwork
         The current network used in the main window, to be
         trained with the parameters selected here.
+    is_nn_trained : bool
+        Flag signaling whether the training procedure succeeded
+        or not.
     dataset_path : str
         The dataset path to train the network.
     dataset_params : dict
@@ -184,6 +187,7 @@ class TrainingWindow(NeVerWindow):
 
         # Training elements
         self.nn = nn
+        self.is_nn_trained = False
         self.dataset_path = ""
         self.dataset_params = dict()
         self.dataset_transform = None
@@ -505,25 +509,44 @@ class TrainingWindow(NeVerWindow):
         else:
             metrics = None  # TODO which is MSE metric?
 
-        # Init train strategy
-        train_strategy = PytorchTraining(opt.Adam, opt_params,
-                                         loss,
-                                         self.params["Epochs"]["value"],
-                                         self.params["Validation percentage"]["value"],
-                                         self.params["Training batch size"]["value"],
-                                         self.params["Validation batch size"]["value"],
-                                         opt.lr_scheduler.ReduceLROnPlateau,
-                                         sched_params,
-                                         metrics,
-                                         cuda=self.params["Cuda"]["value"],
-                                         train_patience=self.params["Train patience"].get("value", None),
-                                         checkpoints_root=self.params["Checkpoints root"].get("value", ''),
-                                         verbose_rate=self.params["Verbosity level"].get("value", None))
-        try:
-            self.nn = train_strategy.train(self.nn, data)
-        except Exception:
-            self.nn = None
-            self.close()
+        # Checkpoint loading
+        checkpoint_path = None
+        for fname in os.listdir('.'):
+            if fname.endswith('.pth.tar'):
+                checkpoint_path = fname
+                break
+
+        start_epoch = 0
+        if checkpoint_path is not None:
+            checkpoint = torch.load(checkpoint_path)
+            start_epoch = checkpoint["epoch"]
+            if self.params["Epochs"]["value"] <= start_epoch:
+                start_epoch = -1
+                logger.info("Checkpoint already reached, no further training necessary")
+
+        if start_epoch > -1:
+            # Init train strategy
+            train_strategy = PytorchTraining(opt.Adam, opt_params,
+                                             loss,
+                                             self.params["Epochs"]["value"],
+                                             self.params["Validation percentage"]["value"],
+                                             self.params["Training batch size"]["value"],
+                                             self.params["Validation batch size"]["value"],
+                                             opt.lr_scheduler.ReduceLROnPlateau,
+                                             sched_params,
+                                             metrics,
+                                             cuda=self.params["Cuda"]["value"],
+                                             train_patience=self.params["Train patience"].get("value", None),
+                                             checkpoints_root=self.params["Checkpoints root"].get("value", ''),
+                                             verbose_rate=self.params["Verbosity level"].get("value", None))
+            try:
+                self.nn = train_strategy.train(self.nn, data)
+                self.is_nn_trained = True
+            except Exception as e:
+                self.nn = None
+                dialog = MessageDialog("Training error:\n" + str(e), MessageType.ERROR)
+                dialog.exec()
+                self.close()
 
         self.train_btn.setEnabled(False)
         self.cancel_btn.setText("Close")
