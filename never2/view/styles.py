@@ -63,7 +63,7 @@ NODE_TITLE_STYLE = ("QLabel {"
                     "background-color: " + BLUE_0 + ";" +
                     "margin-bottom: -5px;"  # Overwrites double margin
                     "padding: 7px;"
-                    "font-family: calibri;"
+                    "font-family: georgia;"
                     "font-size: 18px;"
                     "border-top-left-radius: 10px;"
                     "border-top-right-radius: 10px;"
@@ -90,7 +90,7 @@ PROPERTY_TITLE_STYLE = ("QLabel {"
                         "background-color: " + ORANGE_0 + ";" +
                         "margin-bottom: -5px;"
                         "padding: 7px;"
-                        "font-family: calibri;"
+                        "font-family: georgia;"
                         "font-size: 18px;"
                         "border-top-left-radius: 10px;"
                         "border-top-right-radius: 30px;"

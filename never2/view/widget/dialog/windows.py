@@ -210,6 +210,7 @@ class TrainingWindow(NeVerWindow):
 
         transform_layout = QHBoxLayout()
         self.widgets["transform"] = CustomComboBox()
+        self.widgets["transform"].addItem("ToTensor")
         self.widgets["transform"] \
             .addItem("Compose(ToTensor, Normalize(1, 0.5), Flatten)")
         self.widgets["transform"].setCurrentIndex(-1)
@@ -413,7 +414,9 @@ class TrainingWindow(NeVerWindow):
             self.dataset_params = dialog.params
 
     def setup_transform(self, sel_t: str) -> None:
-        if sel_t != '':
+        if sel_t == 'ToTensor':
+            self.dataset_transform = tr.Compose([tr.ToTensor()])
+        else:
             self.dataset_transform = tr.Compose([tr.ToTensor(),
                                                  tr.Normalize(1, 0.5),
                                                  tr.Lambda(lambda x: torch.flatten(x))])
@@ -495,8 +498,8 @@ class TrainingWindow(NeVerWindow):
 
         # Init loss function
         if self.loss_f == "Loss Function:Cross Entropy":
-            loss = fun.cross_entropy
-            loss.weight = self.gui_params["Loss Function:Cross Entropy"]["Weight"]["value"]
+            loss = torch.nn.CrossEntropyLoss()
+            # loss.weight = self.gui_params["Loss Function:Cross Entropy"]["Weight"]["value"]
             loss.ignore_index = self.gui_params["Loss Function:Cross Entropy"]["Ignore index"]["value"]
             loss.reduction = self.gui_params["Loss Function:Cross Entropy"]["Reduction"]["value"]
         else:
