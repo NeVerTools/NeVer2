@@ -427,7 +427,7 @@ class GenericDatasetDialog(NeVerDialog):
         self.layout = QGridLayout()
         self.params = {"target_idx": 0,
                        "data_type": float,
-                       "delimiter": ","}
+                       "delimiter": ','}
 
         target_label = CustomLabel("Target index")
         target_edit = CustomTextBox()
@@ -465,7 +465,8 @@ class GenericDatasetDialog(NeVerDialog):
             if key == "delimiter":
                 self.params[key] = value
             else:
-                self.params[key] = eval(value)
+                if value != '':
+                    self.params[key] = eval(value)
 
     def ok(self):
         self.close()
@@ -473,7 +474,7 @@ class GenericDatasetDialog(NeVerDialog):
     def exit(self):
         self.params = {"target_idx": 0,
                        "data_type": float,
-                       "delimiter": ","}
+                       "delimiter": ','}
         self.close()
 
 
