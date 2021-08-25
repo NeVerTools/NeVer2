@@ -431,14 +431,15 @@ class GenericDatasetDialog(NeVerDialog):
 
         target_label = CustomLabel("Target index")
         target_edit = CustomTextBox()
+        target_edit.setValidator(ArithmeticValidator.INT)
         target_edit.textChanged.connect(lambda: self.update_dict("target_idx", target_edit.text()))
         self.layout.addWidget(target_label, 0, 0)
         self.layout.addWidget(target_edit, 0, 1)
 
         data_type_label = CustomLabel("Data type")
-        data_type_edit = CustomTextBox()
-        data_type_edit.setText("float")
-        data_type_edit.textChanged.connect(lambda: self.update_dict("data_type", data_type_edit.text()))
+        data_type_edit = CustomComboBox()
+        data_type_edit.addItems(["float", "int"])
+        data_type_edit.activated.connect(lambda: self.update_dict("data_type", data_type_edit.currentText()))
         self.layout.addWidget(data_type_label, 1, 0)
         self.layout.addWidget(data_type_edit, 1, 1)
 
