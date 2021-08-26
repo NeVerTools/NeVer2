@@ -190,7 +190,7 @@ class TrainingWindow(NeVerWindow):
         self.is_nn_trained = False
         self.dataset_path = ""
         self.dataset_params = dict()
-        self.dataset_transform = None
+        self.dataset_transform = tr.Compose([])
         self.params = utility.read_json(ROOT_DIR + '/res/json/training.json')
         self.gui_params = dict()
         self.loss_f = ''
@@ -210,10 +210,7 @@ class TrainingWindow(NeVerWindow):
 
         transform_layout = QHBoxLayout()
         self.widgets["transform"] = CustomComboBox()
-        self.widgets["transform"].addItem("ToTensor")
-        self.widgets["transform"] \
-            .addItem("Compose(ToTensor, Normalize(1, 0.5), Flatten)")
-        self.widgets["transform"].setCurrentIndex(-1)
+        self.widgets["transform"].addItems(["No transform", "Convolutional MNIST", "Fully Connected MNIST"])
         self.widgets["transform"].activated \
             .connect(lambda: self.setup_transform(self.widgets["transform"].currentText()))
         transform_layout.addWidget(CustomLabel("Dataset transform"))
@@ -414,9 +411,11 @@ class TrainingWindow(NeVerWindow):
             self.dataset_params = dialog.params
 
     def setup_transform(self, sel_t: str) -> None:
-        if sel_t == 'ToTensor':
-            self.dataset_transform = tr.Compose([tr.ToTensor()])
-        else:
+        if sel_t == 'No transform':
+            self.dataset_transform = tr.Compose([])
+        elif sel_t == 'Convolutional MNIST':
+            self.dataset_transform = tr.Compose([tr.ToTensor(), tr.Normalize(1, 0.5)])
+        elif sel_t == 'Fully Connected MNIST':
             self.dataset_transform = tr.Compose([tr.ToTensor(),
                                                  tr.Normalize(1, 0.5),
                                                  tr.Lambda(lambda x: torch.flatten(x))])
