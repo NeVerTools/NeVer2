@@ -498,7 +498,8 @@ class TrainingWindow(NeVerWindow):
         # Init loss function
         if self.loss_f == "Loss Function:Cross Entropy":
             loss = torch.nn.CrossEntropyLoss()
-            # loss.weight = self.gui_params["Loss Function:Cross Entropy"]["Weight"]["value"]
+            if self.gui_params["Loss Function:Cross Entropy"]["Weight"]["value"] != '':
+                loss.weight = self.gui_params["Loss Function:Cross Entropy"]["Weight"]["value"]
             loss.ignore_index = self.gui_params["Loss Function:Cross Entropy"]["Ignore index"]["value"]
             loss.reduction = self.gui_params["Loss Function:Cross Entropy"]["Reduction"]["value"]
         else:
@@ -509,7 +510,8 @@ class TrainingWindow(NeVerWindow):
         if self.metric == "Metrics:Inaccuracy":
             metrics = PytorchMetrics.inaccuracy
         else:
-            metrics = None  # TODO which is MSE metric?
+            metrics = fun.mse_loss
+            metrics.reduction = self.gui_params["Metrics:MSE Loss"]["Reduction"]["value"]
 
         # Checkpoint loading
         checkpoint_path = None
