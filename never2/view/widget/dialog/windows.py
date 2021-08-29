@@ -514,15 +514,13 @@ class TrainingWindow(NeVerWindow):
             metrics.reduction = self.gui_params["Metrics:MSE Loss"]["Reduction"]["value"]
 
         # Checkpoint loading
-        checkpoint_path = None
-        for fname in os.listdir('.'):
-            if fname.endswith('.pth.tar'):
-                checkpoint_path = fname
-                break
+        checkpoints_path = self.params["Checkpoints root"].get("value", '') + self.nn.identifier + '.pth.tar'
+        if not os.path.isfile(checkpoints_path):
+            checkpoints_path = None
 
         start_epoch = 0
-        if checkpoint_path is not None:
-            checkpoint = torch.load(checkpoint_path)
+        if checkpoints_path is not None:
+            checkpoint = torch.load(checkpoints_path)
             start_epoch = checkpoint["epoch"]
             if self.params["Epochs"]["value"] <= start_epoch:
                 start_epoch = -1
@@ -546,6 +544,10 @@ class TrainingWindow(NeVerWindow):
             try:
                 self.nn = train_strategy.train(self.nn, data)
                 self.is_nn_trained = True
+
+                # Delete checkpoint if the network isn't saved
+                if self.nn.identifier == '':
+                    os.remove('.pth.tar')
             except Exception as e:
                 self.nn = None
                 dialog = MessageDialog("Training error:\n" + str(e), MessageType.ERROR)
