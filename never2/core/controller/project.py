@@ -17,9 +17,9 @@ from never2.view.widget.dialog.dialogs import MessageDialog, MessageType, InputD
 NETWORK_FORMATS_OPENING = "All supported formats (*.onnx *.pt *.pth);;\
                             ONNX(*.onnx);;\
                             PyTorch(*.pt *.pth)"
-NETWORK_FORMATS_SAVE = "VNNLIB (*.onnx + *.smt2);;\
-                        ONNX(*.onnx);;\
-                        PyTorch(*.pt *.pth)"
+NETWORK_FORMATS_SAVE = "ONNX(*.onnx);;\
+                        PyTorch(*.pt *.pth)\
+                        VNNLIB (*.onnx + *.smt2);;"
 PROPERTY_FORMATS = "SMT-LIB files (*.smt *.smt2);;\
                            SMT(*.smt *.smt2)"
 SUPPORTED_NETWORK_FORMATS = {'VNNLIB': ['vnnlib'],
@@ -154,6 +154,7 @@ class Project(QObject):
 
         if self.file_name != ("", ""):
             self.output_handler = OutputHandler()
+            self.network.identifier = self.file_name[0].split('/')[-1]
 
             # A  "wait cursor" appears locking the interface
             QApplication.setOverrideCursor(Qt.WaitCursor)
