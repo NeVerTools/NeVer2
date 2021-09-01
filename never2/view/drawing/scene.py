@@ -833,7 +833,8 @@ class Canvas(QWidget):
             window = TrainingWindow(self.renderer.NN)
             window.exec()
             if window.is_nn_trained:
-                dialog = FuncDialog("Save network?", self.project.save)
+                dialog = FuncDialog("Training completed. Weights and biases updated.\nSave network?",
+                                    self.project.save)
                 dialog.exec()
 
     def verify_network(self):
