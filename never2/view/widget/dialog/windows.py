@@ -406,9 +406,10 @@ class TrainingWindow(NeVerWindow):
             self.dataset_path = datapath[0]
 
             # Get additional parameters via dialog
-            dialog = GenericDatasetDialog()
-            dialog.exec()
-            self.dataset_params = dialog.params
+            if self.dataset_path != '':
+                dialog = GenericDatasetDialog()
+                dialog.exec()
+                self.dataset_params = dialog.params
 
     def setup_transform(self, sel_t: str) -> None:
         if sel_t == 'No transform':
