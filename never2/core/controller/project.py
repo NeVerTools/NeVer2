@@ -154,7 +154,7 @@ class Project(QObject):
 
         if self.file_name != ("", ""):
             self.output_handler = OutputHandler()
-            self.network.identifier = self.file_name[0].split('/')[-1]
+            self.network.identifier = self.file_name[0].split('/')[-1].split(".")[0]
 
             # A  "wait cursor" appears locking the interface
             QApplication.setOverrideCursor(Qt.WaitCursor)
@@ -240,11 +240,11 @@ class InputHandler:
 
         if self.extension in SUPPORTED_NETWORK_FORMATS['ONNX']:
             model_proto = onnx.load(path)
-            self.alt_repr = ONNXNetwork(net_id + "_onnx", model_proto, True)
+            self.alt_repr = ONNXNetwork(net_id, model_proto, True)
 
         elif self.extension in SUPPORTED_NETWORK_FORMATS['PyTorch']:
             module = torch.load(path)
-            self.alt_repr = PyTorchNetwork(net_id + "_pytorch", module, True)
+            self.alt_repr = PyTorchNetwork(net_id, module, True)
 
         # Convert the network
         if self.alt_repr is not None:
@@ -493,18 +493,18 @@ class OutputHandler:
         """
 
         # Getting the filename
-        net_id = filename.split("/")[-1]
+        net_id = filename.split("/")[-1].split(".")[0]
 
         if self.extension in SUPPORTED_NETWORK_FORMATS['ONNX'] or \
                 self.extension in SUPPORTED_NETWORK_FORMATS['VNNLIB']:
             self.strategy = ONNXConverter()
             model = self.strategy.from_neural_network(network)
-            self.alt_repr = ONNXNetwork(net_id + "_onnx", model, True)
+            self.alt_repr = ONNXNetwork(net_id, model, True)
 
         elif self.extension in SUPPORTED_NETWORK_FORMATS['PyTorch']:
             self.strategy = PyTorchConverter()
             self.alt_repr = self.strategy.from_neural_network(network)
-            self.alt_repr.identifier = net_id + "_pytorch"
+            self.alt_repr.identifier = net_id
             self.alt_repr.up_to_date = True
         else:
             raise Exception("Format not supported")
