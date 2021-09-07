@@ -336,12 +336,14 @@ class MainWindow(QtWidgets.QMainWindow):
                     self.update_status()
                     # A file is opened
                     self.canvas.project.open()
-                    self.setWindowTitle(self.SYSNAME + " - " + self.canvas.project.network.identifier)
+                    if self.canvas.project.network is not None:
+                        self.setWindowTitle(self.SYSNAME + " - " + self.canvas.project.network.identifier)
         else:
             # If the canvas was already empty, the opening function is directly
             # called
             self.canvas.project.open()
-            self.setWindowTitle(self.SYSNAME + " - " + self.canvas.project.network.identifier)
+            if self.canvas.project.network is not None:
+                self.setWindowTitle(self.SYSNAME + " - " + self.canvas.project.network.identifier)
 
     def save(self, _as: bool = True):
         """
