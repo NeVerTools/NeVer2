@@ -298,7 +298,7 @@ class InputHandler:
         properties = dict()
 
         for d in declarations:
-            var_list.append(str(d.args[0]))
+            var_list.append(str(d.args[0]).replace('\'', ''))
             varname = str(d.args[0]).split('_')[0].replace('\'', '')  # Variable format is <v_name>_<idx>
             if varname not in var_set:
                 var_set.append(varname)
