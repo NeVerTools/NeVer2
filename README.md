@@ -17,7 +17,7 @@ NeVer 2 can be executed on any system running Python >= 3.8. \
 The instructions below have been tested on Windows, 
 Ubuntu Linux and Mac OS x86 and ARM-based Mac OS.
 
-## Linux, Mac OS x86 & Windows
+* ### Linux, Mac OS x86 & Windows
 There is a number of Python packages required in order to
 run NeVer 2. All the following packages can be installed
 via PIP
@@ -32,7 +32,7 @@ After the installation, you can run NeVer 2 from the root directory
 python NeVer2/never2.py
 ```
 
-## ARM-based Mac OS
+* ### ARM-based Mac OS
 
 Since the Python packages needed are incompatible with "Python for ARM
 Platform" you can install [Anaconda](https://www.anaconda.com/) using
@@ -54,3 +54,14 @@ $ python NeVer2/never2.py
 
 Note that each time you want to run NeVer 2 you'll need to activate 
 the Conda environment.
+
+## Examples and tutorials
+
+We provide some tutorials for the construction, learning and 
+verification of networks thanks to Karim Pedemonte, Giacomo Rosato
+and Andrea Gimelli.
+
+* A [Convolutional Network](https://nevertools.github.io/tutorial_fmnist.html)
+for the fMNIST dataset
+* A [Fully Connected Network](https://nevertools.github.io/tutorial_fmnist.html) 
+for a robotics dataset.
