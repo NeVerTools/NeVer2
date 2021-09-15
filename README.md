@@ -63,5 +63,5 @@ and Andrea Gimelli.
 
 * A [Convolutional Network](https://nevertools.github.io/tutorial_fmnist.html)
 for the fMNIST dataset
-* A [Fully Connected Network](https://nevertools.github.io/tutorial_fmnist.html) 
+* A [Fully Connected Network](https://nevertools.github.io/tutorial_james.html) 
 for a robotics dataset.
