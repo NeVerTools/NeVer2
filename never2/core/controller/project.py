@@ -18,8 +18,8 @@ NETWORK_FORMATS_OPENING = "All supported formats (*.onnx *.pt *.pth);;\
                             ONNX(*.onnx);;\
                             PyTorch(*.pt *.pth)"
 NETWORK_FORMATS_SAVE = "ONNX(*.onnx);;\
-                        PyTorch(*.pt *.pth)\
-                        VNNLIB (*.onnx + *.smt2);;"
+                        PyTorch(*.pt *.pth);;\
+                        VNNLIB (*.onnx + *.smt2)"
 PROPERTY_FORMATS = "SMT-LIB files (*.smt *.smt2);;\
                            SMT(*.smt *.smt2)"
 SUPPORTED_NETWORK_FORMATS = {'VNNLIB': ['vnnlib'],

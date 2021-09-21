@@ -67,7 +67,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # Init window appearance
         self.SYSNAME = "NeVer 2"
         self.setWindowTitle(self.SYSNAME)
-        self.setWindowIcon(QtGui.QIcon(ROOT_DIR + '/res/icons/logo.svg'))
+        self.setWindowIcon(QtGui.QIcon(ROOT_DIR + '/res/icons/logo.png'))
         self.setStyleSheet("background-color: " + style.GREY_1)
 
         # Navigation menu
