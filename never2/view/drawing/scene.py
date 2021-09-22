@@ -536,7 +536,7 @@ class Canvas(QWidget):
         self.num_props += 1
         block.variables = self.get_input_variables()
         if add_dict_entry:
-            self.project.properties[f"PRE{self.num_props}"] = block
+            self.project.properties[f"{self.num_props - 1}Pr"] = block
         self.renderer.add_property_block(block)
 
         return block
