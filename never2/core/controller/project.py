@@ -243,7 +243,11 @@ class InputHandler:
             self.alt_repr = ONNXNetwork(net_id, model_proto, True)
 
         elif self.extension in SUPPORTED_NETWORK_FORMATS['PyTorch']:
-            module = torch.load(path)
+            if not torch.cuda.is_available():
+                module = torch.load(path, map_location=torch.device('cpu'))
+            else:
+                module = torch.load(path)
+
             self.alt_repr = PyTorchNetwork(net_id, module, True)
 
         # Convert the network
