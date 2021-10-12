@@ -153,6 +153,7 @@ class Canvas(QWidget):
         elif self.scene.mode == DrawingMode.DRAW_BLOCK:
             self.insert_node()
 
+    # TODO DEPRECATED, WILL BE REMOVED
     def insert_node(self):
         """
         This method inserts a block inside the network. The selected
@@ -282,7 +283,7 @@ class Canvas(QWidget):
                 else:
                     # If the edge is illegal for a legal network, it is removed
                     conn_nodes[2].remove_self()
-                    dialog = MessageDialog("Sequential network : illegal edge.",
+                    dialog = MessageDialog("Sequential network: illegal edge.",
                                            MessageType.ERROR)
                     dialog.exec()
             except Exception as e:
@@ -609,9 +610,13 @@ class Canvas(QWidget):
             if "in_dim" in edit_data.keys():
                 new_in_dim = edit_data["in_dim"]
 
-            # If in_dim changes to fully connected, update in_features
-            if block.node.name == "Fully Connected" and new_in_dim is not None:
+            # If in_dim changes in FC, update in_features
+            if block.node.name == 'Fully Connected' and new_in_dim is not None:
                 edit_data["in_features"] = new_in_dim[-1]
+
+            # If out_features changes in FC, update out_dim
+            if block.node.name == 'Fully Connected' and 'out_features' in edit_data.keys():
+                edit_data["out_dim"] = block.out_dim[:-1] + (edit_data["out_features"],)
 
             for block_par, info in block.node.param.items():
                 if "shape" in info:
@@ -632,7 +637,7 @@ class Canvas(QWidget):
             try:  # Check if the network has changed
                 self.renderer.edit_node(edit_node_id, edit_data)
             except Exception as e:
-                dialog = MessageDialog(str(e) + "\nChanges not applied.",
+                dialog = MessageDialog(str(e) + "\nImpossible to propagate changes.",
                                        MessageType.ERROR)
                 dialog.exec()
 

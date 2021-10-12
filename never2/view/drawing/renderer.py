@@ -367,10 +367,17 @@ class SequentialNetworkRenderer:
             True if the update has been done correctly, False otherwise.
 
         """
+
         in_dim = None
+        out_dim = None
+
         if "in_dim" in data.keys():
             in_dim = data["in_dim"]
             data.pop("in_dim")
+
+        if "out_dim" in data.keys():
+            out_dim = data["out_dim"]
+            data.pop("out_dim")
 
         # Copy current data
         old_data = copy.deepcopy(self.disconnected_network[block_id].block_data)
@@ -383,6 +390,8 @@ class SequentialNetworkRenderer:
 
         if in_dim is not None:
             self.disconnected_network[block_id].in_dim = in_dim
+        if out_dim is not None:
+            self.disconnected_network[block_id].out_dim = out_dim
 
         if block_id not in self.NN.nodes.keys():
             return False
@@ -392,6 +401,8 @@ class SequentialNetworkRenderer:
         try:
             if in_dim is not None:
                 NodeOps.update_node_input(node, in_dim)
+            if out_dim is not None:
+                node.out_dim = out_dim
 
             NodeOps.update_node_data(node, data)
 

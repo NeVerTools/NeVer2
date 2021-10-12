@@ -205,7 +205,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
         Parameters
         ----------
-        button : QPushButton
+        button : CustomButton
             The pressed button.
 
         """
@@ -213,8 +213,9 @@ class MainWindow(QtWidgets.QMainWindow):
         def pressed():
             if isinstance(button, NodeButton):
                 self.canvas.draw_node(button.node_type)
-            elif isinstance(button, PropertyButton) and self.canvas.project.network.nodes:
-                self.canvas.draw_property(button.name)
+            elif isinstance(button, PropertyButton):
+                if self.canvas.project.network.nodes:
+                    self.canvas.draw_property(button.name)
 
         return pressed
 
