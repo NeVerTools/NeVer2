@@ -125,7 +125,7 @@
       }
     }
   },
-  "Metrics": {
+  "Precision Metric": {
     "Inaccuracy": {},
     "MSE Loss": {
       "Reduction": {

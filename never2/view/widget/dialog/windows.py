@@ -132,8 +132,8 @@ class NeVerWindow(QtWidgets.QDialog):
                         self.widgets[first_level].setValidator(ArithmeticValidator.TENSOR)
 
             w_label = CustomLabel(first_level)
-            if 'optional' in widget_dict[first_level].keys():
-                w_label.setText(first_level + ' (opt)')
+            if 'optional' not in widget_dict[first_level].keys():
+                w_label.setText(first_level + '*')
             w_label.setToolTip(widget_dict[first_level].get("description"))
             left_layout.addWidget(w_label, counter, 0)
             left_layout.addWidget(self.widgets[first_level], counter, 1)
@@ -274,7 +274,7 @@ class TrainingWindow(NeVerWindow):
         self.clear_grid()
         if 'Loss Function' in caller:
             self.loss_f = caller
-        elif 'Metrics' in caller:
+        elif 'Precision Metric' in caller:
             self.metric = caller
 
         for first_level in self.params.keys():
@@ -298,7 +298,7 @@ class TrainingWindow(NeVerWindow):
 
         """
 
-        title = CustomLabel(name)
+        title = CustomLabel(name.replace(':', ': '))
         title.setAlignment(Qt.AlignCenter)
         self.grid_layout.addWidget(title, 0, 0, 1, 2)
         widgets_2level = dict()
@@ -460,7 +460,7 @@ class TrainingWindow(NeVerWindow):
             err_dialog = MessageDialog("No scheduler selected.", MessageType.ERROR)
         elif self.widgets["Loss Function"].currentIndex() == -1:
             err_dialog = MessageDialog("No loss function selected.", MessageType.ERROR)
-        elif self.widgets["Metrics"].currentIndex() == -1:
+        elif self.widgets["Precision Metric"].currentIndex() == -1:
             err_dialog = MessageDialog("No metrics selected.", MessageType.ERROR)
         elif "value" not in self.params["Epochs"].keys():
             err_dialog = MessageDialog("No epochs selected.", MessageType.ERROR)
@@ -508,11 +508,11 @@ class TrainingWindow(NeVerWindow):
             loss.reduction = self.gui_params["Loss Function:MSE Loss"]["Reduction"]["value"]
 
         # Init metrics
-        if self.metric == "Metrics:Inaccuracy":
+        if self.metric == "Precision Metric:Inaccuracy":
             metrics = PytorchMetrics.inaccuracy
         else:
             metrics = fun.mse_loss
-            metrics.reduction = self.gui_params["Metrics:MSE Loss"]["Reduction"]["value"]
+            metrics.reduction = self.gui_params["Precision Metric:MSE Loss"]["Reduction"]["value"]
 
         # Checkpoint loading
         checkpoints_path = self.params["Checkpoints root"].get("value", '') + self.nn.identifier + '.pth.tar'
