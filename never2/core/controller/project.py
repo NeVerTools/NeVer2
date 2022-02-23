@@ -236,7 +236,7 @@ class InputHandler:
 
         # Get extension
         self.extension = path.split(".")[-1]
-        net_id = path.split("/")[-1].split(".")[0]
+        net_id = path.split("/")[-1].replace(f".{self.extension}", '')
 
         if self.extension in SUPPORTED_NETWORK_FORMATS['ONNX']:
             model_proto = onnx.load(path)

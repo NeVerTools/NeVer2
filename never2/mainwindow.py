@@ -295,11 +295,13 @@ class MainWindow(QtWidgets.QMainWindow):
                 self.canvas.scene.has_changed_mode.connect(lambda: self.update_status())
                 self.canvas.scene.selectionChanged.connect(lambda: self.update_status())
                 self.update_status()
+                self.setWindowTitle(self.SYSNAME)
         else:
             self.canvas.clear_scene()
             self.canvas.scene.has_changed_mode.connect(lambda: self.update_status())
             self.canvas.scene.selectionChanged.connect(lambda: self.update_status())
             self.update_status()
+            self.setWindowTitle(self.SYSNAME)
 
     def reset(self):
         """
