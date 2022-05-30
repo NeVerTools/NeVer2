@@ -1,4 +1,5 @@
-from PyQt5.QtWidgets import QLabel, QComboBox, QLineEdit, QPlainTextEdit, QPushButton
+from PyQt5 import Qt
+from PyQt5.QtWidgets import QLabel, QComboBox, QLineEdit, QPlainTextEdit, QPushButton, QListWidget
 
 import never2.view.styles as style
 
@@ -22,7 +23,8 @@ class CustomComboBox(QComboBox):
 
 class CustomTextBox(QLineEdit):
     def __init__(self, text: str = '', color: str = style.WHITE):
-        super(CustomTextBox, self).__init__(text)
+        super(CustomTextBox, self).__init__()
+        self.setText(text)
         self.setStyleSheet("color: " + color + ";" +
                            "background-color: " + style.GREY_2 + ";" +
                            "border: none;" +
@@ -37,6 +39,19 @@ class CustomTextArea(QPlainTextEdit):
                            "border: none;" +
                            "padding: 2px;" +
                            "QPlainTextEdit::placeholder {" +
+                           "color: " + style.GREY_4 + ";" +
+                           "}")
+
+
+class CustomListBox(QListWidget):
+    def __init__(self, color: str = style.WHITE):
+        super(QListWidget, self).__init__()
+        self.setSelectionMode(Qt.QAbstractItemView.SelectionMode.SingleSelection)
+        self.setStyleSheet("color: " + color + ";" +
+                           "background-color: " + style.GREY_2 + ";" +
+                           "border: none;" +
+                           "padding: 2px;" +
+                           "QListWidget::placeholder {" +
                            "color: " + style.GREY_4 + ";" +
                            "}")
 

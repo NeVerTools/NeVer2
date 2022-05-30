@@ -20,7 +20,7 @@ from never2 import ROOT_DIR
 from never2.view.util import utility
 from never2.view.widget.custom import CustomLabel, CustomComboBox, CustomTextBox, CustomButton
 from never2.view.widget.dialog.dialogs import MessageDialog, MessageType, GenericDatasetDialog, ArithmeticValidator, \
-    MixedVerificationDialog
+    MixedVerificationDialog, ComposeTransformDialog
 from never2.view.widget.misc import LoggerTextBox
 
 
@@ -198,6 +198,11 @@ class TrainingWindow(NeVerWindow):
         self.grid_layout = QGridLayout()
 
         # Dataset
+        dt_label = CustomLabel("Dataset")
+        dt_label.setAlignment(Qt.AlignCenter)
+        dt_label.setStyleSheet(style.NODE_LABEL_STYLE)
+        self.layout.addWidget(dt_label)
+
         dataset_layout = QHBoxLayout()
         self.widgets["dataset"] = CustomComboBox()
         self.widgets["dataset"].addItems(["MNIST", "Fashion MNIST", "Custom data source..."])
@@ -210,7 +215,8 @@ class TrainingWindow(NeVerWindow):
 
         transform_layout = QHBoxLayout()
         self.widgets["transform"] = CustomComboBox()
-        self.widgets["transform"].addItems(["No transform", "Convolutional MNIST", "Fully Connected MNIST"])
+        self.widgets["transform"].addItems(["No transform", "Convolutional MNIST", "Fully Connected MNIST",
+                                            "Custom..."])
         self.widgets["transform"].activated \
             .connect(lambda: self.setup_transform(self.widgets["transform"].currentText()))
         transform_layout.addWidget(CustomLabel("Dataset transform"))
@@ -420,6 +426,10 @@ class TrainingWindow(NeVerWindow):
             self.dataset_transform = tr.Compose([tr.ToTensor(),
                                                  tr.Normalize(1, 0.5),
                                                  tr.Lambda(lambda x: torch.flatten(x))])
+        else:
+            dialog = ComposeTransformDialog()
+            dialog.exec()
+            self.dataset_transform = tr.Compose(dialog.trList)
 
     def load_dataset(self) -> Dataset:
         """

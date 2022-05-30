@@ -2,10 +2,12 @@ from enum import Enum
 from typing import Callable
 
 import numpy as np
+import torch
+import torchvision.transforms as tr
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import QRegExp, Qt, QSize
 from PyQt5.QtGui import QIntValidator, QRegExpValidator, QDoubleValidator
-from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QGridLayout, QTextEdit
+from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QGridLayout
 from pynever.tensor import Tensor
 
 import never2.view.styles as style
@@ -13,7 +15,9 @@ import never2.view.util.utility as u
 from never2 import ROOT_DIR
 from never2.core.model.network import NetworkNode
 from never2.view.drawing.element import PropertyBlock, NodeBlock
-from never2.view.widget.custom import CustomLabel, CustomComboBox, CustomTextBox, CustomTextArea, CustomButton
+from never2.view.util import utility
+from never2.view.widget.custom import CustomLabel, CustomComboBox, CustomTextBox, CustomTextArea, CustomButton, \
+    CustomListBox
 from never2.view.widget.misc import ProgressBar
 
 
@@ -205,7 +209,7 @@ class HelpDialog(NeVerDialog):
 
         # The dialogs contains a text area reading the user guide file
         text = open(ROOT_DIR.replace('/never2', '') + '/docs/never2/userguide/User Guide.html', encoding="utf8").read()
-        text_area = QTextEdit(text)
+        text_area = CustomTextBox(text)
         text_area.setReadOnly(True)
 
         self.layout = QHBoxLayout()
@@ -444,8 +448,7 @@ class GenericDatasetDialog(NeVerDialog):
         self.layout.addWidget(data_type_edit, 1, 1)
 
         delimiter_label = CustomLabel("Delimiter character")
-        delimiter_edit = CustomTextBox()
-        delimiter_edit.setText(",")
+        delimiter_edit = CustomTextBox(',')
         delimiter_edit.textChanged.connect(lambda: self.update_dict("delimiter", delimiter_edit.text()))
         self.layout.addWidget(delimiter_label, 2, 0)
         self.layout.addWidget(delimiter_edit, 2, 1)
@@ -475,6 +478,186 @@ class GenericDatasetDialog(NeVerDialog):
         self.params = {"target_idx": 0,
                        "data_type": float,
                        "delimiter": ','}
+        self.close()
+
+
+class ComposeTransformDialog(NeVerDialog):
+    """
+        This class allows for the composition of a custom
+        dataset transform.
+
+        Attributes
+        ----------
+        trList : list
+            List of transform objects selected by the user.
+
+        Methods
+        ----------
+        initUI()
+            Setup of graphical elements
+        add_transform()
+            Adds a transform object from a ListView to another
+        rm_transform()
+            Removes a transform object from a ListView
+        ok()
+            Fills the trList parameter to return
+
+        """
+
+    def __init__(self):
+        super().__init__("Dataset transform - composition", "")
+        # List to return
+        self.trList = []
+
+        # 2-level parameters of the transforms
+        self.params_2level = {}
+
+        # Widgets
+        self.available = CustomListBox()
+        self.applied = CustomListBox()
+        self.add_btn = CustomButton("Add")
+        self.rm_btn = CustomButton("Remove")
+        self.add_btn.clicked.connect(self.add_transform)
+        self.rm_btn.clicked.connect(self.rm_transform)
+
+        # Init data
+        self.initUI()
+
+        self.render_layout()
+
+    def initUI(self):
+        # Setup layouts
+        tr_layout = QHBoxLayout()
+        left_layout = QVBoxLayout()
+        label1 = CustomLabel("Available")
+        label1.setAlignment(Qt.AlignCenter)
+        label1.setStyleSheet(style.NODE_LABEL_STYLE)
+        left_layout.addWidget(label1)
+        left_layout.addWidget(self.available)
+
+        mid_layout = QVBoxLayout()
+        mid_layout.addWidget(self.add_btn)
+        mid_layout.addWidget(self.rm_btn)
+        mid_layout.setAlignment(Qt.AlignCenter)
+
+        right_layout = QVBoxLayout()
+        label2 = CustomLabel("Applied")
+        label2.setAlignment(Qt.AlignCenter)
+        label2.setStyleSheet(style.NODE_LABEL_STYLE)
+        right_layout.addWidget(label2)
+        right_layout.addWidget(self.applied)
+
+        tr_layout.addLayout(left_layout)
+        tr_layout.addLayout(mid_layout)
+        tr_layout.addLayout(right_layout)
+        self.layout.addLayout(tr_layout)
+
+        # Buttons
+        btn_layout = QHBoxLayout()
+        ok_btn = CustomButton("Ok")
+        ok_btn.clicked.connect(self.ok)
+        cancel_btn = CustomButton("Cancel")
+        cancel_btn.clicked.connect(self.exit)
+        btn_layout.addWidget(ok_btn)
+        btn_layout.addWidget(cancel_btn)
+        self.layout.addLayout(btn_layout)
+
+        transform = utility.read_json(ROOT_DIR + '/res/json/transform.json')
+        for t in transform.keys():
+            self.available.addItem(t)
+
+            if transform[t]:
+                self.params_2level[t] = {}
+                for k, v in transform[t].items():
+                    self.params_2level[t][k] = v
+
+    def add_transform(self):
+        item = self.available.currentItem()
+        if item is not None:
+            self.applied.addItem(item.text())
+            item.setHidden(True)
+            self.available.setCurrentItem(None)
+
+            if item.text() in self.params_2level.keys():
+                d = Param2levelDialog(self.params_2level[item.text()], item.text())
+                d.exec()
+
+                for k in self.params_2level[item.text()].keys():
+                    self.params_2level[item.text()][k]['value'] = d.params[k]
+
+    def rm_transform(self):
+        item = self.applied.currentItem()
+        if item is not None:
+            self.available.findItems(item.text(), Qt.MatchExactly)[0].setHidden(False)
+            self.applied.takeItem(self.applied.row(item))
+
+    def ok(self):
+        for idx in range(self.applied.count()):
+            t = self.applied.item(idx).text()
+            if t == 'ToTensor':
+                self.trList.append(tr.ToTensor())
+            elif t == 'PILToTensor':
+                self.trList.append(tr.PILToTensor())
+            elif t == 'Normalize':
+                self.trList.append(tr.Normalize(self.params_2level['Normalize']['Mean']['value'],
+                                                self.params_2level['Normalize']['Std deviation']['value']))
+            elif t == 'Flatten':
+                self.trList.append(tr.Lambda(lambda x: torch.flatten(x)))
+            elif t == 'ToPILImage':
+                self.trList.append(tr.ToPILImage())
+
+        self.close()
+
+    def exit(self):
+        self.trList = []
+        self.close()
+
+
+class Param2levelDialog(NeVerDialog):
+    def __init__(self, param_dict: dict, t_name: str):
+        super(Param2levelDialog, self).__init__('Parameters required', '')
+        self.layout = QGridLayout()
+        self.params = {}
+
+        input_widgets = {}
+        self.layout.addWidget(CustomLabel(t_name), 0, 0, 1, 0)
+        count = 1
+
+        # Event connection
+        def activation_f(key: str):
+            return lambda: self.update_params(key, input_widgets[key].text())
+
+        for name, val in param_dict.items():
+            input_widgets[name] = CustomTextBox(str(val['value']))
+            input_widgets[name].setValidator(ArithmeticValidator.FLOAT)
+
+            self.layout.addWidget(CustomLabel(name), count, 0)
+            self.layout.addWidget(input_widgets[name], count, 1)
+            self.params[name] = val['value']
+
+            input_widgets[name].textChanged.connect(activation_f(name))
+
+            count += 1
+
+        # Buttons
+        ok_btn = CustomButton("Ok")
+        ok_btn.clicked.connect(self.ok)
+        cancel_btn = CustomButton("Cancel")
+        cancel_btn.clicked.connect(lambda: self.exit(param_dict))
+        self.layout.addWidget(ok_btn, count, 0)
+        self.layout.addWidget(cancel_btn, count, 1)
+
+        self.render_layout()
+
+    def update_params(self, key: str, val: str) -> None:
+        self.params[key] = float(val)
+
+    def ok(self):
+        self.close()
+
+    def exit(self, param_dict: dict):
+        for name, val in param_dict.items():
+            self.params[name] = val['value']
         self.close()
 
 
@@ -623,8 +806,7 @@ class EditNodeDialog(NeVerDialog):
         in_dim_label.setAlignment(Qt.AlignRight)
         self.layout.addWidget(in_dim_label, 1, 0)
 
-        in_dim_box = CustomTextBox()
-        in_dim_box.setText(','.join(map(str, node_block.in_dim)))
+        in_dim_box = CustomTextBox(','.join(map(str, node_block.in_dim)))
         in_dim_box.setValidator(ArithmeticValidator.TENSOR)
 
         self.layout.addWidget(in_dim_box, 1, 1)

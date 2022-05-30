@@ -1,0 +1,20 @@
+{
+  "ToTensor": {
+  },
+  "PILToTensor": {
+  },
+  "Normalize": {
+    "Mean": {
+      "type": "float",
+      "value": "1.0"
+    },
+    "Std deviation": {
+      "type": "float",
+      "value": "0.5"
+    }
+  },
+  "Flatten": {
+  },
+  "ToPILImage": {
+  }
+}
