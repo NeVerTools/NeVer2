@@ -1,15 +1,21 @@
-from PyQt5 import Qt
+from PyQt5.Qt import QAbstractItemView
+from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QLabel, QComboBox, QLineEdit, QPlainTextEdit, QPushButton, QListWidget
 
 import never2.view.styles as style
 
 
 class CustomLabel(QLabel):
-    def __init__(self, text: str = '', color: str = style.WHITE):
+    def __init__(self, text: str = '', color: str = style.WHITE, primary: bool = False, alignment=Qt.AlignLeft):
         super(CustomLabel, self).__init__(text)
-        self.setStyleSheet("color: " + color + ";" +
-                           "border: none;" +
-                           "padding: 2px 0px 2px 2px;")
+        if primary:
+            self.setAlignment(Qt.AlignCenter)
+            self.setStyleSheet(style.NODE_LABEL_STYLE)
+        else:
+            self.setAlignment(alignment)
+            self.setStyleSheet("color: " + color + ";" +
+                               "border: none;" +
+                               "padding: 2px 0px 2px 2px;")
 
 
 class CustomComboBox(QComboBox):
@@ -46,7 +52,7 @@ class CustomTextArea(QPlainTextEdit):
 class CustomListBox(QListWidget):
     def __init__(self, color: str = style.WHITE):
         super(QListWidget, self).__init__()
-        self.setSelectionMode(Qt.QAbstractItemView.SelectionMode.SingleSelection)
+        self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
         self.setStyleSheet("color: " + color + ";" +
                            "background-color: " + style.GREY_2 + ";" +
                            "border: none;" +

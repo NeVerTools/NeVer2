@@ -7,7 +7,7 @@ import torchvision.transforms as tr
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtCore import QRegExp, Qt, QSize
 from PyQt5.QtGui import QIntValidator, QRegExpValidator, QDoubleValidator
-from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QGridLayout
+from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QGridLayout, QTextEdit
 from pynever.tensor import Tensor
 
 import never2.view.styles as style
@@ -40,8 +40,8 @@ class ArithmeticValidator:
 
     INT = QIntValidator()
     FLOAT = QDoubleValidator()
-    TENSOR = QRegExpValidator(QRegExp("(([0-9])+(,[0-9]+)*)"))
-    TENSOR_LIST = QRegExpValidator(QRegExp("(\((([0-9])+(,[0-9]+)*)\))+(,(\((([0-9])+(,[0-9]+)*)\)))*"))
+    TENSOR = QRegExpValidator(QRegExp('(([0-9])+(,[0-9]+)*)'))
+    TENSOR_LIST = QRegExpValidator(QRegExp('(\((([0-9])+(,[0-9]+)*)\))+(,(\((([0-9])+(,[0-9]+)*)\)))*'))
 
 
 class MessageType(Enum):
@@ -76,7 +76,7 @@ class NeVerDialog(QtWidgets.QDialog):
 
     """
 
-    def __init__(self, title="NeVer Dialog", message="NeVer message", parent=None):
+    def __init__(self, title='NeVer Dialog', message='NeVer message', parent=None):
         super().__init__(parent)
         self.layout = QVBoxLayout()
         self.title = title
@@ -87,7 +87,7 @@ class NeVerDialog(QtWidgets.QDialog):
         else:
             self.setWindowTitle(self.title)
         self.setModal(True)
-        self.setStyleSheet("background-color: " + style.GREY_1 + ";")
+        self.setStyleSheet('background-color: ' + style.GREY_1 + ';')
 
     def set_title(self, title: str) -> None:
         """
@@ -126,7 +126,115 @@ class NeVerDialog(QtWidgets.QDialog):
         self.setLayout(self.layout)
 
 
-class FuncDialog(NeVerDialog):
+class HelpDialog(NeVerDialog):
+    """
+    This dialog displays the user guide from the documentation file.
+
+    """
+
+    def __init__(self):
+        super().__init__('User Guide', 'User Guide')
+        self.resize(QSize(800, 600))
+        self.setStyleSheet('background-color: ' + style.GREY_3 + ';')
+
+        # The dialogs contains a text area reading the user guide file
+        text = open(ROOT_DIR.replace('/never2', '') + '/docs/never2/userguide/User Guide.html', encoding="utf8").read()
+        text_area = QTextEdit(text)
+        text_area.setReadOnly(True)
+
+        self.layout.addWidget(text_area)
+        self.render_layout()
+
+
+class SingleButtonDialog(NeVerDialog):
+    """
+    This class is a generic dialog with a single button
+    at the bottom of the main layout. It also provides
+    a method for imposing the button text ('Ok' by default)
+
+    Attributes
+    ----------
+    button : CustomButton
+        A single button for leaving the dialog
+
+    Methods
+    ----------
+    set_button_text(str)
+        A method for setting the button text
+
+    """
+
+    def __init__(self, title: str = 'NeVer Dialog', message: str = ''):
+        super(SingleButtonDialog, self).__init__(title, message)
+
+        self.button = CustomButton('Ok')
+        self.button.clicked.connect(self.close)
+
+    def set_button_text(self, text: str):
+        self.button.setText(text)
+
+    def render_layout(self) -> None:
+        """
+        Override with a button at the end
+
+        """
+
+        self.layout.addWidget(self.button)
+        self.setLayout(self.layout)
+
+
+class TwoButtonsDialog(NeVerDialog):
+    """
+    This class is a generic dialog with two buttons
+    at the bottom of the main layout, for accepting or
+    refusing the operations of the dialog. It also provides
+    a method for imposing the buttons text ('Cancel' and 'Ok'
+    by default)
+
+    Attributes
+    ----------
+    cancel_btn : CustomButton
+        A single button for leaving the dialog without applying
+        the changes
+    ok_btn : CustomButton
+        A single button for leaving the dialog and applying
+        the changes
+
+    Methods
+    ----------
+    set_buttons_text(str, str)
+        A method for setting the buttons text
+
+    """
+
+    def __init__(self, title: str = 'NeVer Dialog', message: str = ''):
+        super(TwoButtonsDialog, self).__init__(title, message)
+
+        self.cancel_btn = CustomButton('Cancel')
+        self.cancel_btn.clicked.connect(self.close)
+
+        self.ok_btn = CustomButton('Ok')
+        self.ok_btn.clicked.connect(self.close)
+
+        self.button_layout = QHBoxLayout()
+        self.button_layout.addWidget(self.cancel_btn)
+        self.button_layout.addWidget(self.ok_btn)
+
+    def set_buttons_text(self, cancel_text: str, ok_text: str):
+        self.cancel_btn.setText(cancel_text)
+        self.ok_btn.setText(ok_text)
+
+    def render_layout(self) -> None:
+        """
+        Override with a button at the end
+
+        """
+
+        self.layout.addLayout(self.button_layout)
+        self.setLayout(self.layout)
+
+
+class FuncDialog(TwoButtonsDialog):
     """
     This class is a parametric Dialog displaying a message
     to the user and executing a function if the user clicks
@@ -135,104 +243,57 @@ class FuncDialog(NeVerDialog):
     """
 
     def __init__(self, message: str, ok_fun: Callable):
-        super().__init__("", message)
-        title_label = CustomLabel("Message")
-        title_label.setAlignment(Qt.AlignCenter)
+        super().__init__('', message)
+        title_label = CustomLabel('Message', alignment=Qt.AlignCenter)
 
         # Set content label
-        mess_label = CustomLabel("\n" + self.content + "\n")
-        mess_label.setAlignment(Qt.AlignCenter)
+        mess_label = CustomLabel(f"\n{self.content}\n", alignment=Qt.AlignCenter)
 
-        # Buttons
-        btn_layout = QHBoxLayout()
-        ok_btn = CustomButton("Ok")
-        ok_btn.clicked.connect(lambda: ok_fun(False))
-        ok_btn.clicked.connect(self.close)
-        cancel_btn = CustomButton("Cancel")
-        cancel_btn.clicked.connect(self.close)
-        btn_layout.addWidget(ok_btn)
-        btn_layout.addWidget(cancel_btn)
+        # Connect function
+        self.ok_btn.clicked.connect(lambda: ok_fun)
 
         self.layout.addWidget(title_label)
         self.layout.addWidget(mess_label)
-        self.layout.addLayout(btn_layout)
 
         self.render_layout()
 
 
-class MessageDialog(NeVerDialog):
+class MessageDialog(SingleButtonDialog):
     """
     This class is a Dialog displaying a message to the user.
 
     """
 
     def __init__(self, message: str, message_type: MessageType):
-        super().__init__("", message)
+        super().__init__('', message)
 
         # Set the dialog stile depending on message_type
         if message_type == MessageType.MESSAGE:
-            title_label = CustomLabel("Message")
+            title_label = CustomLabel('Message', alignment=Qt.AlignCenter)
             title_label.setStyleSheet(style.NODE_LABEL_STYLE)
         else:
-            title_label = CustomLabel("Error")
+            title_label = CustomLabel('Error', alignment=Qt.AlignCenter)
             title_label.setStyleSheet(style.ERROR_LABEL_STYLE)
 
-        title_label.setAlignment(Qt.AlignCenter)
-
         # Set content label
-        mess_label = CustomLabel("\n" + self.content + "\n")
-        mess_label.setAlignment(Qt.AlignCenter)
-
-        # Add a button to close the dialog
-        ok_button = CustomButton("Ok")
-        ok_button.clicked.connect(self.close)
+        mess_label = CustomLabel(f"\n{self.content}\n", alignment=Qt.AlignCenter)
 
         # Compose widgets
         self.layout.addWidget(title_label)
         self.layout.addWidget(mess_label)
-        self.layout.addWidget(ok_button)
 
         self.render_layout()
 
 
-class HelpDialog(NeVerDialog):
+class ConfirmDialog(TwoButtonsDialog):
     """
-    This dialog displays the user guide from the documentation file.
-
-    """
-
-    def __init__(self):
-        super().__init__("User Guide", "User Guide")
-        self.setWindowTitle(self.title)
-        self.resize(QSize(800, 600))
-        self.setStyleSheet("background-color: " + style.GREY_3 + ";")
-
-        # The dialogs contains a text area reading the user guide file
-        text = open(ROOT_DIR.replace('/never2', '') + '/docs/never2/userguide/User Guide.html', encoding="utf8").read()
-        text_area = CustomTextBox(text)
-        text_area.setReadOnly(True)
-
-        self.layout = QHBoxLayout()
-        self.layout.addWidget(text_area)
-        self.render_layout()
-
-
-class ConfirmDialog(NeVerDialog):
-    """
-    This dialog asks the user the confirm to clear the
+    This dialog asks the user the confirmation to clear the
     unsaved workspace before continue.
 
     Attributes
     ----------
     confirm : bool
-        Boolean value to store user decision.
-
-    Methods
-    ----------
-    ok()
-        Register user confirm.
-    deny()
-        Register user denial.
+        Boolean value to store user decision
 
     """
 
@@ -240,55 +301,31 @@ class ConfirmDialog(NeVerDialog):
         super().__init__(title, message)
 
         # Set title label
-        title_label = CustomLabel(self.title)
-        title_label.setStyleSheet(style.NODE_LABEL_STYLE)
-        title_label.setAlignment(Qt.AlignCenter)
+        title_label = CustomLabel(self.title, primary=True)
 
         # Set message label
-        mess_label = CustomLabel("\n" + self.content + "\n")
-        mess_label.setAlignment(Qt.AlignCenter)
+        mess_label = CustomLabel(f"\n{self.content}\n", alignment=Qt.AlignCenter)
 
         self.confirm = False
 
         # Add buttons to close the dialog
-        confirm_button = CustomButton("Yes")
-        confirm_button.clicked.connect(self.ok)
-
-        no_button = CustomButton("No")
-        no_button.clicked.connect(self.deny)
-
-        buttons_layout = QHBoxLayout()
-        buttons_layout.addWidget(confirm_button)
-        buttons_layout.addWidget(no_button)
-        buttons = QWidget()
-        buttons.setLayout(buttons_layout)
+        self.ok_btn.clicked.connect(self.ok)
+        self.cancel_btn.clicked.connect(self.deny)
 
         # Compose widgets
         self.layout.addWidget(title_label)
         self.layout.addWidget(mess_label)
-        self.layout.addWidget(buttons)
 
         self.render_layout()
 
-    def ok(self) -> None:
-        """
-        This method sets the result to True and closes the dialog.
-
-        """
-
+    def ok(self):
         self.confirm = True
-        self.close()
 
-    def deny(self) -> None:
-        """
-        This method sets the result to False and closes the dialog.
-
-        """
-
+    def deny(self):
         self.confirm = False
-        self.close()
 
 
+# Deprecated
 class InputDialog(NeVerDialog):
     """
     This dialog prompts the user to give an input. After the input
@@ -376,6 +413,7 @@ class InputDialog(NeVerDialog):
         self.close()
 
 
+# Deprecated
 class LoadingDialog(NeVerDialog):
     """
     This frameless dialog keeps busy the interface during a
@@ -409,7 +447,7 @@ class LoadingDialog(NeVerDialog):
         self.setWindowFlags(Qt.FramelessWindowHint)
 
 
-class GenericDatasetDialog(NeVerDialog):
+class GenericDatasetDialog(TwoButtonsDialog):
     """
     This class is a simple dialog asking for additional
     parameters of a generic file dataset.
@@ -422,45 +460,44 @@ class GenericDatasetDialog(NeVerDialog):
     Methods
     ----------
     update_dict(str, str)
-        Procedure to read the given input and save it.
+        Procedure to read the given input and save it
+    reset()
+        Procedure to restore the parameters to default
 
     """
 
     def __init__(self):
-        super().__init__("Dataset - additional parameters", "")
-        self.layout = QGridLayout()
-        self.params = {"target_idx": 0,
-                       "data_type": float,
-                       "delimiter": ','}
+        super().__init__('Dataset - additional parameters', '')
+        g_layout = QGridLayout()
+        self.layout.addLayout(g_layout)
+        self.params = {'target_idx': 0,
+                       'data_type': float,
+                       'delimiter': ','}
 
-        target_label = CustomLabel("Target index")
+        target_label = CustomLabel('Target index')
         target_edit = CustomTextBox()
         target_edit.setValidator(ArithmeticValidator.INT)
-        target_edit.textChanged.connect(lambda: self.update_dict("target_idx", target_edit.text()))
-        self.layout.addWidget(target_label, 0, 0)
-        self.layout.addWidget(target_edit, 0, 1)
+        target_edit.textChanged. \
+            connect(lambda: self.update_dict('target_idx', target_edit.text()))
+        g_layout.addWidget(target_label, 0, 0)
+        g_layout.addWidget(target_edit, 0, 1)
 
-        data_type_label = CustomLabel("Data type")
+        data_type_label = CustomLabel('Data type')
         data_type_edit = CustomComboBox()
-        data_type_edit.addItems(["float", "int"])
-        data_type_edit.activated.connect(lambda: self.update_dict("data_type", data_type_edit.currentText()))
-        self.layout.addWidget(data_type_label, 1, 0)
-        self.layout.addWidget(data_type_edit, 1, 1)
+        data_type_edit.addItems(['float', 'int'])
+        data_type_edit.activated. \
+            connect(lambda: self.update_dict('data_type', data_type_edit.currentText()))
+        g_layout.addWidget(data_type_label, 1, 0)
+        g_layout.addWidget(data_type_edit, 1, 1)
 
-        delimiter_label = CustomLabel("Delimiter character")
+        delimiter_label = CustomLabel('Delimiter character')
         delimiter_edit = CustomTextBox(',')
-        delimiter_edit.textChanged.connect(lambda: self.update_dict("delimiter", delimiter_edit.text()))
-        self.layout.addWidget(delimiter_label, 2, 0)
-        self.layout.addWidget(delimiter_edit, 2, 1)
+        delimiter_edit.textChanged. \
+            connect(lambda: self.update_dict('delimiter', delimiter_edit.text()))
+        g_layout.addWidget(delimiter_label, 2, 0)
+        g_layout.addWidget(delimiter_edit, 2, 1)
 
-        # Buttons
-        ok_btn = CustomButton("Ok")
-        ok_btn.clicked.connect(self.ok)
-        cancel_btn = CustomButton("Cancel")
-        cancel_btn.clicked.connect(self.exit)
-        self.layout.addWidget(ok_btn, 3, 0)
-        self.layout.addWidget(cancel_btn, 3, 1)
-
+        self.cancel_btn.clicked.connect(self.reset)
         self.render_layout()
 
     def update_dict(self, key: str, value: str):
@@ -471,41 +508,37 @@ class GenericDatasetDialog(NeVerDialog):
                 if value != '':
                     self.params[key] = eval(value)
 
-    def ok(self):
-        self.close()
-
-    def exit(self):
-        self.params = {"target_idx": 0,
-                       "data_type": float,
-                       "delimiter": ','}
-        self.close()
+    def reset(self):
+        self.params = {'target_idx': 0,
+                       'data_type': float,
+                       'delimiter': ','}
 
 
-class ComposeTransformDialog(NeVerDialog):
+class ComposeTransformDialog(TwoButtonsDialog):
     """
-        This class allows for the composition of a custom
-        dataset transform.
+    This class allows for the composition of a custom
+    dataset transform.
 
-        Attributes
-        ----------
-        trList : list
-            List of transform objects selected by the user.
+    Attributes
+    ----------
+    trList : list
+        List of transform objects selected by the user.
 
-        Methods
-        ----------
-        initUI()
-            Setup of graphical elements
-        add_transform()
-            Adds a transform object from a ListView to another
-        rm_transform()
-            Removes a transform object from a ListView
-        ok()
-            Fills the trList parameter to return
+    Methods
+    ----------
+    initUI()
+        Setup of graphical elements
+    add_transform()
+        Adds a transform object from a ListView to another
+    rm_transform()
+        Removes a transform object from a ListView
+    ok()
+        Fills the trList parameter to return
 
-        """
+    """
 
     def __init__(self):
-        super().__init__("Dataset transform - composition", "")
+        super().__init__('Dataset transform - composition', '')
         # List to return
         self.trList = []
 
@@ -514,24 +547,32 @@ class ComposeTransformDialog(NeVerDialog):
 
         # Widgets
         self.available = CustomListBox()
-        self.applied = CustomListBox()
-        self.add_btn = CustomButton("Add")
-        self.rm_btn = CustomButton("Remove")
+        self.selected = CustomListBox()
+        self.add_btn = CustomButton('>')
+        self.rm_btn = CustomButton('<')
         self.add_btn.clicked.connect(self.add_transform)
         self.rm_btn.clicked.connect(self.rm_transform)
 
         # Init data
-        self.initUI()
+        self.init_layout()
+
+        # Buttons
+        self.ok_btn.clicked.connect(self.ok)
+        self.cancel_btn.clicked.connect(self.trList.clear)
 
         self.render_layout()
 
-    def initUI(self):
+    def init_layout(self):
+        """
+        Initialize the dialog layout with two ListViews and two
+        buttons in the middle for the composition
+
+        """
+
         # Setup layouts
         tr_layout = QHBoxLayout()
         left_layout = QVBoxLayout()
-        label1 = CustomLabel("Available")
-        label1.setAlignment(Qt.AlignCenter)
-        label1.setStyleSheet(style.NODE_LABEL_STYLE)
+        label1 = CustomLabel('Available', primary=True)
         left_layout.addWidget(label1)
         left_layout.addWidget(self.available)
 
@@ -541,26 +582,14 @@ class ComposeTransformDialog(NeVerDialog):
         mid_layout.setAlignment(Qt.AlignCenter)
 
         right_layout = QVBoxLayout()
-        label2 = CustomLabel("Applied")
-        label2.setAlignment(Qt.AlignCenter)
-        label2.setStyleSheet(style.NODE_LABEL_STYLE)
+        label2 = CustomLabel('Selected', primary=True)
         right_layout.addWidget(label2)
-        right_layout.addWidget(self.applied)
+        right_layout.addWidget(self.selected)
 
         tr_layout.addLayout(left_layout)
         tr_layout.addLayout(mid_layout)
         tr_layout.addLayout(right_layout)
         self.layout.addLayout(tr_layout)
-
-        # Buttons
-        btn_layout = QHBoxLayout()
-        ok_btn = CustomButton("Ok")
-        ok_btn.clicked.connect(self.ok)
-        cancel_btn = CustomButton("Cancel")
-        cancel_btn.clicked.connect(self.exit)
-        btn_layout.addWidget(ok_btn)
-        btn_layout.addWidget(cancel_btn)
-        self.layout.addLayout(btn_layout)
 
         transform = utility.read_json(ROOT_DIR + '/res/json/transform.json')
         for t in transform.keys():
@@ -572,28 +601,47 @@ class ComposeTransformDialog(NeVerDialog):
                     self.params_2level[t][k] = v
 
     def add_transform(self):
+        """
+        This method takes the selected transform in the 'available' list
+        and moves it to the 'selected' one
+
+        """
+
         item = self.available.currentItem()
         if item is not None:
-            self.applied.addItem(item.text())
-            item.setHidden(True)
+            self.selected.addItem(item.text())
             self.available.setCurrentItem(None)
+            item.setHidden(True)
 
             if item.text() in self.params_2level.keys():
+                # If the transform has parameters, ask now
                 d = Param2levelDialog(self.params_2level[item.text()], item.text())
                 d.exec()
 
-                for k in self.params_2level[item.text()].keys():
+                for k in d.params.keys():
                     self.params_2level[item.text()][k]['value'] = d.params[k]
 
     def rm_transform(self):
-        item = self.applied.currentItem()
+        """
+        This method removes the selected transform from the 'selected'
+        list and re-enables it in the 'available' one
+
+        """
+
+        item = self.selected.currentItem()
         if item is not None:
             self.available.findItems(item.text(), Qt.MatchExactly)[0].setHidden(False)
-            self.applied.takeItem(self.applied.row(item))
+            self.selected.takeItem(self.selected.row(item))
 
     def ok(self):
-        for idx in range(self.applied.count()):
-            t = self.applied.item(idx).text()
+        """
+        This method reads the 'selected' list view and fills the
+        trList list with the corresponding dataset transforms
+
+        """
+
+        for idx in range(self.selected.count()):
+            t = self.selected.item(idx).text()
             if t == 'ToTensor':
                 self.trList.append(tr.ToTensor())
             elif t == 'PILToTensor':
@@ -606,33 +654,44 @@ class ComposeTransformDialog(NeVerDialog):
             elif t == 'ToPILImage':
                 self.trList.append(tr.ToPILImage())
 
-        self.close()
 
-    def exit(self):
-        self.trList = []
-        self.close()
+class Param2levelDialog(TwoButtonsDialog):
+    """
+    This class is a dialog for the further specification of some
+    transform parameters
 
+    Attributes
+    ----------
+    params : dict
+        A dictionary of the required parameters to return
 
-class Param2levelDialog(NeVerDialog):
+    Methods
+    ----------
+    update_param(str, str)
+        Procedure to update the parameter 'k' with the value 'v'
+
+    """
+
     def __init__(self, param_dict: dict, t_name: str):
         super(Param2levelDialog, self).__init__('Parameters required', '')
-        self.layout = QGridLayout()
+        g_layout = QGridLayout()
+        self.layout.addLayout(g_layout)
         self.params = {}
 
         input_widgets = {}
-        self.layout.addWidget(CustomLabel(t_name), 0, 0, 1, 0)
+        g_layout.addWidget(CustomLabel(t_name, primary=True), 0, 0, 1, 0)
         count = 1
 
         # Event connection
         def activation_f(key: str):
-            return lambda: self.update_params(key, input_widgets[key].text())
+            return lambda: self.update_param(key, input_widgets[key].text())
 
         for name, val in param_dict.items():
             input_widgets[name] = CustomTextBox(str(val['value']))
             input_widgets[name].setValidator(ArithmeticValidator.FLOAT)
 
-            self.layout.addWidget(CustomLabel(name), count, 0)
-            self.layout.addWidget(input_widgets[name], count, 1)
+            g_layout.addWidget(CustomLabel(name), count, 0)
+            g_layout.addWidget(input_widgets[name], count, 1)
             self.params[name] = val['value']
 
             input_widgets[name].textChanged.connect(activation_f(name))
@@ -640,47 +699,34 @@ class Param2levelDialog(NeVerDialog):
             count += 1
 
         # Buttons
-        ok_btn = CustomButton("Ok")
-        ok_btn.clicked.connect(self.ok)
-        cancel_btn = CustomButton("Cancel")
-        cancel_btn.clicked.connect(lambda: self.exit(param_dict))
-        self.layout.addWidget(ok_btn, count, 0)
-        self.layout.addWidget(cancel_btn, count, 1)
+        self.cancel_btn.clicked.connect(lambda: self.reset(param_dict))
 
         self.render_layout()
 
-    def update_params(self, key: str, val: str) -> None:
+    def update_param(self, key: str, val: str) -> None:
         self.params[key] = float(val)
 
-    def ok(self):
-        self.close()
-
-    def exit(self, param_dict: dict):
+    def reset(self, param_dict: dict):
         for name, val in param_dict.items():
             self.params[name] = val['value']
-        self.close()
 
 
-class MixedVerificationDialog(NeVerDialog):
+class MixedVerificationDialog(TwoButtonsDialog):
     def __init__(self):
-        super().__init__("Mixed Verification", "")
-        self.layout = QGridLayout()
+        super().__init__('Mixed Verification', '')
+        g_layout = QGridLayout()
+        self.layout.addLayout(g_layout)
         self.n_neurons = 0
 
-        target_label = CustomLabel("Neurons number")
+        target_label = CustomLabel('Neurons number')
         target_edit = CustomTextBox()
         target_edit.textChanged.connect(lambda: self.update_neurons(target_edit.text()))
         target_edit.setValidator(ArithmeticValidator.INT)
-        self.layout.addWidget(target_label, 0, 0)
-        self.layout.addWidget(target_edit, 0, 1)
+        g_layout.addWidget(target_label, 0, 0)
+        g_layout.addWidget(target_edit, 0, 1)
 
         # Buttons
-        ok_btn = CustomButton("Ok")
-        ok_btn.clicked.connect(self.ok)
-        cancel_btn = CustomButton("Cancel")
-        cancel_btn.clicked.connect(self.exit)
-        self.layout.addWidget(ok_btn, 1, 0)
-        self.layout.addWidget(cancel_btn, 1, 1)
+        self.cancel_btn.clicked.connect(self.reset)
 
         self.render_layout()
 
@@ -688,14 +734,11 @@ class MixedVerificationDialog(NeVerDialog):
         if n != '':
             self.n_neurons = int(n)
 
-    def ok(self):
-        self.close()
-
-    def exit(self):
+    def reset(self):
         self.n_neurons = 0
-        self.close()
 
 
+# Deprecated
 class EditNodeInputDialog(NeVerDialog):
     def __init__(self, node_block: NodeBlock):
         super().__init__(node_block.node.name, "")
