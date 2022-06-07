@@ -712,6 +712,12 @@ class Param2levelDialog(TwoButtonsDialog):
 
 
 class MixedVerificationDialog(TwoButtonsDialog):
+    """
+    This class is a dialog for prompting the number of neurons to refine
+    in the mixed approach
+
+    """
+
     def __init__(self):
         super().__init__('Mixed Verification', '')
         g_layout = QGridLayout()
@@ -720,8 +726,8 @@ class MixedVerificationDialog(TwoButtonsDialog):
 
         target_label = CustomLabel('Neurons number')
         target_edit = CustomTextBox()
-        target_edit.textChanged.connect(lambda: self.update_neurons(target_edit.text()))
         target_edit.setValidator(ArithmeticValidator.INT)
+        target_edit.textChanged.connect(lambda: self.update_neurons(target_edit.text()))
         g_layout.addWidget(target_label, 0, 0)
         g_layout.addWidget(target_edit, 0, 1)
 
@@ -800,7 +806,7 @@ class EditNodeInputDialog(NeVerDialog):
         self.close()
 
 
-class EditNodeDialog(NeVerDialog):
+class EditNodeDialog(TwoButtonsDialog):
     """
     This dialog allows to edit the selected node in the canvas.
 
@@ -829,7 +835,8 @@ class EditNodeDialog(NeVerDialog):
 
     def __init__(self, node_block: NodeBlock):
         super().__init__(node_block.node.name, "")
-        self.layout = QGridLayout()
+        g_layout = QGridLayout()
+        self.layout.addLayout(g_layout)
 
         # Connect node
         self.node = node_block
@@ -841,44 +848,34 @@ class EditNodeDialog(NeVerDialog):
         title_label = CustomLabel("Edit parameters")
         title_label.setStyleSheet(style.NODE_LABEL_STYLE)
         title_label.setAlignment(Qt.AlignCenter)
-        self.layout.addWidget(title_label, 0, 0, 1, 2)
+        g_layout.addWidget(title_label, 0, 0, 1, 2)
 
         # Input box
         in_dim_label = CustomLabel("Input")
         in_dim_label.setStyleSheet(style.IN_DIM_LABEL_STYLE)
         in_dim_label.setAlignment(Qt.AlignRight)
-        self.layout.addWidget(in_dim_label, 1, 0)
+        g_layout.addWidget(in_dim_label, 1, 0)
 
         in_dim_box = CustomTextBox(','.join(map(str, node_block.in_dim)))
         in_dim_box.setValidator(ArithmeticValidator.TENSOR)
 
-        self.layout.addWidget(in_dim_box, 1, 1)
+        g_layout.addWidget(in_dim_box, 1, 1)
         self.parameters["in_dim"] = in_dim_box
 
         if not node_block.is_head:
             in_dim_box.setReadOnly(True)
 
         # Display parameters if present
-        counter = 2
         if node_block.node.param:
-            counter = self.append_node_params(node_block.node, node_block.block_data)
+            self.append_node_params(node_block.node, node_block.block_data, g_layout)
 
         # "Apply" button which saves changes
-        apply_button = CustomButton("Apply")
-        apply_button.clicked.connect(self.save_data)
-        self.layout.addWidget(apply_button, counter, 0)
-
-        # "Cancel" button which closes the dialog without saving
-        cancel_button = CustomButton("Cancel")
-        cancel_button.clicked.connect(self.close)
-        self.layout.addWidget(cancel_button, counter, 1)
-
-        self.layout.setColumnStretch(0, 1)
-        self.layout.setColumnStretch(1, 1)
+        self.set_buttons_text('Discard', 'Apply')
+        self.ok_btn.clicked.connect(self.save_data)
 
         self.render_layout()
 
-    def append_node_params(self, node: NetworkNode, current_data: dict) -> int:
+    def append_node_params(self, node: NetworkNode, current_data: dict, layout: QGridLayout) -> None:
         """
 
         This method adds to the dialog layer the editable parameters of
@@ -886,14 +883,12 @@ class EditNodeDialog(NeVerDialog):
 
         Attributes
         ----------
-        node: NetworkNode
+        node : NetworkNode
             The node whose parameters are displayed.
-        current_data: dict
+        current_data : dict
             The node current data.
-        Returns
-        ----------
-        int
-            The last row counter.
+        layout : QGridLayout
+            The grid layout to fill
 
         """
 
@@ -910,7 +905,7 @@ class EditNodeDialog(NeVerDialog):
             # Set the tooltip of the input with the description
             param_label.setToolTip("<" + value["type"] + ">: "
                                    + value["description"])
-            self.layout.addWidget(param_label, counter, 0)
+            layout.addWidget(param_label, counter, 0)
 
             # Display parameter values
             if value["type"] == "boolean":
@@ -943,13 +938,11 @@ class EditNodeDialog(NeVerDialog):
 
             if node.param[param]["editable"] == "false":
                 line.setStyleSheet(style.UNEDITABLE_VALUE_LABEL_STYLE)
-            self.layout.addWidget(line, counter, 1)
+            layout.addWidget(line, counter, 1)
 
             # Keep trace of CustomTextBox objects
             self.parameters[param] = line
             counter += 1
-
-        return counter
 
     def save_data(self) -> None:
         """
@@ -982,8 +975,7 @@ class EditNodeDialog(NeVerDialog):
                                 self.edited_data[key] = tuple(
                                     map(int, line.text().split(',')))
                             elif data_type == "list of Tensors":
-                                self.edited_data[key] = u.text_to_tensor_set(
-                                    line.text())
+                                self.edited_data[key] = u.text_to_tensor_set(line.text())
 
                 elif type(line) == CustomComboBox:
                     if line.currentText() == "True":
@@ -999,7 +991,7 @@ class EditNodeDialog(NeVerDialog):
         self.close()
 
 
-class EditSmtPropertyDialog(NeVerDialog):
+class EditSmtPropertyDialog(TwoButtonsDialog):
     """
     This dialog allows to define a generic SMT property
     by writing directly in the SMT-LIB language.
@@ -1027,43 +1019,34 @@ class EditSmtPropertyDialog(NeVerDialog):
         self.property_block = property_block
         self.new_property = self.property_block.smt_string
         self.has_edits = False
-        self.layout = QGridLayout()
+        g_layout = QGridLayout()
+        self.layout.addLayout(g_layout)
 
         # Build main_layout
         title_label = CustomLabel("SMT property")
         title_label.setStyleSheet(style.NODE_LABEL_STYLE)
         title_label.setAlignment(Qt.AlignCenter)
-        self.layout.addWidget(title_label, 0, 0, 1, 2)
+        g_layout.addWidget(title_label, 0, 0, 1, 2)
 
         # Input box
         smt_label = CustomLabel("SMT-LIB definition")
         smt_label.setStyleSheet(style.IN_DIM_LABEL_STYLE)
         smt_label.setAlignment(Qt.AlignRight)
-        self.layout.addWidget(smt_label, 1, 0)
+        g_layout.addWidget(smt_label, 1, 0)
 
         self.smt_box = CustomTextArea()
         self.smt_box.insertPlainText(self.new_property)
-        self.layout.addWidget(self.smt_box, 1, 1)
+        g_layout.addWidget(self.smt_box, 1, 1)
 
         # "Apply" button which saves changes
-        apply_button = CustomButton("Apply")
-        apply_button.clicked.connect(self.save_data)
-        self.layout.addWidget(apply_button, 2, 0)
-
-        # "Cancel" button which closes the dialog without saving
-        cancel_button = CustomButton("Cancel")
-        cancel_button.clicked.connect(self.close)
-        self.layout.addWidget(cancel_button, 2, 1)
-
-        self.layout.setColumnStretch(0, 1)
-        self.layout.setColumnStretch(1, 1)
+        self.set_buttons_text('Discard', 'Apply')
+        self.ok_btn.clicked.connect(self.save_data)
 
         self.render_layout()
 
     def save_data(self):
         self.has_edits = True
         self.new_property = self.smt_box.toPlainText()
-        self.close()
 
 
 class EditPolyhedralPropertyDialog(NeVerDialog):
