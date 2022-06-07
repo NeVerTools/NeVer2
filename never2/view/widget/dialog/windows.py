@@ -10,8 +10,9 @@ import torchvision.transforms as tr
 from PyQt5 import QtWidgets
 from PyQt5.QtCore import Qt
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QFileDialog
+from pynever import nodes
 from pynever.datasets import Dataset
-from pynever.networks import NeuralNetwork
+from pynever.networks import NeuralNetwork, SequentialNetwork
 from pynever.strategies import reading, verification
 from pynever.strategies.training import PytorchTraining, PytorchMetrics
 
@@ -604,15 +605,51 @@ class VerificationWindow(NeVerWindow):
 
         self.render_layout()
 
+    def count_layers(self) -> int:
+        """
+        Count the number of ReLU layers of the NN.
+
+        Returns
+        -------
+        int
+            The number of ReLU layers
+
+        """
+
+        if isinstance(self.nn, SequentialNetwork) and self.nn.nodes:
+            current_node = self.nn.get_first_node()
+            relu_count = 0
+
+            while self.nn.get_next_node(current_node) is not None:
+                current_node = self.nn.get_next_node(current_node)
+                if isinstance(current_node, nodes.ReLUNode):
+                    relu_count += 1
+
+            return relu_count
+        else:
+            return 0
+
     def update_methodology(self, methodology: str) -> None:
+        """
+        Function to set up the verification strategy based on the user choice.
+
+        Parameters
+        ----------
+        methodology : str
+            Verification methodology.
+
+        """
+
         if methodology == 'Complete':
-            self.strategy = verification.NeverVerification(heuristic="best_n_neurons", params=[10000])
+            ver_params = [[10000] for _ in range(self.count_layers())]
         elif methodology == 'Over-approximated':
-            self.strategy = verification.NeverVerification(heuristic="best_n_neurons", params=[0])
+            ver_params = [[0] for _ in range(self.count_layers())]
         else:
             dialog = MixedVerificationDialog()
             dialog.exec()
-            self.strategy = verification.NeverVerification(heuristic="best_n_neurons", params=[dialog.n_neurons])
+            ver_params = [[dialog.n_neurons] for _ in range(self.count_layers())]
+
+        self.strategy = verification.NeverVerification('best_n_neurons', ver_params)
 
     def verify_network(self):
         """
