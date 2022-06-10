@@ -167,7 +167,7 @@ class SingleButtonDialog(NeVerDialog):
     def __init__(self, title: str = 'NeVer Dialog', message: str = ''):
         super(SingleButtonDialog, self).__init__(title, message)
 
-        self.button = CustomButton('Ok')
+        self.button = CustomButton('Ok', primary=True)
         self.button.clicked.connect(self.close)
 
     def set_button_text(self, text: str):
@@ -213,7 +213,7 @@ class TwoButtonsDialog(NeVerDialog):
         self.cancel_btn = CustomButton('Cancel')
         self.cancel_btn.clicked.connect(self.close)
 
-        self.ok_btn = CustomButton('Ok')
+        self.ok_btn = CustomButton('Ok', primary=True)
         self.ok_btn.clicked.connect(self.close)
 
         self.button_layout = QHBoxLayout()
@@ -1126,7 +1126,7 @@ class EditPolyhedralPropertyDialog(NeVerDialog):
         grid.addWidget(add_button, 3, 0)
 
         # "Save" button which saves the state
-        save_button = CustomButton("Save")
+        save_button = CustomButton("Save", primary=True)
         save_button.clicked.connect(self.save_property)
         grid.addWidget(save_button, 3, 1)
 

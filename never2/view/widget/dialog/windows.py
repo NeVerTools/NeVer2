@@ -199,9 +199,7 @@ class TrainingWindow(NeVerWindow):
         self.grid_layout = QGridLayout()
 
         # Dataset
-        dt_label = CustomLabel("Dataset")
-        dt_label.setAlignment(Qt.AlignCenter)
-        dt_label.setStyleSheet(style.NODE_LABEL_STYLE)
+        dt_label = CustomLabel("Dataset", primary=True)
         self.layout.addWidget(dt_label)
 
         dataset_layout = QHBoxLayout()
@@ -225,9 +223,7 @@ class TrainingWindow(NeVerWindow):
         self.layout.addLayout(transform_layout)
 
         # Separator
-        sep_label = CustomLabel("Training parameters")
-        sep_label.setAlignment(Qt.AlignCenter)
-        sep_label.setStyleSheet(style.NODE_LABEL_STYLE)
+        sep_label = CustomLabel("Training parameters", primary=True)
         self.layout.addWidget(sep_label)
 
         # Main body
@@ -245,12 +241,12 @@ class TrainingWindow(NeVerWindow):
 
         # Buttons
         btn_layout = QHBoxLayout()
-        self.train_btn = CustomButton("Train network")
-        self.train_btn.clicked.connect(self.train_network)
         self.cancel_btn = CustomButton("Cancel")
         self.cancel_btn.clicked.connect(self.close)
-        btn_layout.addWidget(self.train_btn)
+        self.train_btn = CustomButton("Train network", primary=True)
+        self.train_btn.clicked.connect(self.train_network)
         btn_layout.addWidget(self.cancel_btn)
+        btn_layout.addWidget(self.train_btn)
         self.layout.addLayout(btn_layout)
 
         self.render_layout()
@@ -595,12 +591,12 @@ class VerificationWindow(NeVerWindow):
 
         # Buttons
         btn_layout = QHBoxLayout()
-        self.verify_btn = CustomButton("Verify network")
-        self.verify_btn.clicked.connect(self.verify_network)
         self.cancel_btn = CustomButton("Cancel")
         self.cancel_btn.clicked.connect(self.close)
-        btn_layout.addWidget(self.verify_btn)
+        self.verify_btn = CustomButton("Verify network", primary=True)
+        self.verify_btn.clicked.connect(self.verify_network)
         btn_layout.addWidget(self.cancel_btn)
+        btn_layout.addWidget(self.verify_btn)
         self.layout.addLayout(btn_layout)
 
         self.render_layout()

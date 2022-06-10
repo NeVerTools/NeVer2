@@ -63,6 +63,9 @@ class CustomListBox(QListWidget):
 
 
 class CustomButton(QPushButton):
-    def __init__(self, text: str = ''):
+    def __init__(self, text: str = '', primary: bool = False):
         super(CustomButton, self).__init__(text)
-        self.setStyleSheet(style.BUTTON_STYLE)
+        if primary:
+            self.setStyleSheet(style.PRIMARY_BUTTON_STYLE)
+        else:
+            self.setStyleSheet(style.BUTTON_STYLE)

@@ -152,7 +152,7 @@ ERROR_LABEL_STYLE = ("QLabel {"
                      "font-weight: bold;"
                      "}")
 
-BUTTON_STYLE = ("NodeButton, QPushButton { "
+BUTTON_STYLE = ("QPushButton { "
                 "background-color: " + GREY_2 + ";" +
                 "border: 2px solid " + GREY_1 + ";" +
                 "padding: 6px;"
@@ -161,7 +161,7 @@ BUTTON_STYLE = ("NodeButton, QPushButton { "
                 "border-radius: 5px;"
                 "margin: 2px;"
                 "}"
-                "NodeButton:hover, QPushButton:hover {"
+                "QPushButton:hover {"
                 "background-color: " + GREY_4 + ";" +
                 "border: 2px solid " + GREY_3 + ";" +
                 "font-weight: bold;"
@@ -172,6 +172,27 @@ BUTTON_STYLE = ("NodeButton, QPushButton { "
                 "color: white;"
                 "border: black solid 1px;"
                 "}")
+
+PRIMARY_BUTTON_STYLE = ("QPushButton { "
+                        "background-color: " + GREEN_2 + ";" +
+                        "border: 2px solid " + GREEN_1 + ";" +
+                        "padding: 6px;"
+                        "color: #CFCFCF;"
+                        "font-family: georgia;"
+                        "border-radius: 5px;"
+                        "margin: 2px;"
+                        "}"
+                        "QPushButton:hover {"
+                        "background-color: " + GREEN_1 + ";" +
+                        "border: 2px solid " + GREEN_2 + ";" +
+                        "font-weight: bold;"
+                        "color: white;"
+                        "}"
+                        "QToolTip {"
+                        "background-color: " + GREY_1 + ";" +
+                        "color: white;"
+                        "border: black solid 1px;"
+                        "}")
 
 TOOLBAR_STYLE = ("background-color: " + GREY_1 + ";" +
                  "padding: 4px;"
@@ -266,18 +287,6 @@ STATUS_BAR_WIDGET_STYLE = ("color: " + GREY_4 + ";" +
                            "border-right: 1px solid " + GREY_2)
 
 """ PARAMETERS BOX """
-CLOSE_BUTTON_STYLE = ("QPushButton {"
-                      "color: " + GREY_4 + ";" +
-                      "font-weight: bold;"
-                      "font-size: 15px;"
-                      "background-color: " + GREY_1 + ";" +
-                      "border: none;"
-                      "text-align: right;"
-                      "margin-right: 2px;"
-                      "}"
-                      "QPushButton:hover {"
-                      "color: " + GREY_2 + ";" +
-                      "}")
 
 PAR_NAME_LABEL = ("color: white;"
                   "background-color: " + GREY_2 + ";" +
