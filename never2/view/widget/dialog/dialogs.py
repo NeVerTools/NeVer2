@@ -4,7 +4,7 @@ from typing import Callable
 import numpy as np
 import torch
 import torchvision.transforms as tr
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets
 from PyQt5.QtCore import QRegExp, Qt, QSize
 from PyQt5.QtGui import QIntValidator, QRegExpValidator, QDoubleValidator
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QGridLayout, QTextEdit
@@ -18,7 +18,6 @@ from never2.view.drawing.element import PropertyBlock, NodeBlock
 from never2.view.util import utility
 from never2.view.widget.custom import CustomLabel, CustomComboBox, CustomTextBox, CustomTextArea, CustomButton, \
     CustomListBox
-from never2.view.widget.misc import ProgressBar
 
 
 class ArithmeticValidator:
@@ -413,40 +412,6 @@ class InputDialog(NeVerDialog):
         self.close()
 
 
-# Deprecated
-class LoadingDialog(NeVerDialog):
-    """
-    This frameless dialog keeps busy the interface during a
-    long action performed by a thread. It shows a message
-    and a loading bar.
-
-    """
-
-    def __init__(self, message: str):
-        super().__init__("", message)
-        # Override window title
-        self.setWindowTitle("Wait...")
-
-        # Set content label
-        message_label = CustomLabel(self.content)
-        message_label.setStyleSheet(style.LOADING_LABEL_STYLE)
-
-        # Set loading bar
-        progress_bar = ProgressBar(self, minimum=0, maximum=0,
-                                   textVisible=False, objectName="ProgressBar")
-        progress_bar.setStyleSheet(style.PROGRESS_BAR_STYLE)
-
-        # Compose widgets
-        self.layout.addWidget(message_label)
-        self.layout.addWidget(progress_bar)
-
-        self.render_layout()
-
-        # Disable the dialog frame and close button
-        self.setWindowFlag(QtCore.Qt.WindowCloseButtonHint, False)
-        self.setWindowFlags(Qt.FramelessWindowHint)
-
-
 class GenericDatasetDialog(TwoButtonsDialog):
     """
     This class is a simple dialog asking for additional
@@ -744,68 +709,6 @@ class MixedVerificationDialog(TwoButtonsDialog):
         self.n_neurons = 0
 
 
-# Deprecated
-class EditNodeInputDialog(NeVerDialog):
-    def __init__(self, node_block: NodeBlock):
-        super().__init__(node_block.node.name, "")
-        self.layout = QGridLayout()
-
-        # Connect node
-        self.node = node_block
-        self.new_in_dim = ','.join(map(str, node_block.in_dim))
-        self.in_dim_box = CustomTextBox()
-        self.has_edits = False
-
-        # Build main_layout
-        title_label = CustomLabel("Edit network input")
-        title_label.setStyleSheet(style.NODE_LABEL_STYLE)
-        title_label.setAlignment(Qt.AlignCenter)
-        self.layout.addWidget(title_label, 0, 0, 1, 2)
-
-        # Input box
-        in_dim_label = CustomLabel("Input shape")
-        in_dim_label.setStyleSheet(style.IN_DIM_LABEL_STYLE)
-        in_dim_label.setAlignment(Qt.AlignRight)
-        self.layout.addWidget(in_dim_label, 1, 0)
-
-        self.in_dim_box.setText(self.new_in_dim)
-        self.in_dim_box.setValidator(ArithmeticValidator.TENSOR)
-
-        self.layout.addWidget(self.in_dim_box, 1, 1)
-
-        if not node_block.is_head:
-            self.in_dim_box.setReadOnly(True)
-
-        # "Apply" button which saves changes
-        apply_button = CustomButton("Apply")
-        apply_button.clicked.connect(self.save_data)
-        self.layout.addWidget(apply_button, 2, 0)
-
-        # "Cancel" button which closes the dialog without saving
-        cancel_button = CustomButton("Cancel")
-        cancel_button.clicked.connect(self.close)
-        self.layout.addWidget(cancel_button, 2, 1)
-
-        self.layout.setColumnStretch(0, 1)
-        self.layout.setColumnStretch(1, 1)
-
-        self.render_layout()
-
-    def save_data(self) -> None:
-        """
-        This method saves the new in_dim, returning
-        it to the caller.
-
-        """
-
-        self.has_edits = True
-
-        if len(self.in_dim_box.text()) != 0:
-            self.new_in_dim = tuple(map(int, self.in_dim_box.text().split(',')))
-
-        self.close()
-
-
 class EditNodeDialog(TwoButtonsDialog):
     """
     This dialog allows to edit the selected node in the canvas.
@@ -1083,25 +986,17 @@ class EditPolyhedralPropertyDialog(NeVerDialog):
         grid = QGridLayout()
 
         # Build main_layout
-        title_label = CustomLabel("Polyhedral property")
-        title_label.setStyleSheet(style.NODE_LABEL_STYLE)
-        title_label.setAlignment(Qt.AlignCenter)
+        title_label = CustomLabel("Polyhedral property", primary=True)
         grid.addWidget(title_label, 0, 0, 1, 3)
 
         # Labels
-        var_label = CustomLabel("Variable")
-        var_label.setStyleSheet(style.IN_DIM_LABEL_STYLE)
-        var_label.setAlignment(Qt.AlignRight)
+        var_label = CustomLabel("Variable", primary=True)
         grid.addWidget(var_label, 1, 0)
 
-        relop_label = CustomLabel("Operator")
-        relop_label.setStyleSheet(style.IN_DIM_LABEL_STYLE)
-        relop_label.setAlignment(Qt.AlignCenter)
+        relop_label = CustomLabel("Operator", primary=True)
         grid.addWidget(relop_label, 1, 1)
 
-        value_label = CustomLabel("Value")
-        value_label.setStyleSheet(style.IN_DIM_LABEL_STYLE)
-        value_label.setAlignment(Qt.AlignLeft)
+        value_label = CustomLabel("Value", primary=True)
         grid.addWidget(value_label, 1, 2)
 
         self.var_cb = CustomComboBox()
@@ -1122,7 +1017,7 @@ class EditPolyhedralPropertyDialog(NeVerDialog):
         # "Add" button which adds the constraint
         add_button = CustomButton("Add")
         add_button.clicked.connect(
-            lambda: self.add_entry(str(self.var_cb.currentText()), str(self.op_cb.currentText()), self.val.text()))
+            lambda: self.add_entry(self.var_cb.currentText(), self.op_cb.currentText(), self.val.text()))
         grid.addWidget(add_button, 3, 0)
 
         # "Save" button which saves the state

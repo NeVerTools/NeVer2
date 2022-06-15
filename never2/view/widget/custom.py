@@ -67,5 +67,7 @@ class CustomButton(QPushButton):
         super(CustomButton, self).__init__(text)
         if primary:
             self.setStyleSheet(style.PRIMARY_BUTTON_STYLE)
+            self.setDefault(True)
         else:
             self.setStyleSheet(style.BUTTON_STYLE)
+            self.setDefault(False)
