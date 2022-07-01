@@ -1,5 +1,7 @@
+import logging
+
 from PyQt5.Qt import QAbstractItemView
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QObject, pyqtSignal
 from PyQt5.QtWidgets import QLabel, QComboBox, QLineEdit, QPlainTextEdit, QPushButton, QListWidget
 
 import never2.view.styles as style
@@ -13,53 +15,70 @@ class CustomLabel(QLabel):
             self.setStyleSheet(style.NODE_LABEL_STYLE)
         else:
             self.setAlignment(alignment)
-            self.setStyleSheet("color: " + color + ";" +
-                               "border: none;" +
-                               "padding: 2px 0px 2px 2px;")
+            self.setStyleSheet('color: ' + color + ';' +
+                               'border: none;' +
+                               'padding: 2px 0px 2px 2px;')
 
 
 class CustomComboBox(QComboBox):
     def __init__(self, color: str = style.WHITE):
         super(CustomComboBox, self).__init__()
-        self.setStyleSheet("color: " + color + ";" +
-                           "background-color: " + style.GREY_2 + ";" +
-                           "border: none;" +
-                           "padding: 2px;")
+        self.setStyleSheet('color: ' + color + ';' +
+                           'background-color: ' + style.GREY_2 + ';' +
+                           'border: none;' +
+                           'padding: 2px;')
 
 
 class CustomTextBox(QLineEdit):
     def __init__(self, text: str = '', color: str = style.WHITE):
         super(CustomTextBox, self).__init__()
         self.setText(text)
-        self.setStyleSheet("color: " + color + ";" +
-                           "background-color: " + style.GREY_2 + ";" +
-                           "border: none;" +
-                           "padding: 2px;")
+        self.setStyleSheet('color: ' + color + ';' +
+                           'background-color: ' + style.GREY_2 + ';' +
+                           'border: none;' +
+                           'padding: 2px;')
 
 
 class CustomTextArea(QPlainTextEdit):
-    def __init__(self, color: str = style.WHITE):
-        super(CustomTextArea, self).__init__()
-        self.setStyleSheet("color: " + color + ";" +
-                           "background-color: " + style.GREY_2 + ";" +
-                           "border: none;" +
-                           "padding: 2px;" +
-                           "QPlainTextEdit::placeholder {" +
-                           "color: " + style.GREY_4 + ";" +
-                           "}")
+    def __init__(self, color: str = style.WHITE, parent=None):
+        super(CustomTextArea, self).__init__(parent)
+        self.setStyleSheet('color: ' + color + ';' +
+                           'background-color: ' + style.GREY_2 + ';' +
+                           'border: none;' +
+                           'padding: 2px;' +
+                           'QPlainTextEdit::placeholder {' +
+                           'color: ' + style.GREY_4 + ';' +
+                           '}')
+
+
+class CustomLoggerTextArea(logging.Handler, QObject):
+    appendPlainText = pyqtSignal(str)
+
+    def __init__(self, parent):
+        super().__init__()
+        QObject.__init__(self)
+
+        self.widget = CustomTextArea(parent=parent)
+        self.widget.setReadOnly(True)
+        self.widget.setFixedHeight(150)
+        self.appendPlainText.connect(self.widget.appendPlainText)
+
+    def emit(self, record: logging.LogRecord) -> None:
+        msg = self.format(record)
+        self.appendPlainText.emit(msg)
 
 
 class CustomListBox(QListWidget):
     def __init__(self, color: str = style.WHITE):
         super(QListWidget, self).__init__()
         self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
-        self.setStyleSheet("color: " + color + ";" +
-                           "background-color: " + style.GREY_2 + ";" +
-                           "border: none;" +
-                           "padding: 2px;" +
-                           "QListWidget::placeholder {" +
-                           "color: " + style.GREY_4 + ";" +
-                           "}")
+        self.setStyleSheet('color: ' + color + ';' +
+                           'background-color: ' + style.GREY_2 + ';' +
+                           'border: none;' +
+                           'padding: 2px;' +
+                           'QListWidget::placeholder {' +
+                           'color: ' + style.GREY_4 + ';' +
+                           '}')
 
 
 class CustomButton(QPushButton):

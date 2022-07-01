@@ -19,10 +19,9 @@ from pynever.strategies.training import PytorchTraining, PytorchMetrics
 import never2.view.styles as style
 from never2 import ROOT_DIR
 from never2.view.util import utility
-from never2.view.widget.custom import CustomLabel, CustomComboBox, CustomTextBox, CustomButton
+from never2.view.widget.custom import CustomLabel, CustomComboBox, CustomTextBox, CustomButton, CustomLoggerTextArea
 from never2.view.widget.dialog.dialogs import MessageDialog, MessageType, GenericDatasetDialog, ArithmeticValidator, \
     MixedVerificationDialog, ComposeTransformDialog
-from never2.view.widget.misc import LoggerTextBox
 
 
 class NeVerWindow(QtWidgets.QDialog):
@@ -485,7 +484,7 @@ class TrainingWindow(NeVerWindow):
         data = self.load_dataset()
 
         # Add logger text box
-        log_textbox = LoggerTextBox(self)
+        log_textbox = CustomLoggerTextArea(self)
         logger = logging.getLogger("pynever.strategies.training")
         logger.addHandler(log_textbox)
         logger.setLevel(logging.INFO)
@@ -668,7 +667,7 @@ class VerificationWindow(NeVerWindow):
         output_name = list(self.properties.keys())[-1]
 
         # Add logger text box
-        log_textbox = LoggerTextBox(self)
+        log_textbox = CustomLoggerTextArea(self)
         logger = logging.getLogger("pynever.strategies.verification")
         logger.addHandler(log_textbox)
         logger.setLevel(logging.INFO)
