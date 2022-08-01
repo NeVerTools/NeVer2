@@ -1,11 +1,10 @@
-import onnx
 import pynever.networks as pynn
-import torch
+import pynever.strategies.conversion as conv
 from PyQt5.QtCore import pyqtSignal, QObject, Qt
 from PyQt5.QtWidgets import QFileDialog, QApplication
 from pynever.strategies.conversion import ONNXNetwork, \
     ONNXConverter, PyTorchConverter, TensorflowConverter, PyTorchNetwork, TensorflowNetwork, AlternativeRepresentation
-from pynever.strategies.processing import ExpressionTreeConverter
+from pynever.strategies.smt_reading import ExpressionTreeConverter
 from pysmt.exceptions import PysmtException
 from pysmt.smtlib.parser import SmtLibParser
 
@@ -236,19 +235,7 @@ class InputHandler:
 
         # Get extension
         self.extension = path.split(".")[-1]
-        net_id = path.split("/")[-1].replace(f".{self.extension}", '')
-
-        if self.extension in SUPPORTED_NETWORK_FORMATS['ONNX']:
-            model_proto = onnx.load(path)
-            self.alt_repr = ONNXNetwork(net_id, model_proto, True)
-
-        elif self.extension in SUPPORTED_NETWORK_FORMATS['PyTorch']:
-            if not torch.cuda.is_available():
-                module = torch.load(path, map_location=torch.device('cpu'))
-            else:
-                module = torch.load(path)
-
-            self.alt_repr = PyTorchNetwork(net_id, module, True)
+        self.alt_repr = conv.load_network_path(path)
 
         # Convert the network
         if self.alt_repr is not None:
@@ -446,10 +433,7 @@ class OutputHandler:
             self.alt_repr = self.convert_network(network, filename[0])
 
             # Saving the network on file depending on the format
-            if isinstance(self.alt_repr, ONNXNetwork):
-                onnx.save(self.alt_repr.onnx_network.onnx_network, filename[0])
-            elif isinstance(self.alt_repr, PyTorchNetwork):
-                torch.save(self.alt_repr.pytorch_network, filename[0])
+            conv.save_network_path(self.alt_repr, filename[0])
 
         except Exception as e:
             self.exception = e
@@ -503,7 +487,7 @@ class OutputHandler:
                 self.extension in SUPPORTED_NETWORK_FORMATS['VNNLIB']:
             self.strategy = ONNXConverter()
             model = self.strategy.from_neural_network(network)
-            self.alt_repr = ONNXNetwork(net_id, model, True)
+            self.alt_repr = ONNXNetwork(net_id, model, True).onnx_network
 
         elif self.extension in SUPPORTED_NETWORK_FORMATS['PyTorch']:
             self.strategy = PyTorchConverter()
