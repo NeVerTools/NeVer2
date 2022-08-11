@@ -678,7 +678,12 @@ class Canvas(QWidget):
                         first_node = self.renderer.NN.get_first_node()
 
                         # If the node is in the network, delete it
-                        new_tuple = self.renderer.delete_node(self.scene.blocks[item].block_id)
+                        new_tuple = None
+                        try:
+                            new_tuple = self.renderer.delete_node(self.scene.blocks[item].block_id)
+                        except Exception as e:
+                            dialog = MessageDialog(str(e), MessageType.ERROR)
+                            dialog.exec()
 
                         # If there was a connection, preserve it
                         if new_tuple is not None:
@@ -812,6 +817,13 @@ class Canvas(QWidget):
 
     def draw_properties(self):
         tot_height = 0
+
+        # Preprocessing last node
+        if 'Y' in self.project.properties.keys():
+            v = self.project.properties['Y']
+            self.project.properties.pop('Y')
+            self.project.properties[self.project.network.get_last_node().identifier] = v
+
         for n, p in self.project.properties.items():
             for node in self.project.network.nodes.values():
                 if n == self.project.network.input_id:

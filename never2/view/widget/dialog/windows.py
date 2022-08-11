@@ -13,7 +13,7 @@ from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QFileDialog
 from pynever import nodes
 from pynever.datasets import Dataset
 from pynever.networks import NeuralNetwork, SequentialNetwork
-from pynever.strategies import reading, verification
+from pynever.strategies import smt_reading, verification
 from pynever.strategies.training import PytorchTraining, PytorchMetrics
 
 import never2.view.styles as style
@@ -676,7 +676,7 @@ class VerificationWindow(NeVerWindow):
         logger.info("***** NeVer 2 - VERIFICATION *****")
 
         # Load NeVerProperty from file
-        parser = reading.SmtPropertyParser(verification.SMTLIBProperty(path), input_name, output_name)
+        parser = smt_reading.SmtPropertyParser(path, input_name, output_name)
         to_verify = parser.parse_property()
 
         # Property read, delete file
