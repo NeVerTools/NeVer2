@@ -14,17 +14,19 @@ from never2.view.widget.dialog.dialogs import MessageDialog, MessageType, InputD
 
 # Formats available for opening and saving networks
 NETWORK_FORMATS_OPENING = "All supported formats (*.onnx *.pt *.pth);;\
-                            ONNX(*.onnx);;\
-                            PyTorch(*.pt *.pth)"
-NETWORK_FORMATS_SAVE = "ONNX(*.onnx);;\
-                        PyTorch(*.pt *.pth);;\
+                            ONNX (*.onnx);;\
+                            PyTorch (*.pt *.pth)"
+NETWORK_FORMATS_SAVE = "ONNX (*.onnx);;\
+                        PyTorch (*.pt *.pth);;\
                         VNNLIB (*.onnx + *.smt2)"
-PROPERTY_FORMATS = "SMT-LIB files (*.smt *.smt2);;\
-                           SMT(*.smt *.smt2)"
+PROPERTY_FORMATS = "VNN-LIB files (*.smt *.smt2 *.vnnlib);;\
+                           SMT (*.smt *.smt2);;\
+                           VNNLIB (*.vnnlib)"
 SUPPORTED_NETWORK_FORMATS = {'VNNLIB': ['vnnlib'],
                              'ONNX': ['onnx'],
                              'PyTorch': ['pt', 'pth']}
-SUPPORTED_PROPERTY_FORMATS = {'SMT': ['smt', 'smt2']}
+SUPPORTED_PROPERTY_FORMATS = {'SMT': ['smt', 'smt2'],
+                              'VNNLIB': ['vnnlib']}
 
 
 class Project(QObject):
