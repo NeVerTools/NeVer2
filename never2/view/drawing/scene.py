@@ -817,12 +817,12 @@ class Canvas(QWidget):
 
     def draw_properties(self):
         tot_height = 0
+        y_out = False
 
         # Preprocessing last node
         if 'Y' in self.project.properties.keys():
-            v = self.project.properties['Y']
-            self.project.properties.pop('Y')
-            self.project.properties[self.project.network.get_last_node().identifier] = v
+            self.project.properties[self.project.network.get_last_node().identifier] = self.project.properties.pop('Y')
+            y_out = True
 
         for n, p in self.project.properties.items():
             for node in self.project.network.nodes.values():
@@ -842,6 +842,9 @@ class Canvas(QWidget):
                     tot_height += (new_p.rect.rect().height() + 50)
                     self.draw_line_between(new_p.block_id, n)
                     break
+
+        if y_out:
+            self.project.properties['Y'] = self.project.properties.pop(self.project.network.get_last_node().identifier)
 
     def train_network(self):
         if not self.renderer.NN.nodes:

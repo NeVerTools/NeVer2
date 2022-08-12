@@ -677,7 +677,7 @@ class VerificationWindow(NeVerWindow):
 
         # Load NeVerProperty from file
         parser = smt_reading.SmtPropertyParser(path, input_name, output_name)
-        to_verify = parser.parse_property()
+        to_verify = verification.NeVerProperty(*parser.parse_property())
 
         # Property read, delete file
         os.remove(path)
