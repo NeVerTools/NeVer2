@@ -41,6 +41,7 @@ class ArithmeticValidator:
     FLOAT = QDoubleValidator()
     TENSOR = QRegExpValidator(QRegExp('(([0-9])+(,[0-9]+)*)'))
     TENSOR_LIST = QRegExpValidator(QRegExp('(\((([0-9])+(,[0-9]+)*)\))+(,(\((([0-9])+(,[0-9]+)*)\)))*'))
+    SAMPLE = QRegExpValidator(QRegExp('^(?:\d+(?:\.\d*)?|\.\d+)(?:,(?:\d+(?:\.\d*)?|\.\d+))*$'))
 
 
 class MessageType(Enum):
@@ -952,6 +953,79 @@ class EditSmtPropertyDialog(TwoButtonsDialog):
         self.new_property = self.smt_box.toPlainText()
 
 
+class EditLocalRobustnessPropertyDialog(TwoButtonsDialog):
+    def __init__(self, property_block: PropertyBlock):
+        super().__init__("Edit property", "")
+        self.property_block = property_block
+        self.has_edits = False
+
+        self.local_input = None
+        self.local_output = None
+        self.epsilon_noise = 0.0
+        self.delta_robustness = 0.0
+
+        grid = QGridLayout()
+
+        # Build main_layout
+        title_label = CustomLabel("Local robustness property", primary=True)
+        grid.addWidget(title_label, 0, 0, 1, 2)
+
+        # Labels
+        in_label = CustomLabel("Local input")
+        grid.addWidget(in_label, 1, 0)
+        self.local_input_text = CustomTextBox()
+        self.local_input_text.setValidator(ArithmeticValidator.SAMPLE)
+        grid.addWidget(self.local_input_text, 1, 1)
+
+        out_label = CustomLabel("Local output")
+        grid.addWidget(out_label, 2, 0)
+        self.local_output_text = CustomTextBox()
+        self.local_output_text.setValidator(ArithmeticValidator.SAMPLE)
+        grid.addWidget(self.local_output_text, 2, 1)
+
+        eps_label = CustomLabel("Epsilon noise")
+        grid.addWidget(eps_label, 3, 0)
+        self.epsilon_noise_text = CustomTextBox('0.0')
+        self.epsilon_noise_text.setValidator(ArithmeticValidator.FLOAT)
+        grid.addWidget(self.epsilon_noise_text, 3, 1)
+
+        delta_label = CustomLabel("Delta robustness")
+        grid.addWidget(delta_label, 4, 0)
+        self.delta_robustness_text = CustomTextBox('0.0')
+        self.delta_robustness_text.setValidator(ArithmeticValidator.FLOAT)
+        grid.addWidget(self.delta_robustness_text, 4, 1)
+
+        # Visualizer
+        self.viewer = CustomTextArea()
+        self.viewer.setReadOnly(True)
+        self.viewer.setFixedHeight(80)
+        self.viewer.appendPlainText('X <= x0 + eps')
+        self.viewer.appendPlainText('-X <= -x0 + eps')
+        self.viewer.appendPlainText('')
+        self.viewer.appendPlainText('Y <= y0 + delta')
+        self.viewer.appendPlainText('-Y <= -y0 + delta')
+
+        grid.setColumnStretch(0, 1)
+        grid.setColumnStretch(1, 1)
+
+        self.set_buttons_text('Cancel', 'Save')
+        self.ok_btn.clicked.connect(self.save_property)
+
+        self.layout.addLayout(grid)
+        self.layout.addWidget(self.viewer, 2)
+
+        self.render_layout()
+
+    def save_property(self):
+        self.local_input = self.local_input_text.text().split(',')
+        self.local_output = self.local_output_text.text().split(',')
+        self.epsilon_noise = self.epsilon_noise_text.text()
+        self.delta_robustness = self.delta_robustness_text.text()
+        self.has_edits = True
+
+        self.close()
+
+
 class EditPolyhedralPropertyDialog(NeVerDialog):
     """
     This dialog allows to define a polyhedral property
@@ -1020,15 +1094,15 @@ class EditPolyhedralPropertyDialog(NeVerDialog):
             lambda: self.add_entry(self.var_cb.currentText(), self.op_cb.currentText(), self.val.text()))
         grid.addWidget(add_button, 3, 0)
 
-        # "Save" button which saves the state
-        save_button = CustomButton("Save", primary=True)
-        save_button.clicked.connect(self.save_property)
-        grid.addWidget(save_button, 3, 1)
-
         # "Cancel" button which closes the dialog without saving
         cancel_button = CustomButton("Cancel")
         cancel_button.clicked.connect(self.close)
-        grid.addWidget(cancel_button, 3, 2)
+        grid.addWidget(cancel_button, 3, 1)
+
+        # "Save" button which saves the state
+        save_button = CustomButton("Save", primary=True)
+        save_button.clicked.connect(self.save_property)
+        grid.addWidget(save_button, 3, 2)
 
         grid.setColumnStretch(0, 1)
         grid.setColumnStretch(1, 1)

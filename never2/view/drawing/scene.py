@@ -19,7 +19,7 @@ from never2.view.drawing.element import NodeBlock, GraphicLine, PropertyBlock, G
 from never2.view.drawing.renderer import SequentialNetworkRenderer
 from never2.view.util import utility
 from never2.view.widget.dialog.dialogs import MessageDialog, MessageType, EditSmtPropertyDialog, \
-    EditPolyhedralPropertyDialog, EditNodeDialog, FuncDialog
+    EditPolyhedralPropertyDialog, EditNodeDialog, FuncDialog, EditLocalRobustnessPropertyDialog
 from never2.view.widget.dialog.windows import TrainingWindow, VerificationWindow
 
 
@@ -551,6 +551,27 @@ class Canvas(QWidget):
             if dialog.has_edits:
                 item.smt_string = dialog.new_property
                 item.set_smt_label()
+        elif item.property_type == "Local robustness":
+            dialog = EditLocalRobustnessPropertyDialog(item)
+            dialog.exec()
+
+            if dialog.has_edits:
+                for i in range(len(dialog.local_input)):
+                    item.smt_string += f"(assert (<= X_{i} " \
+                                       f"{eval(dialog.local_input[i]) + eval(dialog.epsilon_noise)}" \
+                                       f"))\n"
+                    item.smt_string += f"(assert (>= X_{i} " \
+                                       f"{eval(dialog.local_input[i]) - eval(dialog.epsilon_noise)}" \
+                                       f"))\n"
+                item.smt_string += '\n'
+                for i in range(len(dialog.local_output)):
+                    item.smt_string += f"(assert (<= Y_{i} " \
+                                       f"{eval(dialog.local_output[i]) + eval(dialog.delta_robustness)}" \
+                                       f"))\n"
+                    item.smt_string += f"(assert (>= Y_{i} " \
+                                       f"{eval(dialog.local_output[i]) - eval(dialog.delta_robustness)}" \
+                                       f"))\n"
+
         elif item.property_type == "Polyhedral":
             dialog = EditPolyhedralPropertyDialog(item)
             dialog.exec()

@@ -637,12 +637,17 @@ class PropertyBlock(GraphicBlock):
         self.property_type = p_type
         self.pre_condition = True
         self.smt_string = ""
+
+        self.condition_label = CustomLabel("PRE")
+
         if p_type == "Generic SMT":
             self.label_string = "-"
         elif p_type == "Polyhedral":
             self.label_string = "Ax - b <= 0"
+        elif p_type == "Local robustness":
+            self.label_string = "x <= eps -> y <= delta"
+            self.condition_label = CustomLabel("GLOBAL")
 
-        self.condition_label = CustomLabel("PRE")
         self.property_label = CustomLabel(self.label_string)
         self.variables = []
         self.init_layout()
@@ -650,7 +655,7 @@ class PropertyBlock(GraphicBlock):
 
     def init_layout(self) -> None:
         """
-        This method sets up the the property block main_layout with
+        This method sets up the property block main_layout with
         the property parameters.
 
         """
