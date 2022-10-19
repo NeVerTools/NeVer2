@@ -8,6 +8,7 @@ from PyQt5 import QtWidgets
 from PyQt5.QtCore import QRegExp, Qt, QSize
 from PyQt5.QtGui import QIntValidator, QRegExpValidator, QDoubleValidator
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QWidget, QGridLayout, QTextEdit
+from pynever.networks import SequentialNetwork
 from pynever.tensor import Tensor
 
 import never2.view.styles as style
@@ -954,10 +955,11 @@ class EditSmtPropertyDialog(TwoButtonsDialog):
 
 
 class EditLocalRobustnessPropertyDialog(TwoButtonsDialog):
-    def __init__(self, property_block: PropertyBlock):
+    def __init__(self, property_block: PropertyBlock, nn: SequentialNetwork):
         super().__init__("Edit property", "")
         self.property_block = property_block
         self.has_edits = False
+        self.nn = nn
 
         self.local_input = None
         self.local_output = None
@@ -1021,6 +1023,9 @@ class EditLocalRobustnessPropertyDialog(TwoButtonsDialog):
         self.local_output = self.local_output_text.text().split(',')
         self.epsilon_noise = self.epsilon_noise_text.text()
         self.delta_robustness = self.delta_robustness_text.text()
+
+        # TODO uncomment when pyNeVer is updated
+        # if len(self.local_input) == self.nn.get_input_len() and len(self.local_output) == self.nn.get_output_len():
         self.has_edits = True
 
         self.close()

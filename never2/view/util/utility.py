@@ -266,11 +266,39 @@ def allow_list_in_dict(dictionary: dict) -> dict:
     return dictionary
 
 
+def read_vars(property_string: str) -> list:
+    """
+    This method reads all the variables contained in a constraints string
+
+    Parameters
+    ----------
+    property_string : str
+        A list of constraints contained in a single smt string
+
+    Returns
+    -------
+    list
+        The variables appearing in the constraints
+
+    """
+    variables = []
+
+    for line in property_string.split('\n'):
+        line = line.replace('(assert (<= ', '').replace('(assert (>= ', '').split(' ')
+
+        if line[0] != '' and line[0] not in variables:
+            variables.append(line[0])
+
+    return variables
+
+
 def write_smt_property(path: str, props: dict, dtype: str) -> None:
     # Create and write file
     with open(path, "w") as f:
         # Variables
         for p in props.values():
+            if p.property_type == 'Local robustness':
+                p.variables = read_vars(p.smt_string)
             for v in p.variables:
                 f.write(f"(declare-fun {v} () {dtype})\n")
         f.write("\n")

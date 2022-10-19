@@ -533,7 +533,7 @@ class Canvas(QWidget):
 
         # Finalize block and update scene
         block.context_actions["Define"].triggered \
-            .connect(lambda: Canvas.define_property(block))
+            .connect(lambda: self.define_property(block))
         self.num_props += 1
         block.variables = self.get_input_variables()
         if add_dict_entry:
@@ -542,8 +542,7 @@ class Canvas(QWidget):
 
         return block
 
-    @staticmethod
-    def define_property(item: PropertyBlock) -> None:
+    def define_property(self, item: PropertyBlock) -> None:
         if item.property_type == "Generic SMT":
             dialog = EditSmtPropertyDialog(item)
             dialog.exec()
@@ -551,26 +550,25 @@ class Canvas(QWidget):
             if dialog.has_edits:
                 item.smt_string = dialog.new_property
                 item.set_smt_label()
+
         elif item.property_type == "Local robustness":
-            dialog = EditLocalRobustnessPropertyDialog(item)
+            dialog = EditLocalRobustnessPropertyDialog(item, self.project.network)
             dialog.exec()
 
             if dialog.has_edits:
-                for i in range(len(dialog.local_input)):
-                    item.smt_string += f"(assert (<= X_{i} " \
-                                       f"{eval(dialog.local_input[i]) + eval(dialog.epsilon_noise)}" \
-                                       f"))\n"
-                    item.smt_string += f"(assert (>= X_{i} " \
-                                       f"{eval(dialog.local_input[i]) - eval(dialog.epsilon_noise)}" \
-                                       f"))\n"
+                size = len(dialog.local_input)
+                e = eval(dialog.epsilon_noise)
+                d = eval(dialog.delta_robustness)
+                for i in range(size):
+                    x0 = eval(dialog.local_input[i])
+                    item.smt_string += f"(assert (<= {self.project.network.input_id}_{i} {x0 + e}))\n"
+                    item.smt_string += f"(assert (>= {self.project.network.input_id}_{i} {x0 - e}))\n"
                 item.smt_string += '\n'
-                for i in range(len(dialog.local_output)):
-                    item.smt_string += f"(assert (<= Y_{i} " \
-                                       f"{eval(dialog.local_output[i]) + eval(dialog.delta_robustness)}" \
-                                       f"))\n"
-                    item.smt_string += f"(assert (>= Y_{i} " \
-                                       f"{eval(dialog.local_output[i]) - eval(dialog.delta_robustness)}" \
-                                       f"))\n"
+                size = len(dialog.local_output)
+                for i in range(size):
+                    y0 = eval(dialog.local_output[i])
+                    item.smt_string += f"(assert (<= {self.project.network.get_last_node().identifier}_{i} {y0 + d}))\n"
+                    item.smt_string += f"(assert (>= {self.project.network.get_last_node().identifier}_{i} {y0 - d}))\n"
 
         elif item.property_type == "Polyhedral":
             dialog = EditPolyhedralPropertyDialog(item)
@@ -1266,5 +1264,5 @@ class NetworkScene(QGraphicsScene):
                     # The block emits a signal
                     item.edits = item.block_id, dialog.edited_data
                     item.edited.emit()
-            else:
-                Canvas.define_property(item)
+            elif isinstance(item, PropertyBlock):
+                self.parent().define_property(item)
