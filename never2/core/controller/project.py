@@ -372,7 +372,6 @@ class InputHandler:
                 self.strategy = TensorflowConverter()
 
             # Converting the network with the given input
-            # TODO ASSOCIATE NEW INPUT SHAPE?
             return self.strategy.to_neural_network(self.alt_repr)
 
         except Exception as e:
@@ -500,5 +499,5 @@ class OutputHandler:
         else:
             raise Exception("Format not supported")
 
-        network.alt_rep_cache.append(self.alt_repr)  # TODO ?
+        network.alt_rep_cache.append(self.alt_repr)
         return self.alt_repr

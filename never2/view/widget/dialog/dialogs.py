@@ -1024,9 +1024,8 @@ class EditLocalRobustnessPropertyDialog(TwoButtonsDialog):
         self.epsilon_noise = self.epsilon_noise_text.text()
         self.delta_robustness = self.delta_robustness_text.text()
 
-        # TODO uncomment when pyNeVer is updated
-        # if len(self.local_input) == self.nn.get_input_len() and len(self.local_output) == self.nn.get_output_len():
-        self.has_edits = True
+        if len(self.local_input) == self.nn.get_input_len() and len(self.local_output) == self.nn.get_output_len():
+            self.has_edits = True
 
         self.close()
 
