@@ -3,7 +3,7 @@ import pynever.strategies.conversion as conv
 from PyQt5.QtCore import pyqtSignal, QObject, Qt
 from PyQt5.QtWidgets import QFileDialog, QApplication
 from pynever.strategies.conversion import ONNXNetwork, \
-    ONNXConverter, PyTorchConverter, TensorflowConverter, PyTorchNetwork, TensorflowNetwork, AlternativeRepresentation
+    ONNXConverter, PyTorchConverter, PyTorchNetwork, AlternativeRepresentation
 from pynever.strategies.smt_reading import ExpressionTreeConverter
 from pysmt.exceptions import PysmtException
 from pysmt.smtlib.parser import SmtLibParser
@@ -367,9 +367,6 @@ class InputHandler:
             # Select the format
             if isinstance(self.alt_repr, PyTorchNetwork):
                 self.strategy = PyTorchConverter()
-
-            elif isinstance(self.alt_repr, TensorflowNetwork):
-                self.strategy = TensorflowConverter()
 
             # Converting the network with the given input
             return self.strategy.to_neural_network(self.alt_repr)
