@@ -6,9 +6,10 @@ This module defines custom UI component with pre-defined style
 Author: Stefano Demarchi
 
 """
+import logging
 
-from PyQt6.QtCore import Qt
-from PyQt6.QtWidgets import QLabel, QComboBox, QLineEdit, QPlainTextEdit, QPushButton
+from PyQt6.QtCore import Qt, QObject, pyqtSignal
+from PyQt6.QtWidgets import QLabel, QComboBox, QLineEdit, QPlainTextEdit, QPushButton, QListWidget, QAbstractItemView
 
 import never2.resources.styling.display as disp
 import never2.resources.styling.palette as palette
@@ -101,5 +102,35 @@ class CustomTextArea(QPlainTextEdit):
                            'border: none;' +
                            'padding: 2px;' +
                            'QPlainTextEdit::placeholder {' +
+                           'color: ' + palette.GREY_4 + ';' +
+                           '}')
+
+
+class CustomLoggerTextArea(logging.Handler, QObject):
+    appendPlainText = pyqtSignal(str)
+
+    def __init__(self, parent):
+        super().__init__()
+        QObject.__init__(self)
+
+        self.widget = CustomTextArea(parent=parent)
+        self.widget.setReadOnly(True)
+        self.widget.setFixedHeight(150)
+        self.appendPlainText.connect(self.widget.appendPlainText)
+
+    def emit(self, record: logging.LogRecord) -> None:
+        msg = self.format(record)
+        self.appendPlainText.emit(msg)
+
+
+class CustomListBox(QListWidget):
+    def __init__(self, color: str = palette.WHITE):
+        super(QListWidget, self).__init__()
+        self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
+        self.setStyleSheet('color: ' + color + ';' +
+                           'background-color: ' + palette.GREY_2 + ';' +
+                           'border: none;' +
+                           'padding: 2px;' +
+                           'QListWidget::placeholder {' +
                            'color: ' + palette.GREY_4 + ';' +
                            '}')
