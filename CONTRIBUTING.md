@@ -5,7 +5,9 @@ via [issues](https://github.com/NeVerTools/NeVer2/issues) and/or [merge_requests
 
 ## Contributors
 
-- 
+- Stefano Demarchi
+- Dario Guidotti
+- Andrea Gimelli
 
 ## Bug fixes, feature additions, etc.
 

@@ -1,0 +1,715 @@
+{
+  "Linear layers": {
+    "Fully Connected": {
+      "name": "FullyConnectedNode",
+      "id": "FCN",
+      "input": {
+        "A": {
+          "type": "Tensor",
+          "description": "Input tensor."
+        }
+      },
+      "parameters": {
+        "in_features": {
+          "type": "int",
+          "description": "Number of inputs of the layer.",
+          "object": "QLabel",
+          "editable": "False"
+        },
+        "out_features": {
+          "type": "int",
+          "description": "Number of outputs of the layer.",
+          "object": "QLineEdit",
+          "default": "1",
+          "editable": "True",
+          "required": "True"
+        },
+        "weight": {
+          "type": "Tensor",
+          "description": "Weight tensor.",
+          "object": "QLabel",
+          "shape": "out_features, in_features",
+          "editable": "False"
+        },
+        "bias": {
+          "type": "Tensor",
+          "description": "Bias tensor.",
+          "object": "QLabel",
+          "shape": "out_features",
+          "editable": "False"
+        },
+        "has_bias": {
+          "type": "boolean",
+          "description": "True if the layer has a bias.",
+          "object": "QComboBox",
+          "required": "False",
+          "default": "True",
+          "editable": "True"
+        }
+      },
+      "output": {
+        "output": {
+          "type": "Tensor",
+          "description": "Output tensor."
+        }
+      },
+      "description": "Matrix product that computes alpha * A' * B' + bias"
+    }
+  },
+  "Convolution layers": {
+    "Convolutional": {
+      "name": "ConvNode",
+      "id": "CNV",
+      "input": {
+        "X": {
+          "type": "Tensor",
+          "description": "Input data tensor from previous layer; has size (N x C x H x W), where N is the batch size, C is the number of channels, and H and W are the height and width. Note that this is for the 2D image. Otherwise the size is (N x C x D1 x D2 ... x Dn). Optionally, if dimension denotation is in effect, the operation expects input data tensor to arrive with the dimension denotation of [DATA_BATCH, DATA_CHANNEL, DATA_FEATURE, DATA_FEATURE ...]."
+        }
+      },
+      "parameters": {
+        "in_channels": {
+          "type": "int",
+          "description": "Number of input channels in Conv Layer.",
+          "object": "QLabel",
+          "editable": "False"
+        },
+        "out_channels": {
+          "type": "int",
+          "description": "Number of output channels in Conv Layer.",
+          "object": "QLineEdit",
+          "default": "1",
+          "editable": "True"
+        },
+        "kernel_size": {
+          "type": "list of ints",
+          "description": "The shape of the convolution kernel. If not present, should be inferred from input W.",
+          "object": "QLineEdit",
+          "required": "False",
+          "default": "1, 1",
+          "editable": "True"
+        },
+        "stride": {
+          "type": "list of ints",
+          "description": "Stride along each spatial axis. If not present, the stride defaults is 1 along each spatial axis.",
+          "object": "QLineEdit",
+          "required": "False",
+          "default": "1, 1",
+          "editable": "True"
+        },
+        "padding": {
+          "type": "list of ints",
+          "description": "Padding for the beginning and ending along each spatial axis, it can take any value greater than or equal to 0. The value represent the number of pixels added to the beginning and end part of the corresponding axis. `pads` format should be as follow [x1_begin, x2_begin...x1_end, x2_end,...], where xi_begin the number of pixels added at the beginning of axis `i` and xi_end, the number of pixels added at the end of axis `i`. This attribute cannot be used simultaneously with auto_pad attribute. If not present, the padding defaults to 0 along start and end of each spatial axis.",
+          "object": "QLineEdit",
+          "required": "False",
+          "default": "0, 0, 0, 0",
+          "editable": "True"
+        },
+        "dilation": {
+          "type": "list of ints",
+          "description": "dilation value along each spatial axis of the filter. If not present, the dilation defaults is 1 along each spatial axis.",
+          "object": "QLineEdit",
+          "required": "False",
+          "default": "1, 1",
+          "editable": "True"
+        },
+        "groups": {
+          "type": "int",
+          "description": "number of groups input channels and output channels are divided into.",
+          "object": "QLineEdit",
+          "required": "True",
+          "default": "1",
+          "editable": "True"
+        },
+        "has_bias": {
+          "type": "boolean",
+          "description": "Flag True if the convolutional layer has bias, False otherwise.",
+          "object": "QComboBox",
+          "required": "False",
+          "editable": "True"
+        },
+        "bias": {
+          "type": "Tensor",
+          "description": "Optional 1D bias to be added to the convolution, has size of M.",
+          "object": "QLabel",
+          "required": "True",
+          "shape": "out_channels",
+          "editable": "False"
+        },
+        "weight": {
+          "type": "Tensor",
+          "description": "The weight tensor that will be used in the convolutions; has size (M x C/group x kH x kW), where C is the number of channels, and kH and kW are the height and width of the kernel, and M is the number of feature maps. For more than 2 dimensions, the kernel shape will be (M x C/group x k1 x k2 x ... x kn), where (k1 x k2 x ... kn) is the dimension of the kernel. Optionally, if dimension denotation is in effect, the operation expects the weight tensor to arrive with the dimension denotation of [FILTER_OUT_CHANNEL, FILTER_IN_CHANNEL, FILTER_SPATIAL, FILTER_SPATIAL ...]. X.shape[1] == (W.shape[1] * group) == C (assuming zero based indices for the shape array). Or in other words FILTER_IN_CHANNEL should be equal to DATA_CHANNEL.",
+          "object": "QLabel",
+          "required": "True",
+          "shape": "out_channels, in_channels, kernel_size",
+          "editable": "False"
+        }
+      },
+      "output": {
+        "Y": {
+          "type": "Tensor",
+          "description": "Output data tensor that contains the result of the convolution. The output dimensions are functions of the kernel size, stride size, and pad lengths."
+        }
+      },
+      "description": "Consumes an input tensor and a filter, and computes the output."
+    }
+  },
+  "Activation layers": {
+    "ReLU": {
+      "name": "ReLUNode",
+      "id": "REL",
+      "input": {
+        "X": {
+          "type": "Tensor",
+          "description": "Input tensor."
+        }
+      },
+      "parameters": {
+      },
+      "output": {
+        "Y": {
+          "type": "Tensor",
+          "description": "Output tensor."
+        }
+      },
+      "description": "Relu takes one input data (Tensor) and produces one output data (Tensor) where the rectified linear function, y = max(0, x), is applied to the tensor elementwise."
+    },
+    "ELU": {
+      "name": "ELUNode",
+      "id": "ELU",
+      "input": {
+        "X": {
+          "type": "Tensor",
+          "description": "Input tensor."
+        }
+      },
+      "parameters": {
+        "alpha": {
+          "type": "float",
+          "description": "The alpha value for the ELU formulation (default 1.0).",
+          "object": "QLineEdit",
+          "required": "True",
+          "default": "1.0",
+          "editable": "True"
+        }
+      },
+      "output": {
+        "Y": {
+          "type": "Tensor",
+          "description": "Output tensor."
+        }
+      },
+      "description": "Elu takes one input data (Tensor) and produces one output data (Tensor) performing the identity operation on positive inputs and an exponential nonlinearity on negative inputs."
+    },
+    "CELU": {
+      "name": "CELUNode",
+      "id": "CEL",
+      "input": {
+        "X": {
+          "type": "Tensor",
+          "description": "Input tensor."
+        }
+      },
+      "parameters": {
+        "alpha": {
+          "type": "float",
+          "description": "The alpha value for the CELU formulation (default 1.0).",
+          "object": "QLineEdit",
+          "required": "True",
+          "default": "1.0",
+          "editable": "True"
+        }
+      },
+      "output": {
+        "Y": {
+          "type": "Tensor",
+          "description": "Output tensor."
+        }
+      },
+      "description": "Celu takes one input data (Tensor) and produces one output data (Tensor) performing the continuously differentiable exponential linear unit."
+    },
+    "Leaky ReLU": {
+      "name": "LeakyReLUNode",
+      "id": "LLU",
+      "input": {
+        "X": {
+          "type": "Tensor",
+          "description": "Input tensor."
+        }
+      },
+      "parameters": {
+        "negative_slope": {
+          "type": "float",
+          "description": "Controls the angle of the negative slope (default: 1e-2).",
+          "object": "QLineEdit",
+          "required": "True",
+          "default": "1e-2",
+          "editable": "True"
+        }
+      },
+      "output": {
+        "Y": {
+          "type": "Tensor",
+          "description": "Output tensor."
+        }
+      },
+      "description": "Leaky ReLU takes one input data (Tensor) and produces one output data (Tensor) performing the max(0.01*x, x) function."
+    },
+    "Sigmoid": {
+      "name": "SigmoidNode",
+      "id": "SIG",
+      "input": {
+        "X": {
+          "type": "Tensor",
+          "description": "Input tensor."
+        }
+      },
+      "parameters": {
+      },
+      "output": {
+        "Y": {
+          "type": "Tensor",
+          "description": "Output tensor."
+        }
+      },
+      "description": "Sigmoid takes one input data (Tensor) and produces one output data (Tensor) where the logistic function is applied to the tensor elementwise."
+    },
+    "Tanh": {
+      "name": "TanhNode",
+      "id": "TAH",
+      "input": {
+        "X": {
+          "type": "Tensor",
+          "description": "Input tensor."
+        }
+      },
+      "parameters": {
+      },
+      "output": {
+        "Y": {
+          "type": "Tensor",
+          "description": "Output tensor."
+        }
+      },
+      "description": "Tanh takes one input data (Tensor) and produces one output data (Tensor) where the hyperbolic tangent function is applied to the tensor elementwise."
+    },
+    "SoftMax": {
+      "name": "SoftMaxNode",
+      "id": "SOF",
+      "input": {
+        "X": {
+          "type": "Tensor",
+          "description": "Input tensor."
+        }
+      },
+      "parameters": {
+        "axis": {
+          "type": "int",
+          "description": " A dimension along which Softmax will be computed (so every slice along dim will sum to 1).",
+          "object": "QLineEdit",
+          "required": "False",
+          "default": "-1",
+          "editable": "True"
+        }
+      },
+      "output": {
+        "Y": {
+          "type": "Tensor",
+          "description": "Output tensor."
+        }
+      },
+      "description": "The operator computes the normalized exponential values for the given input: Softmax(input, axis) = Exp(input) / ReduceSum(Exp(input), axis=axis, keepdims=1). The input does not need to explicitly be a 2D vector. The axis attribute indicates the dimension along which Softmax will be performed. The output tensor has the same shape and contains the Softmax values of the corresponding input."
+    }
+  },
+  "Pooling layers": {
+    "AveragePool": {
+      "name": "AveragePoolNode",
+      "id": "AVG",
+      "input": {
+        "X": {
+          "type": "Tensor",
+          "description": "Input data tensor from the previous operator; dimensions for image case are (N x C x H x W), where N is the batch size, C is the number of channels, and H and W are the height and the width of the data. For non image case, the dimensions are in the form of (N x C x D1 x D2 ... Dn), where N is the batch size. Optionally, if dimension denotation is in effect, the operation expects the input data tensor to arrive with the dimension denotation of [DATA_BATCH, DATA_CHANNEL, DATA_FEATURE, DATA_FEATURE ...]."
+        }
+      },
+      "parameters": {
+        "kernel_size": {
+          "type": "list of ints",
+          "description": "The size of the kernel along each axis.",
+          "object": "QLineEdit",
+          "required": "True",
+          "default": "1, 1",
+          "editable": "True"
+        },
+        "stride": {
+          "type": "list of ints",
+          "description": "Stride along each spatial axis. If not present, the stride defaults to 1 along each spatial axis.",
+          "object": "QLineEdit",
+          "required": "False",
+          "default": "1, 1",
+          "editable": "True"
+        },
+        "padding": {
+          "type": "list of ints",
+          "description": "Padding for the beginning and ending along each spatial axis, it can take any value greater than or equal to 0. The value represent the number of pixels added to the beginning and end part of the corresponding axis. `pads` format should be as follow [x1_begin, x2_begin...x1_end, x2_end,...], where xi_begin the number of pixels added at the beginning of axis `i` and xi_end, the number of pixels added at the end of axis `i`. This attribute cannot be used simultaneously with auto_pad attribute. If not present, the padding defaults to 0 along start and end of each spatial axis.",
+          "object": "QLineEdit",
+          "required": "False",
+          "default": "0, 0, 0, 0",
+          "editable": "True"
+        },
+        "ceil_mode": {
+          "type": "boolean",
+          "description": "Whether to use ceil or floor (default) to compute the output shape.",
+          "object": "QComboBox",
+          "required": "False",
+          "default": "False",
+          "editable": "True"
+        },
+        "count_include_pad": {
+          "type": "boolean",
+          "description": "Whether include pad pixels when calculating values for the edges. Default is 0, doesn't count include pad.",
+          "object": "QComboBox",
+          "required": "False",
+          "default": "False",
+          "editable": "True"
+        }
+      },
+      "output": {
+        "Y": {
+          "type": "Tensor",
+          "description": "Output data tensor from average or max pooling across the input tensor. Dimensions will vary based on various kernel, stride, and pad sizes. Floor value of the dimension is used."
+        }
+      },
+      "description": "Consumes an input tensor X and applies average pooling across the tensor according to kernel sizes, stride sizes, and pad lengths. It consists of computing the average on all values of a subset of the input tensor according to the kernel size and downsampling the data into the output tensor Y for further processing."
+    },
+    "MaxPool": {
+      "name": "MaxPoolNode",
+      "id": "MXP",
+      "input": {
+        "X": {
+          "type": "Tensor",
+          "description": "Input data tensor from the previous operator; dimensions for image case are (N x C x H x W), where N is the batch size, C is the number of channels, and H and W are the height and the width of the data. For non image case, the dimensions are in the form of (N x C x D1 x D2 ... Dn), where N is the batch size. Optionally, if dimension denotation is in effect, the operation expects the input data tensor to arrive with the dimension denotation of [DATA_BATCH, DATA_CHANNEL, DATA_FEATURE, DATA_FEATURE ...]."
+        }
+      },
+      "parameters": {
+        "kernel_size": {
+          "type": "list of ints",
+          "description": "The size of the kernel along each axis.",
+          "object": "QLineEdit",
+          "required": "True",
+          "default": "1, 1",
+          "editable": "True"
+        },
+        "stride": {
+          "type": "list of ints",
+          "description": "Stride along each spatial axis. If not present, the stride defaults to 1 along each spatial axis.",
+          "object": "QLineEdit",
+          "default": "1, 1",
+          "editable": "True"
+        },
+        "padding": {
+          "type": "list of ints",
+          "description": "Padding for the beginning and ending along each spatial axis, it can take any value greater than or equal to 0. The value represent the number of pixels added to the beginning and end part of the corresponding axis. `pads` format should be as follow [x1_begin, x2_begin...x1_end, x2_end,...], where xi_begin the number of pixels added at the beginning of axis `i` and xi_end, the number of pixels added at the end of axis `i`. This attribute cannot be used simultaneously with auto_pad attribute. If not present, the padding defaults to 0 along start and end of each spatial axis.",
+          "object": "QLineEdit",
+          "default": "0, 0, 0, 0",
+          "editable": "True"
+        },
+        "ceil_mode": {
+          "type": "boolean",
+          "description": "Whether to use ceil or floor (default) to compute the output shape.",
+          "object": "QComboBox",
+          "required": "False",
+          "default": "False",
+          "editable": "True"
+        },
+        "dilation": {
+          "type": "list of ints",
+          "description": "Dilation value along each spatial axis of filter. If not present, the dilation defaults to 1 along each spatial axis.",
+          "object": "QLineEdit",
+          "required": "False",
+          "default": "1, 1",
+          "editable": "True"
+        },
+        "return_indices": {
+          "type": "boolean",
+          "description": "Determines if the operator has to return indices output.",
+          "object": "QComboBox",
+          "required": "False",
+          "default": "False",
+          "editable": "True"
+        }
+      },
+      "output": {
+        "Y": {
+          "type": "Tensor",
+          "description": "Output data tensor from average or max pooling across the input tensor. Dimensions will vary based on various kernel, stride, and pad sizes. Floor value of the dimension is used."
+        },
+        "indices": {
+          "type": "Tensor",
+          "description": "Indices tensor from max pooling across the input tensor. The dimensions of indices are the same as output tensor. The values in indices of are the indices of the selected values during pooling. The indices are computed as flatten 1-D tensor, and the indices do not consider padding. So the values in indices are in [0, N x C x D1 x ... x Dn).",
+          "optional": "True"
+        }
+      },
+      "description": "MaxPool consumes an input tensor X and applies max pooling across the tensor according to kernel sizes, stride sizes, and pad lengths. max pooling consisting of computing the max on all values of a subset of the input tensor according to the kernel size and downsampling the data into the output tensor Y for further processing. "
+    }
+  },
+  "Normalization layers": {
+    "Batch Normalization": {
+      "name": "BatchNormNode",
+      "id": "BTN",
+      "input": {
+        "X": {
+          "type": "Tensor",
+          "description": "Input data tensor from the previous operator; dimensions are in the form of (N x C x D1 x D2 ... Dn), where N is the batch size, C is the number of channels. Statistics are computed for every channel of C over N and D1 to Dn dimensions. For image data, input dimensions become (N x C x H x W). The op also accepts single dimension input of size N in which case C is assumed to be 1."
+        }
+      },
+      "parameters": {
+        "num_features": {
+          "type": "int",
+          "description": "Number of features of the node.",
+          "object": "QLabel",
+          "required": "True",
+          "default": "1",
+          "editable": "False"
+        },
+        "weight": {
+          "type": "Tensor",
+          "description": "Scale tensor of shape (C).",
+          "object": "QLabel",
+          "required": "True",
+          "shape": "num_features",
+          "editable": "False"
+        },
+        "bias": {
+          "type": "Tensor",
+          "description": "Bias tensor of shape (C).",
+          "object": "QLabel",
+          "required": "True",
+          "shape": "num_features",
+          "editable": "False"
+        },
+        "running_mean": {
+          "type": "Tensor",
+          "description": "running (training) or estimated (testing) mean tensor of shape (C).",
+          "object": "QLabel",
+          "required": "True",
+          "editable": "False"
+        },
+        "running_var": {
+          "type": "Tensor",
+          "description": "running (training) or estimated (testing) variance tensor of shape (C).",
+          "object": "QLabel",
+          "required": "True",
+          "editable": "False"
+        },
+        "eps": {
+          "type": "float",
+          "description": "The epsilon value to use to avoid division by zero.",
+          "object": "QLineEdit",
+          "required": "False",
+          "default": "1e-05",
+          "editable": "True"
+        },
+        "momentum": {
+          "type": "float",
+          "description": "Factor used in computing the running mean and variance.e.g., running_mean = running_mean * momentum + mean * (1 - momentum).",
+          "object": "QLineEdit",
+          "required": "False",
+          "default": "0.9",
+          "editable": "True"
+        },
+        "affine": {
+          "type": "boolean",
+          "description": "affine",
+          "object": "QComboBox",
+          "required": "False",
+          "default": "True",
+          "editable": "True"
+        },
+        "track_running_stats": {
+          "type": "boolean",
+          "description": "a boolean value that when set to True, this module tracks the running mean and variance, and when set to False, this module does not track such statistics and uses batch statistics instead in both training and eval modes if the running mean and variance are None",
+          "object": "QComboBox",
+          "required": "False",
+          "default": "True",
+          "editable": "True"
+        }
+      },
+      "output": {
+        "Y": {
+          "type": "Tensor",
+          "description": "The output tensor of the same shape as X"
+        }
+      },
+      "description": "Carries out batch normalization. Depending on the mode it is being run, there are multiple cases for the number of outputs."
+    },
+    "LRN": {
+      "name": "LRNNode",
+      "id": "LRN",
+      "input": {
+        "X": {
+          "type": "Tensor",
+          "description": "Input data tensor from the previous operator; dimensions for image case are (N x C x H x W), where N is the batch size, C is the number of channels, and H and W are the height and the width of the data. For non image case, the dimensions are in the form of (N x C x D1 x D2 ... Dn), where N is the batch size. Optionally, if dimension denotation is in effect, the operation expects the input data tensor to arrive with the dimension denotation of [DATA_BATCH, DATA_CHANNEL, DATA_FEATURE, DATA_FEATURE ...]."
+        }
+      },
+      "parameters": {
+        "size": {
+          "type": "int",
+          "description": "The number of channels to sum over.",
+          "object": "QLineEdit",
+          "required": "True",
+          "default": "1",
+          "editable": "True"
+        },
+        "alpha": {
+          "type": "float",
+          "description": "Scaling parameter.",
+          "object": "QLineEdit",
+          "required": "False",
+          "default": "0.0001",
+          "editable": "True"
+        },
+        "beta": {
+          "type": "float",
+          "description": "The exponent.",
+          "object": "QLineEdit",
+          "required": "False",
+          "default": "0.75",
+          "editable": "True"
+        },
+        "k": {
+          "type": "float",
+          "description": "Additive factor",
+          "object": "QLineEdit",
+          "required": "False",
+          "default": "1.0",
+          "editable": "True"
+        }
+      },
+      "output": {
+        "Y": {
+          "type": "Tensor",
+          "description": "Output tensor, which has the shape and type as input tensor."
+        }
+      },
+      "description": "Local Response Normalization proposed in the AlexNet paper. It normalizes over local input regions. The local region is defined across the channels. For an element X[n, c, d1, ..., dk] in a tensor of shape (N x C x D1 x D2, ..., Dk), its region is {X[n, i, d1, ..., dk] | max(0, c - floor((size - 1) / 2)) <= i <= min(C - 1, c + ceil((size - 1) / 2))}."
+    }
+  },
+  "Dropout layers": {
+    "Dropout": {
+      "name": "DropoutNode",
+      "id": "DPT",
+      "input": {
+        "data": {
+          "type": "Tensor",
+          "description": "The input data as Tensor."
+        }
+      },
+      "parameters": {
+        "p": {
+          "type": "float",
+          "description": "The probability of an element to be zeroed",
+          "object": "QLineEdit",
+          "required": "False",
+          "default": "0.5",
+          "editable": "True"
+        }
+      },
+      "output": {
+        "output": {
+          "type": "Tensor",
+          "description": "Output tensor."
+        }
+      },
+      "description": "It takes an input floating-point tensor, an optional input ratio (floating-point scalar) and an optional input training_mode (boolean scalar). It produces two tensor outputs, output (floating-point tensor) and mask (optional Tensor<bool>). If training_mode is True then the output Y will be a random dropout."
+    }
+  },
+  "Utility layers": {
+    "Flatten": {
+      "name": "FlattenNode",
+      "id": "FTN",
+      "input": {
+        "A": {
+          "type": "Tensor",
+          "description": "A tensor of rank >= axis."
+        }
+      },
+      "parameters": {
+        "axis": {
+          "type": "int",
+          "description": "Indicate up to which input dimensions (exclusive) should be flattened to the outer dimension of the output.",
+          "object": "QLineEdit",
+          "required": "False",
+          "default": "0",
+          "editable": "True"
+        }
+      },
+      "output": {
+        "output": {
+          "type": "Tensor",
+          "description": "A 2D tensor with the contents of the input tensor, with input dimensions up to axis flattened to the outer dimension of the output and remaining input dimensions flattened into the inner dimension of the output."
+        }
+      },
+      "description": "Flattens the input tensor into a 2D matrix. If input tensor has shape (d_0, d_1, ... d_n), then the output will have shape (d_0 X d_1 ... d_(axis-1), d_axis X d_(axis+1) ... X dn)."
+    },
+    "Reshape": {
+      "name": "ReshapeNode",
+      "id": "RSH",
+      "input": {
+        "data": {
+          "type": "Tensor",
+          "description": "An input tensor."
+        }
+      },
+      "parameters": {
+        "shape": {
+          "type": "list of ints",
+          "description": "Specified shape for output.",
+          "object": "QLineEdit",
+          "required": "True",
+          "default": "1, 1",
+          "editable": "True"
+        },
+        "allow_zero": {
+          "type": "boolean",
+          "description": "allowzero=1 indicates that if any value in the 'shape' input is set to zero.",
+          "object": "QComboBox",
+          "required": "False",
+          "default": "False",
+          "editable": "True"
+        }
+      },
+      "output": {
+        "reshaped": {
+          "type": "Tensor",
+          "description": "Reshaped data."
+        }
+      },
+      "description": "Reshape the input tensor similar to numpy.reshape. First input is the data tensor, second input is a shape tensor which specifies the output shape. It outputs the reshaped tensor. At most one dimension of the new shape can be -1. In this case, the value is inferred from the size of the tensor and the remaining dimensions. A dimension could also be 0, in which case the actual dimension value is unchanged (i.e. taken from the input tensor)."
+    },
+    "Unsqueeze": {
+      "name": "UnsqueezeNode",
+      "id": "USN",
+      "input": {
+        "Data": {
+          "type": "Tensor",
+          "description": "Original tensor."
+        }
+      },
+      "parameters": {
+        "axes": {
+          "type": "list of ints",
+          "description": "List of integers indicating the dimensions to be inserted. Negative value means counting dimensions from the back. Accepted range is [-r, r-1] where r = rank(expanded).",
+          "object": "QLineEdit",
+          "default": "1, 1",
+          "editable": "True"
+        }
+      },
+      "output": {
+        "expanded": {
+          "type": "Tensor",
+          "description": "Reshaped tensor with same data as input."
+        }
+      },
+      "description": "Insert single-dimensional entries to the shape of an input tensor (data). Takes one required input axes - which contains a list of dimension indices and this operator will insert a dimension of value 1 into the corresponding index of the output tensor (expanded)."
+    }
+  }
+}

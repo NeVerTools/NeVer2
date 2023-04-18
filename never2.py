@@ -1,17 +1,20 @@
 import ctypes
-import os
+import platform
+import sys
+
+from PyQt6.QtWidgets import QApplication
+from never2.main_window import NeVerWindow
 
 if __name__ == "__main__":
-    import sys
-    from never2 import mainwindow
-    from PyQt5 import QtWidgets
 
-    myappid = u'org.neuralverification.coconet.0.1'
-    if os.name == 'nt':
-        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+    APP_ID = u'org.neuralverification.never2.2.0'
 
-    app = QtWidgets.QApplication(sys.argv)
-    window = mainwindow.MainWindow()
+    # Set taskbar icon on Windows
+    if platform.system() == 'Windows':
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(APP_ID)
+        sys.argv += ['-platform', 'windows:darkmode=2']  # TODO remove with styling
 
+    app = QApplication(sys.argv)
+    window = NeVerWindow()
     window.show()
-    sys.exit(app.exec_())
+    sys.exit(app.exec())

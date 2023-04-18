@@ -1,0 +1,61 @@
+{
+  "Input": {
+    "name": "Input",
+    "id": "INP",
+    "parameters": {
+      "Name": {
+        "type": "String",
+        "description": "Identifier of the network input",
+        "object": "QLineEdit",
+        "editable": "True",
+        "default": "X",
+        "required": "True"
+      },
+      "Dimension": {
+        "type": "Tensor",
+        "description": "Dimension of the network input",
+        "object": "QLineEdit",
+        "editable": "True",
+        "required": "True",
+        "default": "1"
+      },
+      "Property": {
+        "type": "String",
+        "description": "Pre-condition related to the input of the property to verify",
+        "object": "QComboBox",
+        "editable": "True",
+        "default": "Generic SMT"
+      }
+    },
+    "description": ""
+  },
+  "Output": {
+    "name": "Output",
+    "id": "END",
+    "parameters": {
+      "Name": {
+        "type": "String",
+        "description": "Identifier of the network output",
+        "object": "QLineEdit",
+        "editable": "True",
+        "default": "Y",
+        "required": "True"
+      },
+      "Dimension": {
+        "type": "Tensor",
+        "description": "Dimension of the network output",
+        "object": "QLabel",
+        "editable": "False",
+        "required": "True"
+      },
+      "Property": {
+        "type": "String",
+        "description": "Post-condition related to the output of the property to verify",
+        "object": "QComboBox",
+        "editable": "True",
+        "default": "Generic SMT"
+      }
+    },
+    "description": ""
+  }
+}

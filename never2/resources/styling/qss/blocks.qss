@@ -1,0 +1,70 @@
+BlockContentWidget {
+    background-color: #2c2c2c;
+}
+
+QLabel {
+    color: white;
+}
+
+QLineEdit {
+    background-color: #2c2c2c;
+    border: 2px solid #304153;
+    color: white;
+    border-radius: 5px;
+    padding: 2px;
+}
+
+QLineEdit:focus {
+    border: 2px solid #157172;
+}
+
+QLineEdit:hover {
+    background-color: #303030;
+}
+
+QComboBox {
+    background-color: #2c2c2c;
+    border: 2px solid #304153;
+    color: white;
+    border-radius: 5px;
+    padding: 3px;
+}
+
+QComboBox:hover {
+    background-color: #303030;
+}
+
+QComboBox:on {
+    border: 2px solid #157172;
+    border-bottom-left-radius: 0px;
+    border-bottom-right-radius: 0px;
+}
+
+QComboBox QListView {
+    border: 2px solid #157172;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    padding: 0px;
+    background-color: #2c2c2c;
+    outline: 0px;
+    color: white;
+}
+
+QComboBox QListView::item {
+    padding-left: 0px;
+    background-color: #2c2c2c;
+    color: white;
+}
+
+QComboBox QListView::item:hover {
+    background-color: #303030;
+}
+
+QComboBox QListView::item:selected {
+    background-color: #4B4E52;
+}
+
+#OutputBlockContent QLabel{
+    padding-top: 5px;
+    padding-bottom: 5px;
+}
