@@ -50,6 +50,7 @@ class BaseWindow(QtWidgets.QDialog):
         Window title to display.
     widgets : dict
         The dictionary of the displayed widgets.
+
     Methods
     ----------
     render_layout()
@@ -74,6 +75,7 @@ class BaseWindow(QtWidgets.QDialog):
         """
         This method updates the main_layout with the changes done
         in the child class(es).
+
         """
 
         self.setLayout(self.layout)
@@ -83,6 +85,7 @@ class BaseWindow(QtWidgets.QDialog):
         This method sets up the parameters layout by reading
         the JSON-based dict of params and building
         the corresponding graphic objects.
+
         Parameters
         ----------
         widget_dict : dict
@@ -91,10 +94,12 @@ class BaseWindow(QtWidgets.QDialog):
             The activation function for combo boxes.
         line_f : Callable, optional
             The activation function for text boxes.
+
         Returns
         ----------
         QHBoxLayout
             The layout with all the widgets loaded.
+
         """
 
         widget_layout = QHBoxLayout()
@@ -117,31 +122,33 @@ class BaseWindow(QtWidgets.QDialog):
                     self.widgets[first_level].activated.connect(cb_f(first_level))
             else:
 
-                if widget_dict[first_level]["type"] == "bool":
+                if widget_dict[first_level]['type'] == 'bool':
 
                     self.widgets[first_level] = CustomComboBox()
-                    self.widgets[first_level].addItems([str(widget_dict[first_level]["value"]),
-                                                        str(not widget_dict[first_level]["value"])])
+                    self.widgets[first_level].addItems([str(widget_dict[first_level]['value']),
+                                                        str(not widget_dict[first_level]['value'])])
                 else:
 
                     self.widgets[first_level] = CustomTextBox()
-                    self.widgets[first_level].setText(str(widget_dict[first_level].get("value", "")))
+                    self.widgets[first_level].setText(str(widget_dict[first_level].get('value', '')))
 
                     if line_f is not None:
                         self.widgets[first_level].textChanged.connect(line_f(first_level))
 
-                    if widget_dict[first_level]["type"] == "int":
+                    if widget_dict[first_level]['type'] == 'int':
                         self.widgets[first_level].setValidator(ArithmeticValidator.INT)
-                    elif widget_dict[first_level]["type"] == "float":
+                    elif widget_dict[first_level]['type'] == 'float':
                         self.widgets[first_level].setValidator(ArithmeticValidator.FLOAT)
-                    elif widget_dict[first_level]["type"] == "tensor" or \
-                            widget_dict[first_level]["type"] == "tuple":
+                    elif widget_dict[first_level]['type'] == 'tensor' or \
+                            widget_dict[first_level]['type'] == 'tuple':
                         self.widgets[first_level].setValidator(ArithmeticValidator.TENSOR)
 
             w_label = CustomLabel(first_level)
+
             if 'optional' not in widget_dict[first_level].keys():
                 w_label.setText(first_level + '*')
-            w_label.setToolTip(widget_dict[first_level].get("description"))
+
+            w_label.setToolTip(widget_dict[first_level].get('description'))
             left_layout.addWidget(w_label, counter, 0)
             left_layout.addWidget(self.widgets[first_level], counter, 1)
             counter += 1
@@ -155,6 +162,7 @@ class TrainingWindow(BaseWindow):
     This class is a Window for the training of the network.
     It features a file picker for choosing the dataset and
     a grid of parameters for tuning the procedure.
+
     Attributes
     ----------
     nn : NeuralNetwork
@@ -174,6 +182,7 @@ class TrainingWindow(BaseWindow):
         based on the selection.
     grid_layout : QGridLayout
         The layout to display the GUI parameters on.
+
     Methods
     ----------
     clear_grid()
@@ -184,15 +193,16 @@ class TrainingWindow(BaseWindow):
         Procedure to display the grid layout.
     update_dict_value(str, str, str)
         Procedure to update the parameters.
+
     """
 
     def __init__(self, nn: NeuralNetwork):
-        super().__init__("Train Network")
+        super().__init__('Train Network')
 
         # Training elements
         self.nn = nn
         self.is_nn_trained = False
-        self.dataset_path = ""
+        self.dataset_path = ''
         self.dataset_params = dict()
         self.dataset_transform = tr.Compose([])
         self.params = rep.read_json(RES_DIR + '/json/training.json')
@@ -202,40 +212,40 @@ class TrainingWindow(BaseWindow):
         self.grid_layout = QGridLayout()
 
         # Dataset
-        dt_label = CustomLabel("Dataset", primary=True)
+        dt_label = CustomLabel('Dataset', primary=True)
         self.layout.addWidget(dt_label)
 
         dataset_layout = QHBoxLayout()
-        self.widgets["dataset"] = CustomComboBox()
-        self.widgets["dataset"].addItems(["MNIST", "Fashion MNIST", "Custom data source..."])
-        self.widgets["dataset"].setCurrentIndex(-1)
-        self.widgets["dataset"].activated \
-            .connect(lambda: self.setup_dataset(self.widgets["dataset"].currentText()))
-        dataset_layout.addWidget(CustomLabel("Dataset"))
-        dataset_layout.addWidget(self.widgets["dataset"])
+        self.widgets['dataset'] = CustomComboBox()
+        self.widgets['dataset'].addItems(['MNIST', 'Fashion MNIST', 'Custom data source...'])
+        self.widgets['dataset'].setCurrentIndex(-1)
+        self.widgets['dataset'].activated \
+            .connect(lambda: self.setup_dataset(self.widgets['dataset'].currentText()))
+        dataset_layout.addWidget(CustomLabel('Dataset'))
+        dataset_layout.addWidget(self.widgets['dataset'])
         self.layout.addLayout(dataset_layout)
 
         transform_layout = QHBoxLayout()
-        self.widgets["transform"] = CustomComboBox()
-        self.widgets["transform"].addItems(["No transform", "Convolutional MNIST", "Fully Connected MNIST",
-                                            "Custom..."])
-        self.widgets["transform"].activated \
-            .connect(lambda: self.setup_transform(self.widgets["transform"].currentText()))
-        transform_layout.addWidget(CustomLabel("Dataset transform"))
-        transform_layout.addWidget(self.widgets["transform"])
+        self.widgets['transform'] = CustomComboBox()
+        self.widgets['transform'].addItems(['No transform', 'Convolutional MNIST', 'Fully Connected MNIST',
+                                            'Custom...'])
+        self.widgets['transform'].activated \
+            .connect(lambda: self.setup_transform(self.widgets['transform'].currentText()))
+        transform_layout.addWidget(CustomLabel('Dataset transform'))
+        transform_layout.addWidget(self.widgets['transform'])
         self.layout.addLayout(transform_layout)
 
         # Separator
-        sep_label = CustomLabel("Training parameters", primary=True)
+        sep_label = CustomLabel('Training parameters', primary=True)
         self.layout.addWidget(sep_label)
 
         # Main body
         # Activation functions for dynamic widgets
         def activation_combo(key: str):
-            return lambda: self.update_grid_view(f"{key}:{self.widgets[key].currentText()}")
+            return lambda: self.update_grid_view(f'{key}:{self.widgets[key].currentText()}')
 
         def activation_line(key: str):
-            return lambda: self.update_dict_value(key, "", self.widgets[key].text())
+            return lambda: self.update_dict_value(key, '', self.widgets[key].text())
 
         body_layout = self.create_widget_layout(self.params, activation_combo, activation_line)
         body_layout.addLayout(self.grid_layout)
@@ -244,10 +254,10 @@ class TrainingWindow(BaseWindow):
 
         # Buttons
         btn_layout = QHBoxLayout()
-        self.cancel_btn = CustomButton("Cancel")
+        self.cancel_btn = CustomButton('Cancel')
         self.cancel_btn.clicked.connect(self.close)
-        self.train_btn = CustomButton("Train network", primary=True)
-        self.train_btn.clicked.connect(self.train_network)
+        self.train_btn = CustomButton('Train network', primary=True)
+        self.train_btn.clicked.connect(self.execute_training)
         btn_layout.addWidget(self.cancel_btn)
         btn_layout.addWidget(self.train_btn)
         self.layout.addLayout(btn_layout)
@@ -258,6 +268,7 @@ class TrainingWindow(BaseWindow):
         """
         This method clears the grid view of the layout,
         in order to display fresh new infos.
+
         """
 
         for i in reversed(range(self.grid_layout.count())):
@@ -268,10 +279,12 @@ class TrainingWindow(BaseWindow):
         This method updates the grid view of the layout,
         displaying the corresponding parameters to the
         selected parameter.
+
         Parameters
         ----------
         caller : str
             The parameter selected in the combo box.
+
         """
 
         self.clear_grid()
@@ -283,7 +296,7 @@ class TrainingWindow(BaseWindow):
         for first_level in self.params.keys():
             if type(self.params[first_level]) == dict:
                 for second_level in self.params[first_level].keys():
-                    if caller == f"{first_level}:{second_level}" and caller not in self.gui_params:
+                    if caller == f'{first_level}:{second_level}' and caller not in self.gui_params:
                         self.gui_params[caller] = self.params[first_level][second_level]
 
         self.show_layout(caller)
@@ -292,11 +305,13 @@ class TrainingWindow(BaseWindow):
         """
         This method displays a grid layout initialized by the
         dictionary of parameters and default values.
+
         Parameters
         ----------
         name : str
             The name of the main parameter to which
             the dictionary is related.
+
         """
 
         title = CustomLabel(name.replace(':', ': '))
@@ -310,38 +325,41 @@ class TrainingWindow(BaseWindow):
             def activation_combo(super_key: str, key: str):
                 return lambda: self.update_dict_value(name,
                                                       key,
-                                                      widgets_2level[f"{super_key}:{key}"][1].text())
+                                                      widgets_2level[f'{super_key}:{key}'][1].text())
 
             def activation_line(super_key: str, key: str):
                 return lambda: self.update_dict_value(name,
                                                       key,
-                                                      widgets_2level[f"{super_key}:{key}"][1].text())
+                                                      widgets_2level[f'{super_key}:{key}'][1].text())
 
             w_label = CustomLabel(k)
-            w_label.setToolTip(v.get("description"))
-            if v["type"] == "bool":
+            w_label.setToolTip(v.get('description'))
+            if v['type'] == 'bool':
                 cb = CustomComboBox()
-                cb.addItems([str(v["value"]), str(not v["value"])])
-                widgets_2level[f"{name}:{k}"] = (w_label, cb)
-                widgets_2level[f"{name}:{k}"][1].activated.connect(activation_combo(name, k))
-            elif "allowed" in v.keys():
+                cb.addItems([str(v['value']), str(not v['value'])])
+                cb.activated.connect(activation_combo(name, k))
+                widgets_2level[f'{name}:{k}'] = (w_label, cb)
+            elif 'allowed' in v.keys():
                 cb = CustomComboBox()
-                cb.addItems(v["allowed"])
-                widgets_2level[f"{name}:{k}"] = (w_label, cb)
-                widgets_2level[f"{name}:{k}"][1].activated.connect(activation_combo(name, k))
+                cb.addItems(v['allowed'])
+                cb.activated.connect(activation_combo(name, k))
+                widgets_2level[f'{name}:{k}'] = (w_label, cb)
             else:
-                widgets_2level[f"{name}:{k}"] = (w_label, CustomTextBox(str(v["value"])))
-                widgets_2level[f"{name}:{k}"][1].textChanged.connect(activation_line(name, k))
-                if v["type"] == "int":
-                    widgets_2level[f"{name}:{k}"][1].setValidator(ArithmeticValidator.INT)
-                elif v["type"] == "float":
-                    widgets_2level[f"{name}:{k}"][1].setValidator(ArithmeticValidator.FLOAT)
-                elif v["type"] == "tensor" or \
-                        v["type"] == "tuple":
-                    widgets_2level[f"{name}:{k}"][1].setValidator(ArithmeticValidator.TENSOR)
+                tb = CustomTextBox(str(v['value']))
+                tb.textChanged.connect(activation_line(name, k))
 
-            self.grid_layout.addWidget(widgets_2level[f"{name}:{k}"][0], count, 0)
-            self.grid_layout.addWidget(widgets_2level[f"{name}:{k}"][1], count, 1)
+                if v['type'] == 'int':
+                    tb.setValidator(ArithmeticValidator.INT)
+                elif v['type'] == 'float':
+                    tb.setValidator(ArithmeticValidator.FLOAT)
+                elif v['type'] == 'tensor' or \
+                        v['type'] == 'tuple':
+                    tb.setValidator(ArithmeticValidator.TENSOR)
+
+                widgets_2level[f'{name}:{k}'] = (w_label, tb)
+
+            self.grid_layout.addWidget(widgets_2level[f'{name}:{k}'][0], count, 0)
+            self.grid_layout.addWidget(widgets_2level[f'{name}:{k}'][1], count, 1)
             count += 1
 
     def update_dict_value(self, name: str, key: str, value: str) -> None:
@@ -349,6 +367,7 @@ class TrainingWindow(BaseWindow):
         This method updates the correct parameter based
         on the selection in the GUI. It provides the details
         to access the parameter and the new value to register.
+
         Parameters
         ----------
         name : str
@@ -359,6 +378,7 @@ class TrainingWindow(BaseWindow):
             which is the key of the second-level dict.
         value : str
             The new value for parameter[name][key].
+
         """
 
         # Cast type
@@ -367,39 +387,41 @@ class TrainingWindow(BaseWindow):
         else:
             gui_param = self.gui_params[name][key]
 
-        if gui_param["type"] == "bool":
-            value = value == "True"
-        elif gui_param["type"] == "int" and value != "":
+        if gui_param['type'] == 'bool':
+            value = value == 'True'
+        elif gui_param['type'] == 'int' and value != '':
             value = int(value)
-        elif gui_param["type"] == "float" and value != "":
+        elif gui_param['type'] == 'float' and value != '':
             value = float(value)
-        elif gui_param["type"] == "tuple" and value != "":
+        elif gui_param['type'] == 'tuple' and value != '':
             value = eval(value)
 
         # Apply changes
-        if ":" in name:
-            first_level, second_level = name.split(":")
-            self.params[first_level][second_level][key]["value"] = value
+        if ':' in name:
+            first_level, second_level = name.split(':')
+            self.params[first_level][second_level][key]['value'] = value
         else:
-            self.params[name]["value"] = value
+            self.params[name]['value'] = value
 
     def setup_dataset(self, name: str) -> None:
         """
         This method reacts to the selection of a dataset in the
         dataset combo box. Depending on the selection, the correct
         path is saved and any additional parameters are asked.
+
         Parameters
         ----------
         name : str
             The dataset name.
+
         """
 
-        if name == "MNIST":
-            self.dataset_path = ROOT_DIR + "/data/MNIST/"
-        elif name == "Fashion MNIST":
-            self.dataset_path = ROOT_DIR + "/data/fMNIST/"
+        if name == 'MNIST':
+            self.dataset_path = ROOT_DIR + '/data/MNIST/'
+        elif name == 'Fashion MNIST':
+            self.dataset_path = ROOT_DIR + '/data/fMNIST/'
         else:
-            datapath = QFileDialog.getOpenFileName(None, "Select data source...", "")
+            datapath = QFileDialog.getOpenFileName(None, 'Select data source...', '')
             self.dataset_path = datapath[0]
 
             # Get additional parameters via dialog
@@ -409,6 +431,16 @@ class TrainingWindow(BaseWindow):
                 self.dataset_params = dialog.params
 
     def setup_transform(self, sel_t: str) -> None:
+        """
+        This method prepares the dataset transform based on the user choice
+
+        Parameters
+        ----------
+        sel_t : str
+            Option selected by the user
+
+        """
+
         if sel_t == 'No transform':
             self.dataset_transform = tr.Compose([])
         elif sel_t == 'Convolutional MNIST':
@@ -426,124 +458,131 @@ class TrainingWindow(BaseWindow):
         """
         This method initializes the selected dataset object,
         given the path loaded before.
+
         Returns
-        -------
+        ----------
         Dataset
             The dataset object.
+
         """
-        if self.dataset_path == ROOT_DIR + "/data/MNIST/":
+
+        if self.dataset_path == ROOT_DIR + '/data/MNIST/':
             return dt.TorchMNIST(self.dataset_path, True, self.dataset_transform)
-        elif self.dataset_path == ROOT_DIR + "/data/fMNIST/":
+        elif self.dataset_path == ROOT_DIR + '/data/fMNIST/':
             return dt.TorchFMNIST(self.dataset_path, True, self.dataset_transform)
-        elif self.dataset_path != "":
+        elif self.dataset_path != '':
             return dt.GenericFileDataset(self.dataset_path,
-                                         self.dataset_params["target_idx"],
-                                         self.dataset_params["data_type"],
-                                         self.dataset_params["delimiter"],
+                                         self.dataset_params['target_idx'],
+                                         self.dataset_params['data_type'],
+                                         self.dataset_params['delimiter'],
                                          self.dataset_transform)
 
-    def train_network(self):
+    def execute_training(self) -> None:
         """
         This method reads the inout from the window widgets and
         launches the training procedure on the selected dataset.
+
         """
 
-        err_dialog = None
-        if self.dataset_path == "":
-            err_dialog = MessageDialog("No dataset selected.", MessageType.ERROR)
-        elif self.widgets["Optimizer"].currentIndex() == -1:
-            err_dialog = MessageDialog("No optimizer selected.", MessageType.ERROR)
-        elif self.widgets["Scheduler"].currentIndex() == -1:
-            err_dialog = MessageDialog("No scheduler selected.", MessageType.ERROR)
-        elif self.widgets["Loss Function"].currentIndex() == -1:
-            err_dialog = MessageDialog("No loss function selected.", MessageType.ERROR)
-        elif self.widgets["Precision Metric"].currentIndex() == -1:
-            err_dialog = MessageDialog("No metrics selected.", MessageType.ERROR)
-        elif "value" not in self.params["Epochs"].keys():
-            err_dialog = MessageDialog("No epochs selected.", MessageType.ERROR)
-        elif "value" not in self.params["Validation percentage"].keys():
-            err_dialog = MessageDialog("No validation percentage selected.", MessageType.ERROR)
-        elif "value" not in self.params["Training batch size"].keys():
-            err_dialog = MessageDialog("No training batch size selected.", MessageType.ERROR)
-        elif "value" not in self.params["Validation batch size"].keys():
-            err_dialog = MessageDialog("No validation batch size selected.", MessageType.ERROR)
-        if err_dialog is not None:
+        err_message = ''
+
+        if self.dataset_path == '':
+            err_message = 'No dataset selected.'
+        elif self.widgets['Optimizer'].currentIndex() == -1:
+            err_message = 'No optimizer selected.'
+        elif self.widgets['Scheduler'].currentIndex() == -1:
+            err_message = 'No scheduler selected.'
+        elif self.widgets['Loss Function'].currentIndex() == -1:
+            err_message = 'No loss function selected.'
+        elif self.widgets['Precision Metric'].currentIndex() == -1:
+            err_message = 'No metrics selected.'
+        elif 'value' not in self.params['Epochs'].keys():
+            err_message = 'No epochs selected.'
+        elif 'value' not in self.params['Validation percentage'].keys():
+            err_message = 'No validation percentage selected.'
+        elif 'value' not in self.params['Training batch size'].keys():
+            err_message = 'No training batch size selected.'
+        elif 'value' not in self.params['Validation batch size'].keys():
+            err_message = 'No validation batch size selected.'
+
+        if err_message != '':
+            err_dialog = MessageDialog(err_message, MessageType.ERROR)
             err_dialog.exec()
-            return
+            self.close()
 
         # Load dataset
         data = self.load_dataset()
 
         # Add logger text box
         log_textbox = CustomLoggerTextArea(self)
-        logger = logging.getLogger("pynever.strategies.training")
+        logger = logging.getLogger('pynever.strategies.training')
         logger.addHandler(log_textbox)
         logger.setLevel(logging.INFO)
         self.layout.addWidget(log_textbox.widget)
 
-        logger.info("***** NeVer 2 - TRAINING *****")
+        logger.info('***** NeVer 2 - TRAINING *****')
 
         # Create optimizer dictionary of parameters
         opt_params = dict()
-        for k, v in self.gui_params["Optimizer:Adam"].items():
-            opt_params[v["name"]] = v["value"]
+        for k, v in self.gui_params['Optimizer:Adam'].items():
+            opt_params[v['name']] = v['value']
 
         # Create scheduler dictionary of parameters
         sched_params = dict()
-        for k, v in self.gui_params["Scheduler:ReduceLROnPlateau"].items():
-            sched_params[v["name"]] = v["value"]
+        for k, v in self.gui_params['Scheduler:ReduceLROnPlateau'].items():
+            sched_params[v['name']] = v['value']
 
         # Init loss function
-        if self.loss_f == "Loss Function:Cross Entropy":
+        if self.loss_f == 'Loss Function:Cross Entropy':
             loss = torch.nn.CrossEntropyLoss()
-            if self.gui_params["Loss Function:Cross Entropy"]["Weight"]["value"] != '':
-                loss.weight = self.gui_params["Loss Function:Cross Entropy"]["Weight"]["value"]
-            loss.ignore_index = self.gui_params["Loss Function:Cross Entropy"]["Ignore index"]["value"]
-            loss.reduction = self.gui_params["Loss Function:Cross Entropy"]["Reduction"]["value"]
+            if self.gui_params['Loss Function:Cross Entropy']['Weight']['value'] != '':
+                loss.weight = self.gui_params['Loss Function:Cross Entropy']['Weight']['value']
+            loss.ignore_index = self.gui_params['Loss Function:Cross Entropy']['Ignore index']['value']
+            loss.reduction = self.gui_params['Loss Function:Cross Entropy']['Reduction']['value']
         else:
             loss = fun.mse_loss
-            loss.reduction = self.gui_params["Loss Function:MSE Loss"]["Reduction"]["value"]
+            loss.reduction = self.gui_params['Loss Function:MSE Loss']['Reduction']['value']
 
         # Init metrics
-        if self.metric == "Precision Metric:Inaccuracy":
+        if self.metric == 'Precision Metric:Inaccuracy':
             metrics = PytorchMetrics.inaccuracy
         else:
             metrics = fun.mse_loss
-            metrics.reduction = self.gui_params["Precision Metric:MSE Loss"]["Reduction"]["value"]
+            metrics.reduction = self.gui_params['Precision Metric:MSE Loss']['Reduction']['value']
 
         # Checkpoint loading
-        checkpoints_path = self.params["Checkpoints root"].get("value", '') + self.nn.identifier + '.pth.tar'
+        checkpoints_path = self.params['Checkpoints root'].get('value', '') + self.nn.identifier + '.pth.tar'
         if not os.path.isfile(checkpoints_path):
             checkpoints_path = None
 
         start_epoch = 0
         if checkpoints_path is not None:
             checkpoint = torch.load(checkpoints_path)
-            start_epoch = checkpoint["epoch"]
-            if self.params["Epochs"]["value"] <= start_epoch:
+            start_epoch = checkpoint['epoch']
+            if self.params['Epochs']['value'] <= start_epoch:
                 start_epoch = -1
-                logger.info("Checkpoint already reached, no further training necessary")
+                logger.info('Checkpoint already reached, no further training necessary')
 
         if start_epoch > -1:
             # Init train strategy
-            if self.params["Cuda"]["value"] == 'True':
+            if self.params['Cuda']['value'] == 'True':
                 cuda_device = 'cuda'
             else:
                 cuda_device = 'cpu'
             train_strategy = PytorchTraining(opt.Adam, opt_params,
                                              loss,
-                                             self.params["Epochs"]["value"],
-                                             self.params["Validation percentage"]["value"],
-                                             self.params["Training batch size"]["value"],
-                                             self.params["Validation batch size"]["value"],
+                                             self.params['Epochs']['value'],
+                                             self.params['Validation percentage']['value'],
+                                             self.params['Training batch size']['value'],
+                                             self.params['Validation batch size']['value'],
                                              True,
                                              opt.lr_scheduler.ReduceLROnPlateau,
                                              sched_params,
                                              metrics,
                                              device=cuda_device,
-                                             train_patience=self.params["Train patience"].get("value", None),
-                                             checkpoints_root=self.params["Checkpoints root"].get("value", ''),
-                                             verbose_rate=self.params["Verbosity level"].get("value", None))
+                                             train_patience=self.params['Train patience'].get('value', None),
+                                             checkpoints_root=self.params['Checkpoints root'].get('value', ''),
+                                             verbose_rate=self.params['Verbosity level'].get('value', None))
             try:
                 self.nn = train_strategy.train(self.nn, data)
                 self.is_nn_trained = True
@@ -551,14 +590,15 @@ class TrainingWindow(BaseWindow):
                 # Delete checkpoint if the network isn't saved
                 if self.nn.identifier == '':
                     os.remove('.pth.tar')
+
             except Exception as e:
                 self.nn = None
-                dialog = MessageDialog("Training error:\n" + str(e), MessageType.ERROR)
+                dialog = MessageDialog('Training error:\n' + str(e), MessageType.ERROR)
                 dialog.exec()
                 self.close()
 
         self.train_btn.setEnabled(False)
-        self.cancel_btn.setText("Close")
+        self.cancel_btn.setText('Close')
 
 
 class VerificationWindow(BaseWindow):
