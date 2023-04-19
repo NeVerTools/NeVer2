@@ -3,7 +3,7 @@ import platform
 import sys
 
 from PyQt6.QtWidgets import QApplication
-from never2.main_window import NeVerWindow
+from never2.main_window import MainWindow
 
 if __name__ == "__main__":
 
@@ -15,6 +15,6 @@ if __name__ == "__main__":
         sys.argv += ['-platform', 'windows:darkmode=2']  # TODO remove with styling
 
     app = QApplication(sys.argv)
-    window = NeVerWindow()
+    window = MainWindow()
     window.show()
     sys.exit(app.exec())

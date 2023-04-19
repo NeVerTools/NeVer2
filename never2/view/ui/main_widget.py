@@ -1,7 +1,7 @@
 """
 Module main_widget.py
 
-This module contains the QWidget class CoCoNetWidget.
+This module contains the QWidget class EditorWidget.
 
 Author: Andrea Gimelli, Giacomo Rosato, Stefano Demarchi
 
@@ -24,14 +24,14 @@ from never2.view.component.inspector import InspectorDockToolbar
 from never2.view.ui.dialog import MessageDialog, MessageType, ConfirmDialog
 
 
-class CoCoNetWidget(QWidget):
+class EditorWidget(QWidget):
     """
     This class initializes the main layout of the application containing the toolbar
     on the left and the scene on the right.
 
     """
 
-    def __init__(self, main_window: 'CoCoNetWindow', parent=None):
+    def __init__(self, main_window: 'MainWindow', parent=None):
         super().__init__(parent)
 
         # Reference to the main window

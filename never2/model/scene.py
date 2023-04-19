@@ -33,7 +33,7 @@ class Scene:
 
     """
 
-    def __init__(self, editor_widget: 'CoCoNetWidget'):
+    def __init__(self, editor_widget: 'EditorWidget'):
         # Reference to the editor widget
         self.editor_widget_ref = editor_widget
 

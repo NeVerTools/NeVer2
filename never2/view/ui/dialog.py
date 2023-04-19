@@ -1,7 +1,7 @@
 """
 Module dialog.py
 
-This module contains all the dialog classes used in CoCoNet
+This module contains all the dialog classes used in NeVer2
 
 Author: Andrea Gimelli, Giacomo Rosato, Stefano Demarchi
 

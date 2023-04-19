@@ -1,3 +1,13 @@
+"""
+Module window.py
+
+This module contains the classes for displaying the windows launching NeVer's capabilities
+of learning and verification.
+
+Author: Stefano Demarchi
+
+"""
+
 import logging
 import os
 from typing import Callable
@@ -49,7 +59,7 @@ class BaseWindow(QtWidgets.QDialog):
 
     """
 
-    def __init__(self, title="NeVer Window", parent=None):
+    def __init__(self, title='Window', parent=None):
         super().__init__(parent)
         self.layout = QVBoxLayout()
         self.title = title
@@ -58,7 +68,7 @@ class BaseWindow(QtWidgets.QDialog):
 
         self.setWindowTitle(self.title)
         self.setModal(True)
-        self.setStyleSheet("background-color: " + palette.GREY_1 + ";")
+        self.setStyleSheet('background-color: ' + palette.GREY_1 + ';')
 
     def render_layout(self) -> None:
         """

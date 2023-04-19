@@ -1,7 +1,7 @@
 """
 Module main_window.py
 
-This module contains the QMainWindow class CoCoNetWindow.
+This module contains the QMainWindow class MainWindow.
 
 Author: Andrea Gimelli, Giacomo Rosato, Stefano Demarchi
 
@@ -16,17 +16,17 @@ from PyQt6.QtWidgets import QMainWindow
 
 import never2.resources.styling.dimension as dim
 from never2 import APP_NAME, RES_DIR
-from never2.view.ui.main_widget import CoCoNetWidget
+from never2.view.ui.main_widget import EditorWidget
 
 
 def open_guide():
     webbrowser.open('https://nevertools.github.io/never2_guide.html')
 
 
-class NeVerWindow(QMainWindow):
+class MainWindow(QMainWindow):
     """
     This class initializes the name of the application, the menu bar and
-    a unique CoCoNetWidget object. The menu bar is made of four submenus
+    a unique EditorWidget object. The menu bar is made of four submenus
     ('File', 'Edit', 'View', 'Help') and each submenu has its own set of
     actions.
 
@@ -34,7 +34,7 @@ class NeVerWindow(QMainWindow):
     ----------
     menu_bar : QMenuBar
         Qt menubar initializer
-    editor_widget : CoCoNetWidget
+    editor_widget : EditorWidget
         Main widget of the application displayed in the window
 
     Methods
@@ -52,7 +52,7 @@ class NeVerWindow(QMainWindow):
         super().__init__()
 
         # Create the main widget
-        self.editor_widget = CoCoNetWidget(self)
+        self.editor_widget = EditorWidget(self)
         self.setCentralWidget(self.editor_widget)
 
         # Create the menu_bar
