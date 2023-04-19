@@ -21,7 +21,8 @@ from never2.model.project import Project
 from never2.model.scene import Scene
 from never2.utils.file import FileFormat, read_properties
 from never2.view.component.inspector import InspectorDockToolbar
-from never2.view.ui.dialog import MessageDialog, MessageType, ConfirmDialog
+from never2.view.ui.dialog import MessageDialog, MessageType, ConfirmDialog, FuncDialog
+from never2.view.ui.window import TrainingWindow, VerificationWindow
 
 
 class EditorWidget(QWidget):
@@ -208,6 +209,42 @@ class EditorWidget(QWidget):
         """
 
         self.scene.view.check_delete()
+
+    def train_network(self):
+        """
+        This method starts the training of the network, provided it exists
+
+        """
+
+        if self.scene.project.nn.is_empty():
+            dialog = MessageDialog('No network to train.', MessageType.ERROR)
+            dialog.exec()
+        else:
+            window = TrainingWindow(self.scene.project.nn)
+            window.exec()
+
+            if window.is_nn_trained:
+                dialog = FuncDialog('Training completed. Weights and biases updated.\nSave network?',
+                                    self.scene.project.save(False))
+                dialog.exec()
+
+    def verify_network(self):
+        """
+        This method starts the verification of the network, provided it exists and has properties
+
+        """
+
+        if self.scene.project.nn.is_empty():
+            dialog = MessageDialog('No network to verify.', MessageType.ERROR)
+            dialog.exec()
+
+        elif not self.scene.has_properties():
+            dialog = MessageDialog('No property to verify.', MessageType.ERROR)
+            dialog.exec()
+
+        else:
+            window = VerificationWindow(self.scene.project.nn, self.scene.get_properties())
+            window.exec()
 
     def show_inspector(self):
         """

@@ -129,6 +129,12 @@ class MainWindow(QMainWindow):
             menu_actions['View:Zoom out'].triggered.connect(self.editor_widget.scene.view.zoom_out)
             menu_actions['View:Show inspector'].triggered.connect(self.editor_widget.show_inspector)
 
+            # LEARNING submenu triggers training
+            menu_actions['Learning:Train...'].triggered.connect(self.editor_widget.train_network)
+
+            # VERIFICATION submenu triggers verification
+            menu_actions['Verification:Verify...'].triggered.connect(self.editor_widget.verify_network)
+
             # HELP
             menu_actions['Help:Open guide'].triggered.connect(open_guide)
 
