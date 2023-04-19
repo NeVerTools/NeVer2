@@ -20,7 +20,6 @@ import torchvision.transforms as tr
 from PyQt6 import QtWidgets
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QFileDialog
-from pynever import nodes
 from pynever.datasets import Dataset
 from pynever.networks import NeuralNetwork, SequentialNetwork
 from pynever.strategies import smt_reading, verification
@@ -606,10 +605,11 @@ class VerificationWindow(BaseWindow):
     This class is a Window for the verification of the network.
     It features a combo box for choosing the verification
     heuristic.
+
     """
 
-    def __init__(self, nn: NeuralNetwork, properties: dict):
-        super().__init__("Verify network")
+    def __init__(self, nn: SequentialNetwork, properties: dict):
+        super().__init__('Verify network')
 
         self.nn = nn
         self.properties = properties
@@ -618,74 +618,53 @@ class VerificationWindow(BaseWindow):
         self.params = rep.read_json(RES_DIR + '/json/verification.json')
 
         def activation_cb(methodology: str):
-            return lambda: self.update_methodology(self.widgets["Verification methodology"].currentText())
+            return lambda: self.update_methodology(self.widgets['Verification methodology'].currentText())
 
         body_layout = self.create_widget_layout(self.params, cb_f=activation_cb)
         self.layout.addLayout(body_layout)
 
         # Buttons
         btn_layout = QHBoxLayout()
-        self.cancel_btn = CustomButton("Cancel")
+        self.cancel_btn = CustomButton('Cancel')
         self.cancel_btn.clicked.connect(self.close)
-        self.verify_btn = CustomButton("Verify network", primary=True)
-        self.verify_btn.clicked.connect(self.verify_network)
+        self.verify_btn = CustomButton('Verify network', primary=True)
+        self.verify_btn.clicked.connect(self.execute_verification)
         btn_layout.addWidget(self.cancel_btn)
         btn_layout.addWidget(self.verify_btn)
         self.layout.addLayout(btn_layout)
 
         self.render_layout()
 
-    def count_layers(self) -> int:
-        """
-        Count the number of ReLU layers of the NN.
-        Returns
-        -------
-        int
-            The number of ReLU layers
-        """
-
-        if isinstance(self.nn, SequentialNetwork) and self.nn.nodes:
-            current_node = self.nn.get_first_node()
-            relu_count = 0
-
-            while self.nn.get_next_node(current_node) is not None:
-                current_node = self.nn.get_next_node(current_node)
-                if isinstance(current_node, nodes.ReLUNode):
-                    relu_count += 1
-
-            return relu_count
-        else:
-            return 0
-
     def update_methodology(self, methodology: str) -> None:
         """
         Function to set up the verification strategy based on the user choice.
+
         Parameters
         ----------
         methodology : str
             Verification methodology.
+
         """
 
         if methodology == 'Complete':
-            ver_params = [[10000] for _ in range(self.count_layers())]
+            ver_params = [[10000] for _ in range(self.nn.count_relu_layers())]
         elif methodology == 'Over-approximated':
-            ver_params = [[0] for _ in range(self.count_layers())]
+            ver_params = [[0] for _ in range(self.nn.count_relu_layers())]
         else:
             dialog = MixedVerificationDialog()
             dialog.exec()
-            ver_params = [[dialog.n_neurons] for _ in range(self.count_layers())]
+            ver_params = [[dialog.n_neurons] for _ in range(self.nn.count_relu_layers())]
 
         self.strategy = verification.NeverVerification('best_n_neurons', ver_params)
 
-    def verify_network(self):
+    def execute_verification(self) -> None:
         """
-        This class is a Window for the training of the network.
-        It features a file picker for choosing the dataset and
-        a grid of parameters for tuning the procedure.
+        This method launches the verification of the network
+
         """
 
         if self.strategy is None:
-            err_dialog = MessageDialog("No verification methodology selected.", MessageType.ERROR)
+            err_dialog = MessageDialog('No verification methodology selected.', MessageType.ERROR)
             err_dialog.exec()
             return
 
@@ -698,12 +677,12 @@ class VerificationWindow(BaseWindow):
 
         # Add logger text box
         log_textbox = CustomLoggerTextArea(self)
-        logger = logging.getLogger("pynever.strategies.verification")
+        logger = logging.getLogger('pynever.strategies.verification')
         logger.addHandler(log_textbox)
         logger.setLevel(logging.INFO)
         self.layout.addWidget(log_textbox.widget)
 
-        logger.info("***** NeVer 2 - VERIFICATION *****")
+        logger.info('***** NeVer 2 - VERIFICATION *****')
 
         # Load NeVerProperty from file
         parser = smt_reading.SmtPropertyParser(path, input_name, output_name)
@@ -715,4 +694,4 @@ class VerificationWindow(BaseWindow):
         # Launch verification
         self.strategy.verify(self.nn, to_verify)
         self.verify_btn.setEnabled(False)
-        self.cancel_btn.setText("Close")
+        self.cancel_btn.setText('Close')
