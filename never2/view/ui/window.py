@@ -192,6 +192,14 @@ class TrainingWindow(BaseWindow):
         Procedure to display the grid layout.
     update_dict_value(str, str, str)
         Procedure to update the parameters.
+    setup_dataset(str)
+        Procedure to prepare the dataset loading.
+    setup_transform(str)
+        Procedure to add a transform to the dataset.
+    load_dataset()
+        Procedure to load the dataset.
+    execute_training()
+        Procedure to launch the training.
 
     """
 
@@ -604,7 +612,25 @@ class VerificationWindow(BaseWindow):
     """
     This class is a Window for the verification of the network.
     It features a combo box for choosing the verification
-    heuristic.
+    heuristic and a text render for the result
+
+    Attributes
+    ----------
+    nn : SequentialNetwork
+        The current network in the main window, already trained
+    properties : dict
+        Dictionary of properties to verify on the nn
+    params : dict
+        Dictionary of parameters to load in the window
+    strategy : VerificationStrategy
+        The verification class to use in the verification procedure
+
+    Methods
+    ----------
+    update_methodology(str)
+        Procedure to select the verification strategy.
+    execute_verification()
+        Procedure to launch the verification.
 
     """
 
