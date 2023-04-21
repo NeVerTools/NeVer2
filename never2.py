@@ -26,7 +26,7 @@ if __name__ == "__main__":
     # CLI mode
     elif len(sys.argv) == 2 and sys.argv[1] == '-h':
         cli.show_help()
-    elif len(sys.argv) == 4 and sys.argv[1] == '-verify':
-        cli.verify_model(sys.argv[2], sys.argv[3])
+    elif len(sys.argv) == 5 and sys.argv[1] == '-verify':
+        cli.verify_model(sys.argv[2], sys.argv[3], sys.argv[4])
     else:
         cli.show_help()

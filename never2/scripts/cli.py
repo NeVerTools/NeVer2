@@ -8,7 +8,9 @@ neural networks properties in the VNN-LIB standard
 Author: Stefano Demarchi
 
 """
+import logging
 import os
+import sys
 
 from pynever.networks import SequentialNetwork
 from pynever.strategies import conversion
@@ -18,18 +20,19 @@ from pynever.strategies.verification import NeVerProperty, NeverVerification
 
 
 def show_help():
-    print("usage: python never2.py ... [-verify] [args]")
+    print("usage: python never2.py ... [-verify] [property] [model] [strategy]")
     print()
     print("Options and arguments:")
     print("no args        : launch NeVer2 in GUI mode.")
-    print("-verify args   : verify the VNN-LIB property in args[1] on the"
-          "               : ONNX model in args[2]")
+    print("-verify args   : verify the VNN-LIB property in args[1] on the\n"
+          "                 ONNX model in args[2] with the strategy in args[3]")
     print()
+    print("[strategy]     : one between 'complete', 'approximate', 'mixed1' or 'mixed2'.")
     print("args ...       : arguments passed to program in sys.argv[1:]")
     print()
 
 
-def verify_model(property_file: str, model_file: str) -> bool:
+def verify_model(property_file: str, model_file: str, strategy: str) -> bool:
     """
     This method starts the verification procedure on the network model
     provided in the model_file path and prints the result
@@ -40,6 +43,8 @@ def verify_model(property_file: str, model_file: str) -> bool:
         Path to the .vnnlib or .smt2 file of the property
     model_file : str
         Path to the .onnx file of the network
+    strategy : str
+        Verification strategy (either complete, approximate, mixed1 or mixed2)
 
     Returns
     ----------
@@ -71,10 +76,26 @@ def verify_model(property_file: str, model_file: str) -> bool:
                                                network.get_last_node().identifier)
                     to_verify = NeVerProperty(*parser.parse_property())
 
-                    strategy = NeverVerification()
-                    result = strategy.verify(network, to_verify)
-                    print(f'Verification result: {result}')
-                    return result
+                    # Log to stdout
+                    logger = logging.getLogger('pynever.strategies.verification')
+                    logger.setLevel(logging.INFO)
+                    logger.addHandler(logging.StreamHandler(sys.stdout))
+
+                    ver_strategy = None
+                    if strategy == 'complete':
+                        ver_strategy = NeverVerification('best_n_neurons',
+                                                         [[10000] for _ in range(network.count_relu_layers())])
+                    elif strategy == 'approximate':
+                        ver_strategy = NeverVerification('best_n_neurons',
+                                                         [[0] for _ in range(network.count_relu_layers())])
+                    elif strategy == 'mixed1':
+                        ver_strategy = NeverVerification('best_n_neurons',
+                                                         [[1] for _ in range(network.count_relu_layers())])
+                    elif strategy == 'mixed2':
+                        ver_strategy = NeverVerification('best_n_neurons',
+                                                         [[2] for _ in range(network.count_relu_layers())])
+
+                    return ver_strategy.verify(network, to_verify)
             else:
                 print('The model is not an ONNX model.')
                 return False
