@@ -8,6 +8,7 @@ neural networks properties in the VNN-LIB standard
 Author: Stefano Demarchi
 
 """
+
 import logging
 import os
 import sys
