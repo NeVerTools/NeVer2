@@ -4,13 +4,20 @@
     "id": "SMT",
     "parameters": {
     },
-    "description": ""
+    "description": "A generic property in plain SMT-LIB format."
   },
   "Polyhedral": {
     "name": "Polyhedral",
     "id": "PLH",
     "parameters": {
     },
-    "description": ""
+    "description": "A property for representing single variable bounds in a controlled way."
+  },
+  "Box": {
+    "name": "Box",
+    "id": "BOX",
+    "parameters": {
+    },
+    "description": "A property for representing Hyper-rectangle bounds as a set of lower bounds and upper bounds."
   }
 }

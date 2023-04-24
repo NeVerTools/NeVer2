@@ -15,7 +15,7 @@ import never2.utils.rep as rep
 from never2.model.component.socket import Socket, SocketPosition, SocketType
 from never2.resources.styling.custom import CustomLabel
 from never2.view.component.graphics_block import GraphicsBlock, BlockContentWidget
-from never2.view.ui.dialog import EditSmtPropertyDialog, EditPolyhedralPropertyDialog
+from never2.view.ui.dialog import EditSmtPropertyDialog, EditPolyhedralPropertyDialog, EditBoxPropertyDialog
 
 
 class Block:
@@ -601,6 +601,17 @@ class PropertyBlock(Block):
                     self.smt_string += f'(assert ({p[1]} {p[0]} {float(p[2])}))\n'
 
                 self.property_label.setText(self.smt_string)
+
+        elif self.title == 'Box':
+            dialog = EditBoxPropertyDialog(self)
+            dialog.exec()
+
+            if dialog.has_edits:
+                self.smt_string = dialog.compile_smt()
+                self.label_string = f'{str(dialog.lower_bounds)}::{str(dialog.upper_bounds)}'
+                self.property_label.setText(self.label_string)
+            else:
+                self.remove()
 
         return dialog.has_edits if dialog is not None else False
 

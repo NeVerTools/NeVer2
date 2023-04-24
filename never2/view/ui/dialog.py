@@ -165,14 +165,14 @@ class TwoButtonsDialog(BaseDialog):
 
     """
 
-    def __init__(self, title: str = 'Dialog', message: str = '', context: str = "None"):
+    def __init__(self, title: str = 'Dialog', message: str = '', context: str = 'None'):
         super(TwoButtonsDialog, self).__init__(title, message)
 
         self.has_been_closed = False
 
-        if context == "None":
+        if context == 'None':
             self.ok_btn = CustomButton('Ok', primary=True)
-        elif context == "Property":
+        elif context == 'Property':
             self.ok_btn = CustomButton('Save', context=context)
         self.cancel_btn = CustomButton('Cancel')
         self.cancel_btn.clicked.connect(self.accept)
@@ -316,8 +316,8 @@ class EditSmtPropertyDialog(TwoButtonsDialog):
 
     """
 
-    def __init__(self, property_block: 'PropertyBlock', context: str = 'Property'):
-        super().__init__('Edit property', '', context=context)
+    def __init__(self, property_block: 'PropertyBlock'):
+        super().__init__('Edit property', '', context='Property')
         self.property_block = property_block
         self.new_property_str = self.property_block.smt_string
         self.has_edits = False
@@ -330,9 +330,7 @@ class EditSmtPropertyDialog(TwoButtonsDialog):
         self.setStyleSheet(qss_file)
 
         # Build main_layout
-        title_label = CustomLabel('SMT property', context='Property')
-        title_label.setStyleSheet(disp.PROPERTY_LABEL_STYLE)
-        title_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        title_label = CustomLabel('SMT property', alignment=Qt.AlignmentFlag.AlignCenter, context='Property')
         g_layout.addWidget(title_label, 0, 0, 1, 2)
 
         # Input box
@@ -474,6 +472,126 @@ class EditPolyhedralPropertyDialog(BaseDialog):
     def show_properties_viewer(self):
         if self.property_block.label_string:
             self.viewer.appendPlainText(self.property_block.label_string)
+
+
+class EditBoxPropertyDialog(TwoButtonsDialog):
+    """
+    This dialog allows to define a bounded box defined by two lists
+    for the lower bounds and the upper bounds.
+
+    Attributes
+    ----------
+    property_block : PropertyBlock
+        Current property to edit.
+    lower_bounds : list
+        Lower bounds of the property.
+    upper_bounds : list
+        Upper bounds of the property.
+    lbs_box : CustomTextBox
+        Input box for lower bounds.
+    ubs_box : CustomTextBox
+        Input box for upper bounds.
+    has_edits : bool
+        Flag signaling if the property was edited.
+
+    Methods
+    ----------
+    save_data()
+        Procedure to read input and save bounds.
+    compile_smt()
+        Procedure to translate the bounds in SMT-LIB.
+
+    """
+
+    def __init__(self, property_block: 'PropertyBlock'):
+        super().__init__('Edit property', '', context='Property')
+        self.property_block = property_block
+        self.lower_bounds = []
+        self.upper_bounds = []
+        self.has_edits = False
+
+        if self.property_block.label_string != '':
+            bounds = self.property_block.label_string.split('::')
+            self.lower_bounds = eval(bounds[0])
+            self.upper_bounds = eval(bounds[1])
+
+        g_layout = QGridLayout()
+        self.layout.addLayout(g_layout)
+
+        # apply same QLineEdit and QComboBox style of the block contents
+        qss_file = open(RES_DIR + '/styling/qss/blocks.qss').read()
+        self.setStyleSheet(qss_file)
+
+        # Build main_layout
+        title_label = CustomLabel('Box property', alignment=Qt.AlignmentFlag.AlignCenter, context='Property')
+        g_layout.addWidget(title_label, 0, 0, 1, 2)
+
+        # Hint
+        hint_label = CustomLabel(f'Enter {len(self.property_block.variables)} comma separated values',
+                                 alignment=Qt.AlignmentFlag.AlignCenter)
+        g_layout.addWidget(hint_label, 1, 0, 1, 2)
+
+        # Lower bounds
+        lbs_label = CustomLabel('Lower bounds', alignment=Qt.AlignmentFlag.AlignRight)
+        lbs_label.setStyleSheet(disp.PROPERTY_IN_DIM_LABEL_STYLE)
+        g_layout.addWidget(lbs_label, 2, 0)
+
+        self.lbs_box = CustomTextBox(f'{[lb for lb in self.lower_bounds]}'.replace('[', '').replace(']', ''))
+        g_layout.addWidget(self.lbs_box, 2, 1)
+
+        # Upper bounds
+        ubs_label = CustomLabel('Upper bounds', alignment=Qt.AlignmentFlag.AlignRight)
+        ubs_label.setStyleSheet(disp.PROPERTY_IN_DIM_LABEL_STYLE)
+        g_layout.addWidget(ubs_label, 3, 0)
+
+        self.ubs_box = CustomTextBox(f'{[ub for ub in self.upper_bounds]}'.replace('[', '').replace(']', ''))
+        g_layout.addWidget(self.ubs_box, 3, 1)
+
+        self.set_buttons_text('Discard', 'Apply')
+        self.ok_btn.clicked.connect(self.save_data)
+
+        self.render_layout()
+
+    def save_data(self) -> None:
+        """
+        Method triggered by 'Apply' button
+
+        """
+
+        num_var = len(self.property_block.variables)
+
+        try:
+            self.lower_bounds = [float(b) for b in self.lbs_box.text().split(',')]
+            self.upper_bounds = [float(b) for b in self.ubs_box.text().split(',')]
+        except ValueError as e:
+            dialog = MessageDialog(f'Illegal value found: {str(e)}', MessageType.ERROR)
+            dialog.exec()
+
+        if not (len(self.lower_bounds) == len(self.upper_bounds) == num_var):
+            dialog = MessageDialog(f'The number of lower bounds and upper bounds must be {num_var}', MessageType.ERROR)
+            dialog.exec()
+        else:
+            self.has_edits = True
+
+    def compile_smt(self) -> str:
+        """
+        This method builds a SMT-LIB string starting from the bounds
+
+        Returns
+        ----------
+        str
+            The SMT-LIB formatted bounds
+
+        """
+
+        smt_string = ''
+        symbol = self.property_block.ref_block.get_identifier()
+
+        for i in range(len(self.lower_bounds)):
+            smt_string += f'(assert (<= (* -1 {symbol}_{i}) {-self.lower_bounds[i]}))\n'
+            smt_string += f'(assert (<= {symbol}_{i} {self.upper_bounds[i]}))\n'
+
+        return smt_string
 
 
 class GenericDatasetDialog(TwoButtonsDialog):

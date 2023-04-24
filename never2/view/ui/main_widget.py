@@ -200,7 +200,8 @@ class EditorWidget(QWidget):
         """
 
         self.scene.clear_scene()
-        self.scene.project.reset_nn('X', 'INP')
+        self.scene.project = Project(self.scene)
+        self.main_wnd_ref.set_project_title('')
 
     def remove_sel(self):
         """
