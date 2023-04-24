@@ -159,10 +159,20 @@ class Scene:
                               self.project.nn.get_last_node().identifier]
 
             # Check variables compatibility
-            for prop_id in prop_dict.keys():
+            for prop_id, prop_value in prop_dict.items():
                 if prop_id not in available_list:
                     raise Exception('This property appears to be defined on another network!\n'
                                     f'Unknown variable: {prop_id}')
+
+                if prop_id == self.input_block.get_identifier():
+                    if not prop_value.check_variables_size(self.input_block.get_dimension()):
+                        raise Exception('The number of input variables is not consistent between\n'
+                                        'the property and the network!')
+
+                if prop_id in [self.output_block.get_identifier(), self.project.nn.get_last_node().identifier]:
+                    if not prop_value.check_variables_size(self.output_block.get_dimension()):
+                        raise Exception('The number of output variables is not consistent between\n'
+                                        'the property and the network!')
 
             # Check output id
             if self.project.nn.get_last_node().identifier in prop_dict.keys():
