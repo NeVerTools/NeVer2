@@ -203,7 +203,7 @@ class TrainingWindow(BaseWindow):
 
     """
 
-    def __init__(self, nn: NeuralNetwork):
+    def __init__(self, nn: SequentialNetwork):
         super().__init__('Train Network')
 
         # Training elements
@@ -479,7 +479,7 @@ class TrainingWindow(BaseWindow):
             return dt.TorchFMNIST(self.dataset_path, True, self.dataset_transform)
         elif self.dataset_path != '':
             return dt.GenericFileDataset(self.dataset_path,
-                                         self.dataset_params['target_idx'],
+                                         self.nn.get_input_len(),
                                          self.dataset_params['data_type'],
                                          self.dataset_params['delimiter'],
                                          self.dataset_transform)

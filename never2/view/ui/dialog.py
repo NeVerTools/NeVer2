@@ -496,32 +496,31 @@ class GenericDatasetDialog(TwoButtonsDialog):
         super().__init__('Dataset - additional parameters', '')
         g_layout = QGridLayout()
         self.layout.addLayout(g_layout)
-        self.params = {'target_idx': 0,
-                       'data_type': float,
+        self.params = {'data_type': float,
                        'delimiter': ','}
 
-        target_label = CustomLabel('Target index')
-        target_edit = CustomTextBox()
-        target_edit.setValidator(ArithmeticValidator.INT)
-        target_edit.textChanged. \
-            connect(lambda: self.update_dict('target_idx', target_edit.text()))
-        g_layout.addWidget(target_label, 0, 0)
-        g_layout.addWidget(target_edit, 0, 1)
+        # target_label = CustomLabel('Target index')
+        # target_edit = CustomTextBox()
+        # target_edit.setValidator(ArithmeticValidator.INT)
+        # target_edit.textChanged. \
+        #     connect(lambda: self.update_dict('target_idx', target_edit.text()))
+        # g_layout.addWidget(target_label, 0, 0)
+        # g_layout.addWidget(target_edit, 0, 1)
 
         data_type_label = CustomLabel('Data type')
         data_type_edit = CustomComboBox()
         data_type_edit.addItems(['float', 'int'])
         data_type_edit.activated. \
             connect(lambda: self.update_dict('data_type', data_type_edit.currentText()))
-        g_layout.addWidget(data_type_label, 1, 0)
-        g_layout.addWidget(data_type_edit, 1, 1)
+        g_layout.addWidget(data_type_label, 0, 0)
+        g_layout.addWidget(data_type_edit, 0, 1)
 
         delimiter_label = CustomLabel('Delimiter character')
         delimiter_edit = CustomTextBox(',')
         delimiter_edit.textChanged. \
             connect(lambda: self.update_dict('delimiter', delimiter_edit.text()))
-        g_layout.addWidget(delimiter_label, 2, 0)
-        g_layout.addWidget(delimiter_edit, 2, 1)
+        g_layout.addWidget(delimiter_label, 1, 0)
+        g_layout.addWidget(delimiter_edit, 1, 1)
 
         self.cancel_btn.clicked.connect(self.reset)
         self.render_layout()
@@ -535,8 +534,7 @@ class GenericDatasetDialog(TwoButtonsDialog):
                     self.params[key] = eval(value)
 
     def reset(self):
-        self.params = {'target_idx': 0,
-                       'data_type': float,
+        self.params = {'data_type': float,
                        'delimiter': ','}
 
 
