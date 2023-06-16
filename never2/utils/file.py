@@ -133,7 +133,7 @@ def write_smt_property(path: str, props: dict, dtype: str) -> None:
         # Variables
         for p in props.values():
             for v in p.variables:
-                f.write(f"(declare-fun {v} () {dtype})\n")
+                f.write(f"(declare-const {v} {dtype})\n")
         f.write("\n")
 
         # Constraints
