@@ -512,7 +512,7 @@ class BlockContentWidget(QWidget):
         buttons = [self.buttons_layout.itemAt(i).widget() for i in range(self.buttons_layout.count())]
 
         for widget in widgets:
-            if isinstance(widget, CustomLabel) or isinstance(widget, CustomComboBox):
+            if isinstance(widget, CustomTextBox) or isinstance(widget, CustomComboBox):
                 # Free to add property
                 if isinstance(widget, CustomComboBox) and get_classname(self.block_ref) == 'FunctionalBlock':
                     continue
@@ -524,14 +524,12 @@ class BlockContentWidget(QWidget):
 
         for button in buttons:
             # Free to add property
-            if get_classname(self.block_ref) == 'FunctionalBlock':
-                if button.text() == 'Add property':
-                    continue
-
-                if enable:
-                    button.setEnabled(True)
-                else:
-                    button.setEnabled(False)
+            if button.text() == 'Add property':
+                continue
+            elif enable:
+                button.setEnabled(True)
+            else:
+                button.setEnabled(False)
 
     def add_property(self):
         """
