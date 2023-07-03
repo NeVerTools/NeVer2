@@ -642,7 +642,7 @@ class BlockContentWidget(QWidget):
         for param_name, param_value in self.wdg_param_dict.items():
             if 'editable' in self.block_ref.attr_dict['parameters'][param_name]:
 
-                if self.block_ref.attr_dict['parameters']['editable'] == 'True':
+                if self.block_ref.attr_dict['parameters'][param_name]['editable'] == 'True':
                     q_widget = param_value[0]
 
                     if 'default' in self.block_ref.attr_dict['parameters'][param_name]:
