@@ -114,7 +114,24 @@ class Project:
 
         """
 
-        new_node = NodeFactory.create_layernode(layer_name, layer_id, data, self.last_out_dim())
+        layer_in_dim = self.last_out_dim()
+
+        # Due to the multidimensional nature of some nodes, some hard-coded processing
+        # in order to assign the correct value is needed.
+        # TODO find a better workaround?
+
+        kernel_dim = len(layer_in_dim) - 1
+        padding_dim = 2 * kernel_dim
+
+        if layer_name == 'ConvNode' or layer_name == 'AveragePoolNode' or layer_name == 'MaxPoolNode':
+            data['kernel_size'] = tuple((data['kernel_size'][0] for _ in range(kernel_dim)))
+            data['stride'] = tuple((data['stride'][0] for _ in range(kernel_dim)))
+            data['padding'] = tuple((data['padding'][0] for _ in range(padding_dim)))
+
+        if layer_name == 'ConvNode' or layer_name == 'MaxPoolNode':
+            data['dilation'] = tuple((data['dilation'][0] for _ in range(kernel_dim)))
+
+        new_node = NodeFactory.create_layernode(layer_name, layer_id, data, layer_in_dim)
         self.nn.add_node(new_node)
         self.set_modified(True)
 

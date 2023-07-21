@@ -17,7 +17,7 @@ import never2.utils.rep as rep
 from never2.model.component.block import FunctionalBlock, Block, LayerBlock, PropertyBlock
 from never2.model.component.edge import Edge
 from never2.model.project import Project
-from never2.resources.styling.custom import CustomLabel
+from never2.resources.styling.custom import CustomLabel, CustomTextBox
 from never2.utils.container import PropertyContainer
 from never2.utils.node_wrapper import NodeFactory
 from never2.view.graphics_scene import GraphicsScene
@@ -381,6 +381,9 @@ class Scene:
                             q_wdg.setText(rep.tuple2text(sh))
                         else:
                             q_wdg.setText(str(node_param))
+                elif isinstance(q_wdg, CustomTextBox):
+                    if hasattr(added_node, param_name) and getattr(added_node, param_name) != eval(q_wdg.text()):
+                        q_wdg.setText(rep.tuple2text(getattr(added_node, param_name), prod=False))
 
     def update_edges(self):
         """

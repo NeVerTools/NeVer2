@@ -246,6 +246,7 @@ class BlockContentWidget(QWidget):
         self.buttons_layout = QHBoxLayout()
         self.buttons_layout.setContentsMargins(0, 0, 0, 0)
 
+        # build_dict is used when loading from file
         if build_dict is None:
             self.init_content()
         else:
