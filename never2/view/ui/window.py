@@ -579,7 +579,7 @@ class TrainingWindow(BaseWindow):
             train_strategy = PytorchTraining(opt.Adam, opt_params,
                                              loss,
                                              self.params['Epochs']['value'],
-                                             self.params['Validation percentage']['value'],
+                                             self.params['Validation percentage']['value'] / 100,
                                              self.params['Training batch size']['value'],
                                              self.params['Validation batch size']['value'],
                                              True,
