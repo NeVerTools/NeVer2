@@ -11,12 +11,19 @@ __NeVer2__ is written in Python, and relies on the
 Here we collect the bibtex entries on our publications related to __NeVer2__
 
 ```
-@inproceedings{demarchi2022formal,
-    title = {Formal Verification of Neural Networks: a Case Study about Adaptive Cruise Control},
-	author = {Demarchi, Stefano and Guidotti, Dario and Pitto, Andrea and Tacchella, Armando},
-	year = 2022,
-	booktitle = {International ECMS Conference on Modeling and Simulation},
-	pages={310--316}
+@inproceedings{DBLP:conf/ecms/DemarchiGPT22,
+  author       = {Stefano Demarchi and Dario Guidotti and Andrea Pitto and Armando Tacchella},
+  editor       = {Ibrahim A. Hameed and Agus Hasan and Saleh Abdel{-}Afou Alaliyat},
+  title        = {Formal Verification Of Neural Networks: {A} Case Study About Adaptive
+                  Cruise Control},
+  booktitle    = {Proceedings of the 36th {ECMS} International Conference on Modelling
+                  and Simulation, {ECMS} 2022, {\AA}lesund, Norway, May 30 - June 3, 2022},
+  pages        = {310--316},
+  publisher    = {European Council for Modeling and Simulation},
+  year         = {2022},
+  url          = {https://doi.org/10.7148/2022-0310},
+  doi          = {10.7148/2022-0310},
+  timestamp    = {Mon, 15 Aug 2022 13:47:01 +0200}
 }
 ```
 
