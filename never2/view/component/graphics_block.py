@@ -298,7 +298,16 @@ class BlockContentWidget(QWidget):
                         self.setObjectName('OutputBlockContent')
 
                     widget = CustomComboBox(context=get_classname(self.block_ref))
-                    cb_fill = self.block_ref.scene_ref.editor_widget_ref.property_data.keys()
+
+                    # Filter properties by applicability
+                    cb_fill = []
+                    for p_k, p_v in self.block_ref.scene_ref.editor_widget_ref.property_data.items():
+                        if p_v['applicable'] == 'global' or \
+                                (p_v['applicable'] == 'input' and self.block_ref.title == 'Input'):
+                            cb_fill.append(p_k)
+                        elif p_v['applicable'] == 'output' and self.block_ref.title == 'Output':
+                            cb_fill.append(p_k)
+
                     widget.addItems(cb_fill)
 
                     widget.view().setMinimumWidth(140)

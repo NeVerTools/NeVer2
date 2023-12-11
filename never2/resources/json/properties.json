@@ -4,6 +4,7 @@
     "id": "SMT",
     "parameters": {
     },
+    "applicable": "global",
     "description": "A generic property in plain SMT-LIB format."
   },
   "Polyhedral": {
@@ -11,6 +12,7 @@
     "id": "PLH",
     "parameters": {
     },
+    "applicable": "global",
     "description": "A property for representing single variable bounds in a controlled way."
   },
   "Box": {
@@ -18,6 +20,15 @@
     "id": "BOX",
     "parameters": {
     },
+    "applicable": "global",
     "description": "A property for representing Hyper-rectangle bounds as a set of lower bounds and upper bounds."
+  },
+  "Max/min": {
+    "name": "Max/min",
+    "id": "MAX",
+    "parameters": {
+    },
+    "applicable": "output",
+    "description": "A property for specifying the label classification."
   }
 }
