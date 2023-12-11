@@ -13,7 +13,7 @@ from PyQt6.QtWidgets import QGraphicsView
 
 import never2.resources.styling.dimension as dim
 from never2.model.component.block import LayerBlock, PropertyBlock
-from never2.view.ui.dialog import MessageDialog, MessageType
+from never2.view.ui.dialogs.message import MessageDialog, MessageType
 
 
 class GraphicsView(QGraphicsView):

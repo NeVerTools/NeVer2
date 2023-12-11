@@ -15,7 +15,7 @@ import never2.utils.rep as rep
 from never2.model.component.socket import Socket, SocketPosition, SocketType
 from never2.resources.styling.custom import CustomLabel
 from never2.view.component.graphics_block import GraphicsBlock, BlockContentWidget
-from never2.view.ui.dialog import EditSmtPropertyDialog, EditPolyhedralPropertyDialog, EditBoxPropertyDialog
+from never2.view.ui.dialogs.property import EditSmtPropertyDialog, EditPolyhedralPropertyDialog, EditBoxPropertyDialog
 
 
 class Block:

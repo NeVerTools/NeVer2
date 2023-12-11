@@ -22,7 +22,7 @@ from never2.utils.container import PropertyContainer
 from never2.utils.node_wrapper import NodeFactory
 from never2.view.graphics_scene import GraphicsScene
 from never2.view.graphics_view import GraphicsView
-from never2.view.ui.dialog import ConfirmDialog, MessageDialog, MessageType
+from never2.view.ui.dialogs.message import ConfirmDialog, MessageDialog, MessageType
 
 
 class Scene:

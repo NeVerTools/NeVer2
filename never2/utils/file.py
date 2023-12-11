@@ -16,7 +16,7 @@ from pysmt.exceptions import PysmtException
 from pysmt.smtlib.parser import SmtLibParser
 
 from never2.utils.container import PropertyContainer
-from never2.view.ui.dialog import MessageDialog, MessageType
+from never2.view.ui.dialogs.message import MessageDialog, MessageType
 
 
 class FileFormat:

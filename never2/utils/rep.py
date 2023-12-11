@@ -11,7 +11,7 @@ import json
 import traceback
 
 from never2 import RES_DIR
-from never2.view.ui.dialog import MessageDialog, MessageType
+from never2.view.ui.dialogs.message import MessageDialog, MessageType
 
 JSON_PATH = RES_DIR + '/json'
 

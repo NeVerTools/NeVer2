@@ -21,8 +21,8 @@ from never2.model.project import Project
 from never2.model.scene import Scene
 from never2.utils.file import FileFormat, read_properties
 from never2.view.component.inspector import InspectorDockToolbar
-from never2.view.ui.dialog import MessageDialog, MessageType, ConfirmDialog, FuncDialog
-from never2.view.ui.window import TrainingWindow, VerificationWindow
+from never2.view.ui.dialogs.message import MessageDialog, MessageType, ConfirmDialog, FuncDialog
+from never2.view.ui.dialogs.window import TrainingWindow, VerificationWindow
 
 
 class EditorWidget(QWidget):

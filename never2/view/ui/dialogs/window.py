@@ -31,8 +31,9 @@ from never2.resources.styling.custom import CustomComboBox, CustomTextBox, Custo
     CustomLoggerTextArea
 from never2.utils import rep, file
 from never2.utils.validator import ArithmeticValidator
-from never2.view.ui.dialog import GenericDatasetDialog, ComposeTransformDialog, MessageDialog, MessageType, \
-    MixedVerificationDialog
+from never2.view.ui.dialogs.action import ComposeTransformDialog, MixedVerificationDialog
+from never2.view.ui.dialogs.dialog import GenericDatasetDialog
+from never2.view.ui.dialogs.message import MessageDialog, MessageType
 
 
 class BaseWindow(QtWidgets.QDialog):

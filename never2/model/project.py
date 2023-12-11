@@ -15,7 +15,7 @@ from pynever.nodes import LayerNode
 import never2.utils.rep as rep
 from never2.utils.file import InputHandler, FileFormat, OutputHandler
 from never2.utils.node_wrapper import NodeFactory
-from never2.view.ui.dialog import FuncDialog
+from never2.view.ui.dialogs.message import FuncDialog
 
 
 class Project:

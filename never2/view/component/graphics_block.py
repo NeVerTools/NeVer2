@@ -19,7 +19,7 @@ import never2.resources.styling.palette as palette
 from never2 import get_classname, RES_DIR
 from never2.resources.styling.custom import CustomTextBox, CustomLabel, CustomComboBox, CustomButton
 from never2.utils.validator import ArithmeticValidator
-from never2.view.ui.dialog import ConfirmDialog, MessageDialog, MessageType
+from never2.view.ui.dialogs.message import ConfirmDialog, MessageDialog, MessageType
 
 
 class GraphicsBlock(QGraphicsItem):
