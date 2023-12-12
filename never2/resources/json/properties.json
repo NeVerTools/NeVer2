@@ -23,9 +23,9 @@
     "applicable": "global",
     "description": "A property for representing Hyper-rectangle bounds as a set of lower bounds and upper bounds."
   },
-  "Max/min": {
-    "name": "Max/min",
-    "id": "MAX",
+  "Classification": {
+    "name": "Classification",
+    "id": "CLS",
     "parameters": {
     },
     "applicable": "output",

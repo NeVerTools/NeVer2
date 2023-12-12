@@ -18,21 +18,36 @@ from never2.view.ui.dialogs.dialog import TwoButtonsDialog, BaseDialog
 from never2.view.ui.dialogs.message import MessageDialog, MessageType
 
 
-class EditSmtPropertyDialog(TwoButtonsDialog):
+class PropertyDialog(TwoButtonsDialog):
+    """
+    This class groups all common functionalities for property dialogs.
+
+    Attributes
+    ----------
+    property_block : PropertyBlock
+        Current property to edit.
+    has_edits : bool
+        Flag signaling if the property was edited.
+
+    """
+
+    def __init__(self, property_block: 'PropertyBlock'):
+        super().__init__('Edit Property', '', context='Property')
+        self.property_block = property_block
+        self.has_edits = False
+
+
+class EditSmtPropertyDialog(PropertyDialog):
     """
     This dialog allows to define a generic SMT property
     by writing directly in the SMT-LIB language.
 
     Attributes
     ----------
-    property_block : PropertyBlock
-        Current property to edit.
     new_property_str : str
         New SMT-LIB property string.
     smt_box : CustomTextArea
         Input box.
-    has_edits : bool
-        Flag signaling if the property was edited.
 
     Methods
     ----------
@@ -42,10 +57,8 @@ class EditSmtPropertyDialog(TwoButtonsDialog):
     """
 
     def __init__(self, property_block: 'PropertyBlock'):
-        super().__init__('Edit property', '', context='Property')
-        self.property_block = property_block
+        super().__init__(property_block)
         self.new_property_str = self.property_block.smt_string
-        self.has_edits = False
 
         g_layout = QGridLayout()
         self.layout.addLayout(g_layout)
@@ -199,15 +212,13 @@ class EditPolyhedralPropertyDialog(BaseDialog):
             self.viewer.appendPlainText(self.property_block.label_string)
 
 
-class EditBoxPropertyDialog(TwoButtonsDialog):
+class EditBoxPropertyDialog(PropertyDialog):
     """
     This dialog allows to define a bounded box defined by two lists
     for the lower bounds and the upper bounds.
 
     Attributes
     ----------
-    property_block : PropertyBlock
-        Current property to edit.
     lower_bounds : list
         Lower bounds of the property.
     upper_bounds : list
@@ -216,8 +227,6 @@ class EditBoxPropertyDialog(TwoButtonsDialog):
         Input box for lower bounds.
     ubs_box : CustomTextBox
         Input box for upper bounds.
-    has_edits : bool
-        Flag signaling if the property was edited.
 
     Methods
     ----------
@@ -229,11 +238,10 @@ class EditBoxPropertyDialog(TwoButtonsDialog):
     """
 
     def __init__(self, property_block: 'PropertyBlock'):
-        super().__init__('Edit property', '', context='Property')
+        super().__init__(property_block)
         self.property_block = property_block
         self.lower_bounds = []
         self.upper_bounds = []
-        self.has_edits = False
 
         if self.property_block.label_string != '':
             bounds = self.property_block.label_string.split('::')
@@ -317,3 +325,20 @@ class EditBoxPropertyDialog(TwoButtonsDialog):
             smt_string += f'(assert (<= {symbol}_{i} {self.upper_bounds[i]}))\n'
 
         return smt_string
+
+
+class EditClassificationPropertyDialog(PropertyDialog):
+    """
+    This dialog allows to define a classification property by selecting
+    an output variable to be minimum or maximum.
+
+    Attributes
+    ----------
+    property_block : PropertyBlock
+        Current property to edit.
+    has_edits : bool
+        Flag signaling if the property was edited.
+
+    """
+
+    pass

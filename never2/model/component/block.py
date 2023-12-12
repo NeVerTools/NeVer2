@@ -15,7 +15,8 @@ import never2.utils.rep as rep
 from never2.model.component.socket import Socket, SocketPosition, SocketType
 from never2.resources.styling.custom import CustomLabel
 from never2.view.component.graphics_block import GraphicsBlock, BlockContentWidget
-from never2.view.ui.dialogs.property import EditSmtPropertyDialog, EditPolyhedralPropertyDialog, EditBoxPropertyDialog
+from never2.view.ui.dialogs.property import EditSmtPropertyDialog, EditPolyhedralPropertyDialog, EditBoxPropertyDialog, \
+    EditClassificationPropertyDialog
 
 
 class Block:
@@ -612,6 +613,10 @@ class PropertyBlock(Block):
                 self.property_label.setText(self.label_string)
             else:
                 self.remove()
+
+        elif self.title == 'Classification':
+            dialog = EditClassificationPropertyDialog(self)
+            dialog.exec()
 
         return dialog.has_edits if dialog is not None else False
 
