@@ -587,7 +587,7 @@ class PropertyBlock(Block):
 
             if dialog.has_edits:
                 self.smt_string = dialog.new_property_str
-                self.property_label.setText(self.smt_string)
+                self.label_string = self.smt_string
 
         elif self.title == 'Polyhedral':
             dialog = EditPolyhedralPropertyDialog(self)
@@ -595,13 +595,11 @@ class PropertyBlock(Block):
 
             if dialog.has_edits:
                 if self.label_string == 'Ax - b <= 0':
-                    self.label_string = ''
+                    self.label_string = self.smt_string
 
                 for p in dialog.property_list:
                     self.label_string += f'{p[0]} {p[1]} {p[2]}\n'
                     self.smt_string += f'(assert ({p[1]} {p[0]} {float(p[2])}))\n'
-
-                self.property_label.setText(self.smt_string)
 
         elif self.title == 'Box':
             dialog = EditBoxPropertyDialog(self)
@@ -609,14 +607,17 @@ class PropertyBlock(Block):
 
             if dialog.has_edits:
                 self.smt_string = dialog.compile_smt()
-                self.label_string = f'{str(dialog.lower_bounds)}::{str(dialog.upper_bounds)}'
-                self.property_label.setText(self.label_string)
-            else:
-                self.remove()
+                self.label_string = f'{str(dialog.lower_bounds)}\n{str(dialog.upper_bounds)}'
 
         elif self.title == 'Classification':
             dialog = EditClassificationPropertyDialog(self)
             dialog.exec()
+
+            if dialog.has_edits:
+                self.smt_string = dialog.compile_smt()
+
+        if dialog is not None:
+            self.property_label.setText(self.label_string)
 
         return dialog.has_edits if dialog is not None else False
 

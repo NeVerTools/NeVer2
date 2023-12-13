@@ -36,6 +36,10 @@ class PropertyDialog(TwoButtonsDialog):
         self.property_block = property_block
         self.has_edits = False
 
+        # apply same QLineEdit and QComboBox style of the block contents
+        qss_file = open(RES_DIR + '/styling/qss/blocks.qss').read()
+        self.setStyleSheet(qss_file)
+
 
 class EditSmtPropertyDialog(PropertyDialog):
     """
@@ -62,10 +66,6 @@ class EditSmtPropertyDialog(PropertyDialog):
 
         g_layout = QGridLayout()
         self.layout.addLayout(g_layout)
-
-        # apply same QLineEdit and QComboBox style of the block contents
-        qss_file = open(RES_DIR + '/styling/qss/blocks.qss').read()
-        self.setStyleSheet(qss_file)
 
         # Build main_layout
         title_label = CustomLabel('SMT property', alignment=Qt.AlignmentFlag.AlignCenter, context='Property')
@@ -101,7 +101,7 @@ class EditPolyhedralPropertyDialog(BaseDialog):
     property_block : PropertyBlock
         Current property to edit.
     property_list : list
-        List of given properties.
+        List of independent statements.
     has_edits : bool
         Flag signaling if the property was edited.
     viewer : CustomTextArea
@@ -130,10 +130,6 @@ class EditPolyhedralPropertyDialog(BaseDialog):
         self.viewer.setMinimumHeight(100)
         self.show_properties_viewer()
         grid = QGridLayout()
-
-        # apply same QLineEdit and QComboBox style of the block contents
-        qss_file = open(RES_DIR + '/styling/qss/blocks.qss').read()
-        self.setStyleSheet(qss_file)
 
         # Build main_layout
         title_label = CustomLabel('Polyhedral property', primary=True, context='Property')
@@ -251,10 +247,6 @@ class EditBoxPropertyDialog(PropertyDialog):
         g_layout = QGridLayout()
         self.layout.addLayout(g_layout)
 
-        # apply same QLineEdit and QComboBox style of the block contents
-        qss_file = open(RES_DIR + '/styling/qss/blocks.qss').read()
-        self.setStyleSheet(qss_file)
-
         # Build main_layout
         title_label = CustomLabel('Box property', alignment=Qt.AlignmentFlag.AlignCenter, context='Property')
         g_layout.addWidget(title_label, 0, 0, 1, 2)
@@ -334,11 +326,75 @@ class EditClassificationPropertyDialog(PropertyDialog):
 
     Attributes
     ----------
-    property_block : PropertyBlock
-        Current property to edit.
-    has_edits : bool
-        Flag signaling if the property was edited.
+
 
     """
 
-    pass
+    def __init__(self, property_block: 'PropertyBlock'):
+        super().__init__(property_block)
+        self.min = True
+        self.viewer = CustomTextBox(context='FunctionalBlock')
+        self.viewer.setReadOnly(True)
+        g_layout = QGridLayout()
+        self.layout.addLayout(g_layout)
+
+        # Build main layout
+        title_label = CustomLabel('Classification property',
+                                  alignment=Qt.AlignmentFlag.AlignCenter,
+                                  context='Property')
+        g_layout.addWidget(title_label, 0, 0, 1, 2)
+
+        # Variable selector
+        var_label = CustomLabel('Variable', primary=True, context='Property')
+        g_layout.addWidget(var_label, 1, 0)
+        self.var_cb = CustomComboBox(context='Property')
+        for v in property_block.variables:
+            self.var_cb.addItem(v)
+        g_layout.addWidget(self.var_cb, 2, 0)
+
+        # Min/Max selector
+        minmax_label = CustomLabel('Expected value', primary=True, context='Property')
+        g_layout.addWidget(minmax_label, 1, 1)
+        self.minmax = CustomComboBox(context='Property')
+        self.minmax.addItems(['Min', 'Max'])
+        g_layout.addWidget(self.minmax, 2, 1)
+
+        # Viewer
+        self.var_cb.currentTextChanged.connect(self.update_self)
+        self.minmax.currentTextChanged.connect(self.update_self)
+        self.update_self()
+        g_layout.addWidget(self.viewer, 3, 0, 1, 2)
+
+        self.render_layout()
+
+    def update_self(self) -> None:
+        self.min = self.minmax.currentText() == 'Min'
+        varname = self.property_block.ref_block.get_identifier()
+        varnum = self.var_cb.currentText().split('_')[-1]
+        operator = '<=' if self.min else '>='
+        self.viewer.setText(f"{self.var_cb.currentText()} {operator} {varname}_j for all j != {varnum}")
+        self.compile_smt()
+        self.has_edits = True
+
+    def compile_smt(self) -> str:
+        """
+        This method builds a SMT-LIB string for the classification
+        specification
+
+        Returns
+        ----------
+        str
+            The SMT-LIB formatted statement
+
+        """
+
+        smt_string = ''
+        varname = self.property_block.ref_block.get_identifier()
+        varnum = self.var_cb.currentText().split('_')[-1]
+        operator = '<=' if self.min else '>='
+
+        for i in range(len(self.property_block.variables)):
+            if i != int(varnum):
+                smt_string += f'(assert ({operator} {varname}_{varnum} {varname}_{i}))\n'
+
+        return smt_string
