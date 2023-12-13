@@ -332,11 +332,15 @@ class EditClassificationPropertyDialog(PropertyDialog):
 
     def __init__(self, property_block: 'PropertyBlock'):
         super().__init__(property_block)
-        self.min = True
+
         self.viewer = CustomTextBox(context='FunctionalBlock')
         self.viewer.setReadOnly(True)
         g_layout = QGridLayout()
         self.layout.addLayout(g_layout)
+
+        self.min = True
+        if self.property_block.label_string != '':
+            self.min = self.property_block.label_string.split('#')[0] == True
 
         # Build main layout
         title_label = CustomLabel('Classification property',
@@ -348,9 +352,12 @@ class EditClassificationPropertyDialog(PropertyDialog):
         var_label = CustomLabel('Variable', primary=True, context='Property')
         g_layout.addWidget(var_label, 1, 0)
         self.var_cb = CustomComboBox(context='Property')
-        for v in property_block.variables:
+        for v in self.property_block.variables:
             self.var_cb.addItem(v)
         g_layout.addWidget(self.var_cb, 2, 0)
+
+        if self.property_block.label_string != '':
+            self.var_cb.setCurrentText(self.property_block.label_string.split('#')[1])
 
         # Min/Max selector
         minmax_label = CustomLabel('Expected value', primary=True, context='Property')
@@ -358,6 +365,10 @@ class EditClassificationPropertyDialog(PropertyDialog):
         self.minmax = CustomComboBox(context='Property')
         self.minmax.addItems(['Min', 'Max'])
         g_layout.addWidget(self.minmax, 2, 1)
+
+        if self.property_block.label_string != '':
+            if not self.min:
+                self.minmax.setCurrentText('Max')
 
         # Viewer
         self.var_cb.currentTextChanged.connect(self.update_self)
@@ -373,7 +384,6 @@ class EditClassificationPropertyDialog(PropertyDialog):
         varnum = self.var_cb.currentText().split('_')[-1]
         operator = '<=' if self.min else '>='
         self.viewer.setText(f"{self.var_cb.currentText()} {operator} {varname}_j for all j != {varnum}")
-        self.compile_smt()
         self.has_edits = True
 
     def compile_smt(self) -> str:

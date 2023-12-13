@@ -481,9 +481,6 @@ class PropertyBlock(Block):
     ref_block : FunctionalBlock
         Reference to the input or output block
 
-    property_label : CustomLabel
-        Label of the block
-
     label_string : str
         String displayed on the label
 
@@ -524,8 +521,6 @@ class PropertyBlock(Block):
         self.label_string = ''
         self.smt_string = ''
         self.variables = self.ref_block.get_variables()
-
-        self.property_label = CustomLabel(self.label_string)
 
     def init_position(self) -> None:
         """
@@ -607,7 +602,7 @@ class PropertyBlock(Block):
 
             if dialog.has_edits:
                 self.smt_string = dialog.compile_smt()
-                self.label_string = f'{str(dialog.lower_bounds)}\n{str(dialog.upper_bounds)}'
+                self.label_string = f'{str(dialog.lower_bounds)}::{str(dialog.upper_bounds)}'
 
         elif self.title == 'Classification':
             dialog = EditClassificationPropertyDialog(self)
@@ -615,9 +610,7 @@ class PropertyBlock(Block):
 
             if dialog.has_edits:
                 self.smt_string = dialog.compile_smt()
-
-        if dialog is not None:
-            self.property_label.setText(self.label_string)
+                self.label_string = f'{dialog.min}#{dialog.var_cb.currentText()}'
 
         return dialog.has_edits if dialog is not None else False
 
