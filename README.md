@@ -11,6 +11,37 @@ __NeVer2__ is written in Python, and relies on the
 Here we collect the bibtex entries on our publications related to __NeVer2__
 
 ```
+@unpublished{Demarchi2024Never2,
+  author       = {Stefano Demarchi and Dario Guidotti and Luca Pulina and Armando Tacchella},
+  title        = {{NeVer2: Learning and Verification of Neural Networks}},
+  month        = {February},
+  year         = {2024},
+  note         = {preprint available at Research Square \url{https://doi.org/10.21203/rs.3.rs-3925432/v1}}
+}
+
+@phdthesis{DBLP:phd/basesearch/Demarchi23,
+  author       = {Stefano Demarchi},
+  title        = {Experimenting with Constraint Programming Techniques in Artificial
+                  Intelligence: Automated System Design and Verification of Neural Networks},
+  school       = {University of Genoa, Italy},
+  year         = {2023},
+  url          = {https://hdl.handle.net/11567/1117675},
+  timestamp    = {Sat, 17 Jun 2023 00:08:09 +0200},
+  biburl       = {https://dblp.org/rec/phd/basesearch/Demarchi23.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
+}
+
+@phdthesis{DBLP:phd/basesearch/Guidotti22,
+  author       = {Dario Guidotti},
+  title        = {Verification and Repair of Machine Learning Models},
+  school       = {University of Genoa, Italy},
+  year         = {2022},
+  url          = {http://hdl.handle.net/11567/1082694},
+  timestamp    = {Sat, 25 Jun 2022 17:45:57 +0200},
+  biburl       = {https://dblp.org/rec/phd/basesearch/Guidotti22.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
+}
+
 @inproceedings{DBLP:conf/ecms/DemarchiGPT22,
   author       = {Stefano Demarchi and Dario Guidotti and Andrea Pitto and Armando Tacchella},
   editor       = {Ibrahim A. Hameed and Agus Hasan and Saleh Abdel{-}Afou Alaliyat},
