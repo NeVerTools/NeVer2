@@ -340,7 +340,7 @@ class EditClassificationPropertyDialog(PropertyDialog):
 
         self.min = True
         if self.property_block.label_string != '':
-            self.min = self.property_block.label_string.split('#')[0] == True
+            self.min = self.property_block.label_string.split('#')[0]
 
         # Build main layout
         title_label = CustomLabel('Classification property',

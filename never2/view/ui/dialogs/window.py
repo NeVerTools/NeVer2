@@ -26,7 +26,6 @@ from pynever.strategies import smt_reading, verification
 from pynever.strategies.training import PytorchTraining, PytorchMetrics
 
 from never2 import RES_DIR, ROOT_DIR
-from never2.resources.styling import palette
 from never2.resources.styling.custom import CustomComboBox, CustomTextBox, CustomLabel, CustomButton, \
     CustomLoggerTextArea
 from never2.utils import rep, file
@@ -69,7 +68,10 @@ class BaseWindow(QtWidgets.QDialog):
 
         self.setWindowTitle(self.title)
         self.setModal(True)
-        self.setStyleSheet('background-color: ' + palette.GREY_1 + ';')
+
+        # apply same QLineEdit and QComboBox style of the block contents
+        qss_file = open(RES_DIR + '/styling/qss/blocks.qss').read()
+        self.setStyleSheet(qss_file)
 
     def render_layout(self) -> None:
         """

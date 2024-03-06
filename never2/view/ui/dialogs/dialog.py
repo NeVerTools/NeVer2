@@ -10,6 +10,7 @@ Author: Andrea Gimelli, Giacomo Rosato, Stefano Demarchi
 from PyQt6 import QtWidgets
 from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout
 
+from never2 import RES_DIR
 from never2.resources.styling.custom import CustomLabel, CustomButton, CustomComboBox, CustomTextBox
 
 
@@ -46,6 +47,10 @@ class BaseDialog(QtWidgets.QDialog):
         else:
             self.setWindowTitle(self.title)
         self.setModal(True)
+
+        # apply same QLineEdit and QComboBox style of the block contents
+        qss_file = open(RES_DIR + '/styling/qss/blocks.qss').read()
+        self.setStyleSheet(qss_file)
 
     def set_title(self, title: str) -> None:
         """
