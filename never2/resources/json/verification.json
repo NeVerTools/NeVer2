@@ -2,7 +2,8 @@
   "Verification strategy": {
     "SSLP": {
       "params": {
-        "Heuristic": {
+        "heuristic": {
+          "name": "Algorithm",
           "alternatives": "['Complete', 'Approximate', 'Mixed']",
           "type": "radio",
           "description": "The algorithm employed for the abstract propagation. Complete performs exact abstract interpretation, Approximate performs incomplete abstract interpretation and Mixed refines one neuron per layer"
@@ -11,22 +12,26 @@
     },
     "SSBP": {
       "params": {
-        "Refinement heuristic": {
+        "heuristic": {
+          "name": "Refinement heuristic",
           "alternatives": "['sequential']",
           "type": "combo",
           "description": "Branching heuristic to employ in the refinement"
         },
-        "Bounds propagation": {
+        "bounds": {
+          "name": "Bounds propagation",
           "alternatives": "['symbolic', 'LiRPA']",
           "type": "combo",
           "description": "Bounds propagation backend"
         },
-        "Intersection strategy": {
+        "intersection": {
+          "name": "Intersection strategy",
           "alternatives": "['bounds_lp', 'star_lp']",
           "type": "combo",
           "description": "Strategy to compute the intersection. bounds_lp is faster, star_lp is more precise"
         },
-        "Timeout": {
+        "timeout": {
+          "name": "Timeout",
           "default": 300,
           "type": "int",
           "description": "Stop criteria for the algorithm in seconds"
