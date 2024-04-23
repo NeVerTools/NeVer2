@@ -1,11 +1,36 @@
 {
-  "Verification methodology": {
-    "Complete": {},
-    "Over-approximated": {},
-    "Mixed": {
-      "Neurons number": {
-        "name": "n_neurons",
-        "type": "int"
+  "Verification strategy": {
+    "SSLP": {
+      "params": {
+        "Heuristic": {
+          "alternatives": "['Complete', 'Approximate', 'Mixed']",
+          "type": "radio",
+          "description": "The algorithm employed for the abstract propagation. Complete performs exact abstract interpretation, Approximate performs incomplete abstract interpretation and Mixed refines one neuron per layer"
+        }
+      }
+    },
+    "SSBP": {
+      "params": {
+        "Refinement heuristic": {
+          "alternatives": "['sequential']",
+          "type": "combo",
+          "description": "Branching heuristic to employ in the refinement"
+        },
+        "Bounds propagation": {
+          "alternatives": "['symbolic', 'LiRPA']",
+          "type": "combo",
+          "description": "Bounds propagation backend"
+        },
+        "Intersection strategy": {
+          "alternatives": "['bounds_lp', 'star_lp']",
+          "type": "combo",
+          "description": "Strategy to compute the intersection. bounds_lp is faster, star_lp is more precise"
+        },
+        "Timeout": {
+          "default": 300,
+          "type": "int",
+          "description": "Stop criteria for the algorithm in seconds"
+        }
       }
     }
   }
