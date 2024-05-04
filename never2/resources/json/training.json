@@ -1,184 +1,194 @@
 {
   "Optimizer": {
-    "Adam": {
-      "Learning Rate": {
-        "name": "lr",
-        "type": "float",
-        "value": "1e-3",
-        "description": "Learning rate."
-      },
-      "Betas": {
-        "name": "betas",
-        "type": "tuple",
-        "value": "(0.9, 0.999)",
-        "description": "Coefficients used for computing running averages\nof gradient and its square."
-      },
-      "Epsilon": {
-        "name": "eps",
-        "type": "float",
-        "value": "1e-8",
-        "description": "Term added to the denominator to improve numerical\nstability."
-      },
-      "Weight decay": {
-        "name": "weight_decay",
-        "type": "float",
-        "value": "0.0",
-        "description": "Weight decay (L2 penalty)."
-      },
-      "AMSGrad": {
-        "name": "amsgrad",
-        "type": "bool",
-        "value": "False",
-        "description": "Whether to use the AMSGrad variant of this algorithm\nfrom the paper 'On the Convergence of Adam and beyond'."
+    "Optimization algorithm": {
+      "Adam": {
+        "Learning Rate": {
+          "name": "lr",
+          "type": "float",
+          "value": "1e-3",
+          "description": "Learning rate."
+        },
+        "Betas": {
+          "name": "betas",
+          "type": "tuple",
+          "value": "(0.9, 0.999)",
+          "description": "Coefficients used for computing running averages of gradient and its square."
+        },
+        "Epsilon": {
+          "name": "eps",
+          "type": "float",
+          "value": "1e-8",
+          "description": "Term added to the denominator to improve numerical stability."
+        },
+        "Weight decay": {
+          "name": "weight_decay",
+          "type": "float",
+          "value": "0.0",
+          "description": "Weight decay (L2 penalty)."
+        },
+        "AMSGrad": {
+          "name": "amsgrad",
+          "type": "bool",
+          "value": "False",
+          "description": "Whether to use the AMSGrad variant of this algorithm from the paper 'On the Convergence of Adam and beyond'."
+        }
       }
     }
   },
   "Scheduler": {
-    "ReduceLROnPlateau": {
-      "Mode": {
-        "name": "mode",
-        "type": "str",
-        "value": "min",
-        "allowed": "[min, max]",
-        "description": "In 'min' mode, lr will be reduced when the quantity\nmonitored has stopped decreasing; in 'max' mode it will\nbe reduced when the quantity monitored has stopped increasing."
-      },
-      "Factor": {
-        "name": "factor",
-        "type": "float",
-        "value": "0.1",
-        "description": "Factor by which the learning rate will be reduced\n(new_lr = lr * factor)."
-      },
-      "Patience": {
-        "name": "patience",
-        "type": "int",
-        "value": "10",
-        "description": "Number of epochs with no improvement after which\nlearning rate wil be reduced. For example, if patience = 2,\nthen we will ignore the first 2 epochs with no improvement, and\nwill only decrease the LR after the 3rd epoch if the loss still\nhasn't improved then."
-      },
-      "Threshold": {
-        "name": "threshold",
-        "type": "float",
-        "value": "1e-4",
-        "description": "Threshold for measuring the new optimum, to only\nfocus on significant changes."
-      },
-      "Threshold mode": {
-        "name": "threshold_mode",
-        "type": "str",
-        "value": "rel",
-        "allowed": "[rel, abs]",
-        "description": "In 'rel' mode, dynamic_threshold = best * (1 + threshold)\nin 'max' mode or best * (1 - threshold) in 'min' mode.\nIn 'abs' mode, dynamic_threshold = best + threshold in\n'max' mode or best - threshold in 'min' mode."
-      },
-      "Cooldown": {
-        "name": "cooldown",
-        "type": "int",
-        "value": "0",
-        "description": "Number of epochs to wait before resuming normal operation\nafter lr has been reduced."
-      },
-      "Min LR": {
-        "name": "min_lr",
-        "type": "float",
-        "value": "0.0",
-        "description": "A scalar or a list of scalars. A lower bound on the\nlearning rate of all param groups or each group respectively."
-      },
-      "Epsilon": {
-        "name": "eps",
-        "type": "float",
-        "value": "1e-8",
-        "description": "Minimal decay applied to lr. If the difference between\nnew and old lr is smaller than eps, the update is ignored."
-      },
-      "Verbose": {
-        "name": "verbose",
-        "type": "bool",
-        "value": "False",
-        "description": "If True, prints a message to stdout for each update."
+    "Learning rate scheduling": {
+      "ReduceLROnPlateau": {
+        "Mode": {
+          "name": "mode",
+          "type": "str",
+          "value": "min",
+          "allowed": "[min, max]",
+          "description": "In 'min' mode, lr will be reduced when the quantity monitored has stopped decreasing; in 'max' mode it will be reduced when the quantity monitored has stopped increasing."
+        },
+        "Factor": {
+          "name": "factor",
+          "type": "float",
+          "value": "0.1",
+          "description": "Factor by which the learning rate will be reduced (new_lr = lr * factor)."
+        },
+        "Patience": {
+          "name": "patience",
+          "type": "int",
+          "value": "10",
+          "description": "Number of epochs with no improvement after which learning rate wil be reduced. For example, if patience = 2, then we will ignore the first 2 epochs with no improvement, and will only decrease the LR after the 3rd epoch if the loss still hasn't improved then."
+        },
+        "Threshold": {
+          "name": "threshold",
+          "type": "float",
+          "value": "1e-4",
+          "description": "Threshold for measuring the new optimum, to only focus on significant changes."
+        },
+        "Threshold mode": {
+          "name": "threshold_mode",
+          "type": "str",
+          "value": "rel",
+          "allowed": "[rel, abs]",
+          "description": "In 'rel' mode, dynamic_threshold = best * (1 + threshold) in 'max' mode or best * (1 - threshold) in 'min' mode. In 'abs' mode, dynamic_threshold = best + threshold in 'max' mode or best - threshold in 'min' mode."
+        },
+        "Cooldown": {
+          "name": "cooldown",
+          "type": "int",
+          "value": "0",
+          "description": "Number of epochs to wait before resuming normal operation after lr has been reduced."
+        },
+        "Min LR": {
+          "name": "min_lr",
+          "type": "float",
+          "value": "0.0",
+          "description": "A scalar or a list of scalars. A lower bound on the learning rate of all param groups or each group respectively."
+        },
+        "Epsilon": {
+          "name": "eps",
+          "type": "float",
+          "value": "1e-8",
+          "description": "Minimal decay applied to lr. If the difference between new and old lr is smaller than eps, the update is ignored."
+        },
+        "Verbose": {
+          "name": "verbose",
+          "type": "bool",
+          "value": "False",
+          "description": "If True, prints a message to stdout for each update."
+        }
       }
     }
   },
   "Loss Function": {
-    "Cross Entropy": {
-      "Weight": {
-        "name": "weight",
-        "type": "tensor",
-        "value": "",
-        "description": "A manual rescaling weight given to each class.\nIf given, has to be a Tensor of size C."
+    "Loss function measure": {
+      "Cross Entropy": {
+        "Weight": {
+          "name": "weight",
+          "type": "tensor",
+          "value": "",
+          "description": "A manual rescaling weight given to each class. If given, has to be a Tensor of size C."
+        },
+        "Ignore index": {
+          "name": "ignore_index",
+          "type": "int",
+          "value": "-100",
+          "description": "Specifies a target value that is ignored and does not contribute to the input gradient."
+        },
+        "Reduction": {
+          "name": "reduction",
+          "type": "str",
+          "value": "mean",
+          "allowed": "[mean, sum, none]",
+          "description": "Specifies the reduction to apply to the output. 'none': no reduction will be applied, 'mean': the sum of the output will be divided by the number of elements in the output, 'sum': the output will be summed. "
+        }
       },
-      "Ignore index": {
-        "name": "ignore_index",
-        "type": "int",
-        "value": "-100",
-        "description": "Specifies a target value that is ignored and does not\ncontribute to the input gradient."
-      },
-      "Reduction": {
-        "name": "reduction",
-        "type": "str",
-        "value": "mean",
-        "allowed": "[mean, sum, none]",
-        "description": "Specifies the reduction to apply to the output.\n'none': no reduction will be applied,\n'mean': the sum of the output will be divided by\nthe number of elements in the output,\n'sum': the output will be summed.\n"
+      "MSE Loss": {
+        "Reduction": {
+          "name": "reduction",
+          "type": "str",
+          "value": "mean",
+          "allowed": "[mean, sum, none]",
+          "description": "Specifies the reduction to apply to the output. 'none': no reduction will be applied, 'mean': the sum of the output will be divided by the number of elements in the output, 'sum': the output will be summed. "
+        }
       }
+    }
+  },
+  "Precision": {
+    "Precision Metric": {
+      "Inaccuracy": {},
+      "MSE Loss": {
+        "Reduction": {
+          "name": "reduction",
+          "type": "str",
+          "value": "mean",
+          "allowed": "[mean, sum, none]",
+          "description": "Specifies the reduction to apply to the output. 'none': no reduction will be applied, 'mean': the sum of the output will be divided by the number of elements in the output, 'sum': the output will be summed. "
+        }
+      }
+    }
+  },
+  "Other parameters": {
+    "Epochs": {
+      "name": "n_epochs",
+      "type": "int",
+      "description": "Number of epochs for the training procedure."
     },
-    "MSE Loss": {
-      "Reduction": {
-        "name": "reduction",
-        "type": "str",
-        "value": "mean",
-        "allowed": "[mean, sum, none]",
-        "description": "Specifies the reduction to apply to the output.\n'none': no reduction will be applied,\n'mean': the sum of the output will be divided by\nthe number of elements in the output,\n'sum': the output will be summed.\n"
-      }
+    "Validation percentage": {
+      "name": "validation_percentage",
+      "type": "float",
+      "description": "Percentage of the dataset to use as the validation set."
+    },
+    "Training batch size": {
+      "name": "train_batch_size",
+      "type": "int",
+      "description": "Dimension for the train batch size for the training procedure."
+    },
+    "Validation batch size": {
+      "name": "validation_batch_size",
+      "type": "int",
+      "description": "Dimension for the validation batch size for the training procedure."
+    },
+    "Cuda": {
+      "name": "cuda",
+      "type": "bool",
+      "value": "False",
+      "description": "Whether to use the cuda library for the procedure."
+    },
+    "Train patience": {
+      "name": "train_patience",
+      "type": "int",
+      "description": "The number of epochs in which the loss may not decrease before the training procedure is interrupted with early stopping.",
+      "optional": "true"
+    },
+    "Checkpoints root": {
+      "name": "checkpoints_root",
+      "type": "str",
+      "description": "Where to store the checkpoints of the training strategy.",
+      "optional": "true"
+    },
+    "Verbosity level": {
+      "name": "verbose_rate",
+      "type": "int",
+      "description": "After how many batch the strategy prints information about how the training is going.",
+      "optional": "true"
     }
-  },
-  "Precision Metric": {
-    "Inaccuracy": {},
-    "MSE Loss": {
-      "Reduction": {
-        "name": "reduction",
-        "type": "str",
-        "value": "mean",
-        "allowed": "[mean, sum, none]",
-        "description": "Specifies the reduction to apply to the output.\n'none': no reduction will be applied,\n'mean': the sum of the output will be divided by\nthe number of elements in the output,\n'sum': the output will be summed.\n"
-      }
-    }
-  },
-  "Epochs": {
-    "name": "n_epochs",
-    "type": "int",
-    "description": "Number of epochs for the training procedure."
-  },
-  "Validation percentage": {
-    "name": "validation_percentage",
-    "type": "float",
-    "description": "Percentage of the dataset to use as the validation set."
-  },
-  "Training batch size": {
-    "name": "train_batch_size",
-    "type": "int",
-    "description": "Dimension for the train batch size for the\ntraining procedure."
-  },
-  "Validation batch size": {
-    "name": "validation_batch_size",
-    "type": "int",
-    "description": "Dimension for the validation batch size for the\ntraining procedure."
-  },
-  "Cuda": {
-    "name": "cuda",
-    "type": "bool",
-    "value": "False",
-    "description": "Whether to use the cuda library for the procedure."
-  },
-  "Train patience": {
-    "name": "train_patience",
-    "type": "int",
-    "description": "The number of epochs in which the loss may not\ndecrease before the training procedure is interrupted\nwith early stopping.",
-    "optional": "true"
-  },
-  "Checkpoints root": {
-    "name": "checkpoints_root",
-    "type": "str",
-    "description": "Where to store the checkpoints of the training strategy.",
-    "optional": "true"
-  },
-  "Verbosity level": {
-    "name": "verbose_rate",
-    "type": "int",
-    "description": "After how many batch the strategy prints information about\nhow the training is going.",
-    "optional": "true"
   }
 }

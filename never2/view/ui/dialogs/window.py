@@ -113,7 +113,7 @@ class BaseWindow(QtWidgets.QDialog):
 
             sub_key = next(iter(widget_dict[first_level]))
 
-            if type(widget_dict[first_level][sub_key]) == dict:
+            if isinstance(widget_dict[first_level][sub_key], dict):
 
                 self.widgets[first_level] = CustomComboBox()
                 for second_level in widget_dict[first_level].keys():

@@ -1,40 +1,46 @@
 {
-  "Verification strategy": {
-    "SSLP": {
-      "params": {
-        "heuristic": {
-          "name": "Algorithm",
-          "alternatives": "['Complete', 'Approximate', 'Mixed']",
-          "type": "radio",
-          "description": "The algorithm employed for the abstract propagation. Complete performs exact abstract interpretation, Approximate performs incomplete abstract interpretation and Mixed refines one neuron per layer"
+  "Strategy": {
+    "Verification strategy": {
+      "SSLP": {
+        "params": {
+          "Algorithm": {
+            "name": "heuristic",
+            "value": "Complete",
+            "allowed": "[Complete, Approximate, Mixed_1, Mixed_2]",
+            "type": "radio",
+            "description": "The algorithm employed for the abstract propagation. Complete performs exact abstract interpretation, Approximate performs incomplete abstract interpretation and Mixed_N refine N neurons per layer"
+          }
         }
-      }
-    },
-    "SSBP": {
-      "params": {
-        "heuristic": {
-          "name": "Refinement heuristic",
-          "alternatives": "['sequential']",
-          "type": "combo",
-          "description": "Branching heuristic to employ in the refinement"
-        },
-        "bounds": {
-          "name": "Bounds propagation",
-          "alternatives": "['symbolic', 'LiRPA']",
-          "type": "combo",
-          "description": "Bounds propagation backend"
-        },
-        "intersection": {
-          "name": "Intersection strategy",
-          "alternatives": "['bounds_lp', 'star_lp']",
-          "type": "combo",
-          "description": "Strategy to compute the intersection. bounds_lp is faster, star_lp is more precise"
-        },
-        "timeout": {
-          "name": "Timeout",
-          "default": 300,
-          "type": "int",
-          "description": "Stop criteria for the algorithm in seconds"
+      },
+      "SSBP": {
+        "params": {
+          "Refinement heuristic": {
+            "name": "heuristic",
+            "value": "sequential",
+            "allowed": "[sequential]",
+            "type": "str",
+            "description": "Branching heuristic to employ in the refinement"
+          },
+          "Bounds propagation": {
+            "name": "bounds",
+            "value": "symbolic",
+            "allowed": "[symbolic, LiRPA]",
+            "type": "str",
+            "description": "Bounds propagation backend"
+          },
+          "Intersection strategy": {
+            "name": "intersection",
+            "value": "bounds_lp",
+            "allowed": "[bounds_lp, star_lp]",
+            "type": "str",
+            "description": "Strategy to compute the intersection. bounds_lp is faster, star_lp is more precise"
+          },
+          "Timeout": {
+            "name": "timeout",
+            "value": "300",
+            "type": "int",
+            "description": "Stop criteria for the algorithm in seconds"
+          }
         }
       }
     }
