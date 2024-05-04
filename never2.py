@@ -7,7 +7,7 @@ from PyQt6.QtWidgets import QApplication
 from never2.main_window import MainWindow
 from never2.scripts import cli
 
-if __name__ == "__main__":
+if __name__ == '__main__':
 
     # GUI mode
     if len(sys.argv) == 1:

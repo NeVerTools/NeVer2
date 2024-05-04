@@ -42,7 +42,7 @@ class BaseDialog(QtWidgets.QDialog):
         self.title = title
         self.content = message
 
-        if self.title == "":
+        if self.title == '':
             self.setWindowTitle("\u26a0")
         else:
             self.setWindowTitle(self.title)
