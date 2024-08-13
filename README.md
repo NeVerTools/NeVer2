@@ -11,12 +11,13 @@ __NeVer2__ is written in Python, and relies on the
 Here we collect the bibtex entries on our publications related to __NeVer2__
 
 ```
-@unpublished{Demarchi2024Never2,
-  author       = {Stefano Demarchi and Dario Guidotti and Luca Pulina and Armando Tacchella},
-  title        = {{NeVer2: Learning and Verification of Neural Networks}},
-  month        = {February},
-  year         = {2024},
-  note         = {preprint available at Research Square \url{https://doi.org/10.21203/rs.3.rs-3925432/v1}}
+@article{demarchi2024never2,
+  title={NeVer2: learning and verification of neural networks},
+  author={Demarchi, Stefano and Guidotti, Dario and Pulina, Luca and Tacchella, Armando},
+  journal={Soft Computing},
+  pages={1--19},
+  year={2024},
+  publisher={Springer}
 }
 
 @phdthesis{DBLP:phd/basesearch/Demarchi23,
@@ -124,6 +125,10 @@ specified in the ONNX file. The verification strategy is one among the following
 
 Details on the algorithms can be found in [our Best Paper @ECMS 2022](https://www.scs-europe.net/dlib/2022/ecms2022acceptedpapers/0310_dis_ecms2022_0075.pdf)
 
+---
+# Contributors
+
+The main contributor of NeVer2 is Stefano Demarchi, with the help of Andrea Gimelli and Elena Botoeva
 ---
 # Examples and tutorials
 
