@@ -6,7 +6,8 @@ for usage terms. \
 __NeVer2__ is written in Python, and relies on the 
 [pyNeVer](https://www.github.com/nevertools/pynever) API.
 
-## Publications
+---
+# Publications
 
 Here we collect the bibtex entries on our publications related to __NeVer2__
 
@@ -129,6 +130,7 @@ Details on the algorithms can be found in [our Best Paper @ECMS 2022](https://ww
 # Contributors
 
 The main contributor of NeVer2 is Stefano Demarchi, with the help of Andrea Gimelli and Elena Botoeva
+
 ---
 # Examples and tutorials
 
