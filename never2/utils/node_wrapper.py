@@ -7,9 +7,9 @@ Author: Andrea Gimelli, Giacomo Rosato, Stefano Demarchi
 
 """
 
-from pynever.nodes import LayerNode, ReLUNode, SigmoidNode, FullyConnectedNode, BatchNormNode, AveragePoolNode, \
+from pynever.nodes import ReLUNode, SigmoidNode, FullyConnectedNode, BatchNormNode, AveragePoolNode, \
     ConvNode, MaxPoolNode, LRNNode, SoftMaxNode, UnsqueezeNode, FlattenNode, DropoutNode, ReshapeNode, ELUNode, \
-    CELUNode, LeakyReLUNode, TanhNode
+    CELUNode, LeakyReLUNode, TanhNode, ConcreteLayerNode
 
 
 class NodeFactory:
@@ -28,7 +28,7 @@ class NodeFactory:
     """
 
     @staticmethod
-    def create_layernode(class_name: str, node_id: str, data: dict, in_dim: tuple) -> LayerNode:
+    def create_layernode(class_name: str, node_id: str, data: dict, in_dim: tuple) -> ConcreteLayerNode:
         """
         This method builds the corresponding LayerNode given the class name,
         a unique identifier and the node data. If the class name is not implemented,
@@ -47,8 +47,8 @@ class NodeFactory:
 
         Returns
         ----------
-        LayerNode
-            The concrete LayerNode object.
+        ConcreteLayerNode
+            The ConcreteLayerNode object.
 
         """
 
@@ -148,21 +148,20 @@ class NodeFactory:
         return node
 
     @staticmethod
-    def create_datanode(node: LayerNode) -> tuple:
+    def create_datanode(node: ConcreteLayerNode) -> tuple[dict, str]:
         """
         This method creates a tuple with the information
         to draw a new block.
 
         Parameters
         ----------
-        node : LayerNode
+        node : ConcreteLayerNode
             The node to get data from.
 
         Returns
         ----------
         data
             The dictionary of the node data and the in_dim shape.
-
         node_identifier
             The id of the node
 

@@ -7,11 +7,9 @@ Author: Andrea Gimelli, Giacomo Rosato, Stefano Demarchi
 
 """
 
-from typing import Optional
-
 import numpy as np
 from PyQt6.QtWidgets import QGraphicsItem
-from pynever.nodes import LayerNode
+from pynever.nodes import ConcreteLayerNode
 
 import never2.utils.rep as rep
 from never2.model.component.block import FunctionalBlock, Block, LayerBlock, PropertyBlock
@@ -65,7 +63,7 @@ class Scene:
         # Project with pynever NN object and interfaces
         self.project = Project(self)
 
-    def init_io(self) -> (Block, Block):
+    def init_io(self) -> tuple[Block, Block]:
         """
         This method creates the input and output blocks, which are permanent
 
@@ -101,7 +99,7 @@ class Scene:
     def has_properties(self) -> bool:
         return self.pre_block is not None or self.post_block is not None
 
-    def get_properties(self) -> dict:
+    def get_properties(self) -> dict[str, PropertyContainer]:
         """
         Pack properties in a container and return
 
@@ -121,7 +119,7 @@ class Scene:
 
         return props
 
-    def draw_network(self, project: Project):
+    def draw_network(self, project: Project) -> None:
         """
         Draw the opened network in the project
 
@@ -130,7 +128,7 @@ class Scene:
         self.clear_scene()
         self.project = project
 
-        in_dim = project.nn.get_first_node().in_dim
+        in_dim = project.nn.get_first_node().get_input_dim()
         self.input_block.set_identifier(project.nn.input_id)
         self.input_block.set_dimension(in_dim)
 
@@ -148,9 +146,9 @@ class Scene:
             if not is_last:
                 node = project.nn.get_next_node(node)
 
-    def load_properties(self, prop_dict: dict):
+    def load_properties(self, prop_dict: dict[str, PropertyContainer]) -> None:
         """
-        Load existing properties from a dictionary <ID> : <PropertyFormat>
+        Load existing properties from a dictionary <ID> : <PropertyContainer>
 
         """
 
@@ -194,7 +192,7 @@ class Scene:
                     self.add_property_block('Generic SMT', self.output_block, v)
 
     def add_layer_block(self, block_data: dict, block_sign: str,
-                        block_id: str = None, load_dict: dict = None) -> Optional[LayerBlock]:
+                        block_id: str = None, load_dict: dict = None) -> LayerBlock | None:
         """
         This method adds a layer block in the Scene and draws it in the View
 
@@ -202,19 +200,16 @@ class Scene:
         ----------
         block_data : dict
             Block info stored in dictionary
-
         block_sign : str
             Signature of the block
-
         block_id : str, Optional
             Identifier provided when reading a network file
-
         load_dict : dict, Optional
             Extra dictionary with values for loading from file
 
         Returns
         ----------
-        Optional[LayerBlock]
+        LayerBlock | None
             Returns the LayerBlock object if created, None otherwise
 
         """
@@ -261,6 +256,7 @@ class Scene:
             if hasattr(added_block.graphics_block, 'content'):
                 added_node = self.project.nn.nodes[block_id]
                 self.update_block_params(added_block, added_node)
+
         # Case 2: the network is built on the fly
         else:
             try:
@@ -286,7 +282,7 @@ class Scene:
 
         return added_block
 
-    def add_property_block(self, name: str, parent: FunctionalBlock, prop_cnt: PropertyContainer = None):
+    def add_property_block(self, name: str, parent: FunctionalBlock, prop_cnt: PropertyContainer = None) -> None:
         """
         This function defines a property given the input or output block
 
@@ -294,10 +290,8 @@ class Scene:
         ----------
         name : str
             The name of the property
-
         parent : FunctionalBlock
             The block to attach the property to
-
         prop_cnt : PropertyContainer
             The container object for property data
 
@@ -338,7 +332,7 @@ class Scene:
             dialog = MessageDialog('No network defined for adding a property', MessageType.ERROR)
             dialog.exec()
 
-    def add_edge(self, prev: Block, cur: Block):
+    def add_edge(self, prev: Block, cur: Block) -> Edge:
         """
         Add and draw the edge connecting two blocks
 
@@ -346,7 +340,6 @@ class Scene:
         ----------
         prev : Block
             The block from where the edge starts
-
         cur : Block
             The block where the edge ends
 
@@ -356,7 +349,7 @@ class Scene:
             return Edge(self, prev, cur)
 
     @staticmethod
-    def update_block_params(added_block: LayerBlock, added_node: LayerNode):
+    def update_block_params(added_block: LayerBlock, added_node: ConcreteLayerNode) -> None:
         """
         Display the correct parameters on the graphics block
 
@@ -364,8 +357,7 @@ class Scene:
         ----------
         added_block : LayerBlock
             The block displayed in the view
-
-        added_node : LayerNode
+        added_node : ConcreteLayerNode
             The corresponding neural network node
 
         """
@@ -385,7 +377,7 @@ class Scene:
                     if hasattr(added_node, param_name) and getattr(added_node, param_name) != eval(q_wdg.text()):
                         q_wdg.setText(rep.tuple2text(getattr(added_node, param_name), prod=False))
 
-    def update_edges(self):
+    def update_edges(self) -> None:
         """
         Add new edges and reposition after an update occurs
 
@@ -405,7 +397,7 @@ class Scene:
             if start_block is not self.input_block or end_block is not self.output_block:
                 self.add_edge(start_block, end_block)
 
-    def update_edge_dim(self, block: Block):
+    def update_edge_dim(self, block: Block) -> None:
         """
         Display the output dimension of a block in the following edge
 
@@ -415,10 +407,10 @@ class Scene:
             prev_id = block.input_sockets[0].edge.start_skt.block_ref.id
 
             if prev_id != 'INP':
-                prev_out_dim = self.project.nn.nodes[prev_id].out_dim
+                prev_out_dim = self.project.nn.nodes[prev_id].get_output_dim()
                 block.input_sockets[0].edge.update_label(rep.tuple2text(prev_out_dim))
 
-    def update_out_dim(self):
+    def update_out_dim(self) -> None:
         """
         Write the output dimension in the output block
 
@@ -436,7 +428,7 @@ class Scene:
         dim_wdg.setText(dim_value)
         self.output_block.content.wdg_param_dict['Dimension'][1] = dim_value
 
-    def remove_block(self, block: Block, logic: bool = False):
+    def remove_block(self, block: Block, logic: bool = False) -> None:
         """
         Remove a block both from the view and from the network
 
@@ -444,7 +436,6 @@ class Scene:
         ----------
         block : Block
             The block to delete
-
         logic : bool, Optional
             Flag for deleting the corresponding node in the network
 
@@ -453,9 +444,11 @@ class Scene:
         # If the block is a property logic is forced to False
         if isinstance(block, PropertyBlock):
             logic = False
+
         elif self.post_block is not None:
-            dialog = ConfirmDialog('Confirm required', 'If you edit the network the output property will be removed\n'
-                                                       'Do you wish to proceed?')
+            dialog = ConfirmDialog('Confirm required',
+                                   'If you edit the network the output property will be removed\n'
+                                   'Do you wish to proceed?')
             dialog.exec()
 
             if dialog.confirm:
@@ -488,17 +481,17 @@ class Scene:
             if logic:
                 self.project.delete_last_node()
 
-    def remove_in_prop(self):
+    def remove_in_prop(self) -> None:
         if self.pre_block is not None:
             self.pre_block.remove()
             self.pre_block = None
 
-    def remove_out_prop(self):
+    def remove_out_prop(self) -> None:
         if self.post_block is not None:
             self.post_block.remove()
             self.post_block = None
 
-    def clear_scene(self):
+    def clear_scene(self) -> None:
         """
         Clear all graphics objects, dictionaries and re-init the I/O blocks
 

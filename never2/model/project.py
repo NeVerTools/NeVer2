@@ -10,7 +10,7 @@ Author: Andrea Gimelli, Giacomo Rosato, Stefano Demarchi
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QApplication, QFileDialog
 from pynever.networks import SequentialNetwork
-from pynever.nodes import LayerNode
+from pynever.nodes import ConcreteLayerNode
 
 import never2.utils.rep as rep
 from never2.utils.file import InputHandler, FileFormat, OutputHandler
@@ -27,10 +27,8 @@ class Project:
     ----------
     scene_ref : Scene
         Reference to the scene
-        
     nn : SequentialNetwork
         The network object instantiated by the interface
-
     filename : (str, str)
         The filename of the network stored in a tuple (name, extension)
     
@@ -50,16 +48,17 @@ class Project:
         if filename is not None:
             self.filename = filename
             self.open()
+
         else:
             self.filename = ('', '')
 
     def is_modified(self) -> bool:
         return self.scene_ref.editor_widget_ref.main_wnd_ref.isWindowModified() and self.nn.nodes
 
-    def set_modified(self, value: bool):
+    def set_modified(self, value: bool) -> None:
         self.scene_ref.editor_widget_ref.main_wnd_ref.setWindowModified(value)
 
-    def last_out_dim(self) -> tuple:
+    def get_last_out_dim(self) -> tuple:
         """
         Compute and return the last node out_dim if there are nodes already,
         read from the input block otherwise
@@ -73,10 +72,11 @@ class Project:
 
         if self.nn.is_empty():
             return rep.text2tuple(self.scene_ref.input_block.content.wdg_param_dict['Dimension'][1])
+
         else:
             return self.nn.get_last_node().out_dim
 
-    def reset_nn(self, new_input_id: str, caller_id: str):
+    def reset_nn(self, new_input_id: str, caller_id: str) -> None:
         """
         If a functional block is updated, the network is re-initialized
 
@@ -90,10 +90,10 @@ class Project:
         """
 
         if caller_id == 'INP':
-            if self.nn.input_id != new_input_id:
+            if new_input_id not in self.nn.input_ids:
                 self.nn = SequentialNetwork('net', new_input_id)
 
-    def add_to_nn(self, layer_name: str, layer_id: str, data: dict) -> LayerNode:
+    def add_to_nn(self, layer_name: str, layer_id: str, data: dict) -> ConcreteLayerNode:
         """
         This method creates the corresponding layer node to the graphical block
         and updates the network
@@ -101,7 +101,7 @@ class Project:
         Parameters
         ----------
         layer_name : str
-            The LayerNode name
+            The ConcreteLayerNode name
         layer_id : str
             The id to assign to the new node
         data : dict
@@ -109,12 +109,12 @@ class Project:
 
         Returns
         ----------
-        LayerNode
+        ConcreteLayerNode
             The node added to the network
 
         """
 
-        layer_in_dim = self.last_out_dim()
+        layer_in_dim = self.get_last_out_dim()
 
         # Due to the multidimensional nature of some nodes, some hard-coded processing
         # in order to assign the correct value is needed.
@@ -132,26 +132,26 @@ class Project:
             data['dilation'] = tuple((data['dilation'][0] for _ in range(kernel_dim)))
 
         new_node = NodeFactory.create_layernode(layer_name, layer_id, data, layer_in_dim)
-        self.nn.add_node(new_node)
+        self.nn.append_node(new_node)
         self.set_modified(True)
 
         return new_node
 
-    def link_to_nn(self, node: LayerNode):
+    def link_to_nn(self, node: ConcreteLayerNode) -> None:
         """
         Alternative method for adding a layer directly
 
         Parameters
         ----------
-        node : LayerNode
+        node : ConcreteLayerNode
             The node to add directly
 
         """
 
-        self.nn.add_node(node)
+        self.nn.append_node(node)
         self.set_modified(True)
 
-    def refresh_node(self, node_id: str, params: dict):
+    def refresh_node(self, node_id: str, params: dict) -> None:
         """
         This method propagates the visual modifications to the logic node
         by deleting and re-adding it to the network
@@ -174,14 +174,15 @@ class Project:
 
         # Update dimensions
         dim_wdg = self.scene_ref.output_block.content.wdg_param_dict['Dimension'][0]
-        dim_wdg.setText(str(new_node.out_dim))
+        dim_wdg.setText(str(new_node.get_output_dim()))
         self.scene_ref.output_block.content.wdg_param_dict['Dimension'][1] = new_node.out_dim
 
-    def delete_last_node(self) -> LayerNode:
+    def delete_last_node(self) -> ConcreteLayerNode:
         self.set_modified(True)
+
         return self.nn.delete_last_node()
 
-    def open(self):
+    def open(self) -> None:
         """
         Load a network from file and convert it in the internal representation
 

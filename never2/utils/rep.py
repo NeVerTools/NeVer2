@@ -211,15 +211,19 @@ def force_types(dictionary: dict) -> dict:
     """
     This method allows to force the value types for the given
     dictionary.
+
     Parameters
     ----------
     dictionary : dict
         The dictionary with values expressed as strings.
+
     Returns
     -------
     dict
         The same dictionary with typed values.
+
     """
+
     for key in dictionary.keys():
         element = dictionary[key]
         if isinstance(element, dict):
@@ -242,14 +246,17 @@ def allow_list_in_dict(dictionary: dict) -> dict:
     This method translates string representations of lists
     in a dictionary to actual lists. Necessary for JSON
     representation of list values.
+
     Parameters
     ----------
     dictionary : dict
         The dictionary containing strings representing lists.
+
     Returns
     -------
     dict
         The same dictionary with actual lists.
+
     """
 
     for key in dictionary.keys():

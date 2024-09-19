@@ -8,9 +8,11 @@ Author: Andrea Gimelli, Giacomo Rosato, Stefano Demarchi
 """
 
 import onnx
-import pynever.strategies.conversion as conv
 import torch
 from pynever.networks import NeuralNetwork
+from pynever.strategies.conversion.converters.onnx import ONNXConverter
+from pynever.strategies.conversion.converters.pytorch import PyTorchConverter
+from pynever.strategies.conversion.representation import ONNXNetwork, PyTorchNetwork, AlternativeRepresentation
 from pynever.strategies.smt_reading import ExpressionTreeConverter
 from pysmt.exceptions import PysmtException
 from pysmt.smtlib.parser import SmtLibParser
@@ -45,7 +47,7 @@ class FileFormat:
                                   'VNNLIB': ['vnnlib']}
 
 
-def read_variables(property_string: str) -> list:
+def read_variables(property_string: str) -> list[str]:
     """
     This method reads all the variables contained in a constraints string
 
@@ -71,7 +73,7 @@ def read_variables(property_string: str) -> list:
     return variables
 
 
-def read_properties(path: str) -> dict:
+def read_properties(path: str) -> dict[str, PropertyContainer]:
     """
     This method reads the SMT property file and
     creates a property for each node.
@@ -84,16 +86,19 @@ def read_properties(path: str) -> dict:
     Returns
     -------
     dict
-        The dictionary of properties whose key is the variable_name and value is the stm_string
+        The dictionary of properties whose key is the variable_name and value is the smt_string
 
     """
 
     parser = SmtLibParser()
+
     try:
         script = parser.get_script_fname(path)
+
     except PysmtException:
         dialog = MessageDialog('Failed to parse SMT property.', MessageType.ERROR)
         dialog.exec()
+
         return dict()
 
     declarations = script.filter_by_command_name(['declare-fun', 'declare-const'])
@@ -105,6 +110,7 @@ def read_properties(path: str) -> dict:
     for d in declarations:
         var_list.append(str(d.args[0]).replace('\'', ''))
         varname = str(d.args[0]).split('_')[0].replace('\'', '')  # Variable format is <v_name>_<idx>
+
         if varname not in var_set:
             var_set.append(varname)
 
@@ -119,8 +125,8 @@ def read_properties(path: str) -> dict:
                     properties[v].smt_string = ''
                     properties[v].variables = list(filter(lambda x: v in x, var_list))
                     counter += 1
-                conv = ExpressionTreeConverter()
-                wrap = conv.build_from_infix(line).as_prefix()
+                converter = ExpressionTreeConverter()
+                wrap = converter.build_from_infix(line).as_prefix()
                 properties[v].smt_string += f"(assert {wrap})\n"
                 break
 
@@ -185,7 +191,7 @@ class InputHandler:
 
         if self.extension in FileFormat.SUPPORTED_NETWORK_FORMATS['ONNX']:
             model_proto = onnx.load(path)
-            self.alt_repr = conv.ONNXNetwork(net_id, model_proto, True)
+            self.alt_repr = ONNXNetwork(net_id, model_proto, True)
 
         elif self.extension in FileFormat.SUPPORTED_NETWORK_FORMATS['PyTorch']:
             if not torch.cuda.is_available():
@@ -193,19 +199,21 @@ class InputHandler:
             else:
                 module = torch.load(path)
 
-            self.alt_repr = conv.PyTorchNetwork(net_id, module, True)
+            self.alt_repr = PyTorchNetwork(net_id, module, True)
 
         # Convert the network
         if self.alt_repr is None:
             raise Exception('No cached representation')
+
         else:
             # Converting the network in the internal representation
             # If the chosen format has got an initial input for the network,
             # it is converted in the internal representation
-            if isinstance(self.alt_repr, conv.ONNXNetwork):
-                self.strategy = conv.ONNXConverter()
+            if isinstance(self.alt_repr, ONNXNetwork):
+                self.strategy = ONNXConverter()
+
             else:
-                self.strategy = conv.PyTorchConverter()
+                self.strategy = PyTorchConverter()
 
             return self.strategy.to_neural_network(self.alt_repr)
 
@@ -237,11 +245,14 @@ class OutputHandler:
         if '.' not in filename[0]:  # If no explicit extension
             if 'VNNLIB' in filename[1]:
                 self.extension = 'vnnlib'
+
             if self.extension == 'vnnlib':
                 filename = (f'{filename[0]}.onnx', filename[1])
+
             else:
                 self.extension = filename[0].split('.')[-1]
                 filename = (f'{filename[0]}.{self.extension}', filename[1])
+
         else:
             self.extension = filename[0].split('.')[-1]
 
@@ -249,7 +260,7 @@ class OutputHandler:
         self.alt_repr = self.convert_network(network, filename[0])
 
         # Saving the network on file depending on the format
-        conv.save_network_path(self.alt_repr, filename[0])
+        self.alt_repr.save(filename[0])
 
     def save_properties(self, properties: dict, filename: tuple) -> None:
         """
@@ -274,7 +285,7 @@ class OutputHandler:
         self.extension = 'smt2'
         write_smt_property(path, properties, 'Real')
 
-    def convert_network(self, network: NeuralNetwork, filename: str) -> conv.AlternativeRepresentation:
+    def convert_network(self, network: NeuralNetwork, filename: str) -> AlternativeRepresentation:
         """
         This method converts the internal representation into the chosen
         alternative representation, depending on the extension
@@ -298,17 +309,15 @@ class OutputHandler:
 
         if self.extension in FileFormat.SUPPORTED_NETWORK_FORMATS['ONNX'] or \
                 self.extension in FileFormat.SUPPORTED_NETWORK_FORMATS['VNNLIB']:
-            self.strategy = conv.ONNXConverter()
+            self.strategy = ONNXConverter()
             self.alt_repr = self.strategy.from_neural_network(network)
 
         elif self.extension in FileFormat.SUPPORTED_NETWORK_FORMATS['PyTorch']:
-            self.strategy = conv.PyTorchConverter()
+            self.strategy = PyTorchConverter()
             self.alt_repr = self.strategy.from_neural_network(network)
         else:
             raise Exception(f'Unsupported format {self.extension}')
 
         self.alt_repr.identifier = net_id
-        self.alt_repr.up_to_date = True
-        network.alt_rep_cache.append(self.alt_repr)
 
         return self.alt_repr

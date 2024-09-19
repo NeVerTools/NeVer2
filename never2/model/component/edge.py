@@ -36,13 +36,16 @@ class GraphicsEdgeFactory:
 
     @staticmethod
     def create_edge(e: 'Edge', t: EdgeType):
-        if t == EdgeType.DIRECT_EDGE:
-            return GraphicsDirectEdge(e)
-        elif t == EdgeType.BEZIER_EDGE:
-            return GraphicsBezierEdge(e)
-        else:
-            # Fallback
-            return GraphicsDirectEdge(e)
+        match t:
+            case EdgeType.DIRECT_EDGE:
+                return GraphicsDirectEdge(e)
+
+            case EdgeType.BEZIER_EDGE:
+                return GraphicsBezierEdge(e)
+
+            case _:
+                # Fallback
+                return GraphicsDirectEdge(e)
 
 
 class Edge:
@@ -64,6 +67,7 @@ class Edge:
         if len(start_block.output_sockets) == 0:
             self.start_skt = end_block.output_sockets[0]
             self.end_skt = start_block.input_sockets[0]
+
         else:
             self.start_skt = start_block.output_sockets[0]
             self.end_skt = end_block.input_sockets[0]
@@ -84,6 +88,7 @@ class Edge:
 
         if self.start_skt is not None:
             self.graphics_edge.src_pos = self.start_skt.abs_pos
+
         if self.end_skt is not None:
             self.graphics_edge.dest_pos = self.end_skt.abs_pos
 
