@@ -22,15 +22,18 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QFileDialog
 from pynever.datasets import Dataset
 from pynever.networks import NeuralNetwork, SequentialNetwork
-from pynever.strategies import smt_reading, verification
 from pynever.strategies.training import PytorchTraining, PytorchMetrics
+from pynever.strategies.verification.algorithms import SSLPVerification, SSBPVerification
+from pynever.strategies.verification.parameters import SSBPVerificationParameters, SSLPVerificationParameters
+from pynever.strategies.verification.properties import VnnLibProperty
 
 from never2 import RES_DIR, ROOT_DIR
 from never2.resources.styling.custom import CustomComboBox, CustomTextBox, CustomLabel, CustomButton, \
     CustomLoggerTextArea
+from never2.resources.styling.tabs import CustomTabWidget
 from never2.utils import rep, file
 from never2.utils.validator import ArithmeticValidator
-from never2.view.ui.dialogs.action import ComposeTransformDialog, MixedVerificationDialog
+from never2.view.ui.dialogs.action import ComposeTransformDialog
 from never2.view.ui.dialogs.dialog import GenericDatasetDialog
 from never2.view.ui.dialogs.message import MessageDialog, MessageType
 
@@ -623,15 +626,13 @@ class VerificationWindow(BaseWindow):
         The current network in the main window, already trained
     properties : dict
         Dictionary of properties to verify on the nn
-    params : dict
-        Dictionary of parameters to load in the window
     strategy : VerificationStrategy
         The verification class to use in the verification procedure
+    params : dict
+        Dictionary of parameters to load in the window
 
     Methods
     ----------
-    update_methodology(str)
-        Procedure to select the verification strategy.
     execute_verification()
         Procedure to launch the verification.
 
@@ -642,67 +643,41 @@ class VerificationWindow(BaseWindow):
 
         self.nn = nn
         self.properties = properties
-        self.strategy = None
+        self.strategy = None  # VerificationStrategy
 
         self.params = rep.read_json(RES_DIR + '/json/verification.json')
 
-        def activation_cb(methodology: str):
-            return lambda: self.update_methodology(self.widgets['Verification methodology'].currentText())
+        # Content
+        tab_layout = QHBoxLayout()
 
-        body_layout = self.create_widget_layout(self.params, cb_f=activation_cb)
-        self.layout.addLayout(body_layout)
+        self.verification_tabs = CustomTabWidget(self.params)
+
+        tab_layout.addWidget(self.verification_tabs)
+        self.layout.addLayout(tab_layout)
 
         # Buttons
         btn_layout = QHBoxLayout()
+
         self.cancel_btn = CustomButton('Cancel')
         self.cancel_btn.clicked.connect(self.close)
         self.verify_btn = CustomButton('Verify network', primary=True)
-        self.verify_btn.clicked.connect(self.execute_verification)
+        self.verify_btn.clicked.connect(self.set_and_launch_verification)
+
         btn_layout.addWidget(self.cancel_btn)
         btn_layout.addWidget(self.verify_btn)
         self.layout.addLayout(btn_layout)
 
         self.render_layout()
 
-    def update_methodology(self, methodology: str) -> None:
-        """
-        Function to set up the verification strategy based on the user choice.
-
-        Parameters
-        ----------
-        methodology : str
-            Verification methodology.
-
-        """
-
-        if methodology == 'Complete':
-            ver_params = [[10000] for _ in range(self.nn.count_relu_layers())]
-        elif methodology == 'Over-approximated':
-            ver_params = [[0] for _ in range(self.nn.count_relu_layers())]
-        else:
-            dialog = MixedVerificationDialog()
-            dialog.exec()
-            ver_params = [[dialog.n_neurons] for _ in range(self.nn.count_relu_layers())]
-
-        self.strategy = verification.NeverVerification('best_n_neurons', ver_params)
-
-    def execute_verification(self) -> None:
+    def set_and_launch_verification(self) -> None:
         """
         This method launches the verification of the network
 
         """
 
-        if self.strategy is None:
-            err_dialog = MessageDialog('No verification methodology selected.', MessageType.ERROR)
-            err_dialog.exec()
-            return
-
-        # Save properties
+        # Set up verification property
         path = 'never2/' + self.__repr__().split(' ')[-1].replace('>', '') + '.smt2'
         file.write_smt_property(path, self.properties, 'Real')
-
-        input_name = list(self.properties.keys())[0]
-        output_name = list(self.properties.keys())[-1]
 
         # Add logger text box
         log_textbox = CustomLoggerTextArea(self)
@@ -713,12 +688,23 @@ class VerificationWindow(BaseWindow):
 
         logger.info('***** NeVer 2 - VERIFICATION *****')
 
-        # Load NeVerProperty from file
-        parser = smt_reading.SmtPropertyParser(path, input_name, output_name)
-        to_verify = verification.NeVerProperty(*parser.parse_property())
-
+        # Load property from file
+        to_verify = VnnLibProperty(path)
         # Property read, delete file
         os.remove(path)
+
+        match self.verification_tabs.currentIndex():
+            case 0:  # SSLP
+                params = SSLPVerificationParameters(*self.verification_tabs.get_params())
+                self.strategy = SSLPVerification(params)
+
+            case 1:  # SSBP
+                params = SSBPVerificationParameters()
+                self.strategy = SSBPVerification(params)
+
+            case _:
+                params = SSLPVerificationParameters(*self.verification_tabs.get_params())
+                self.strategy = SSLPVerification(params)
 
         # Launch verification
         self.strategy.verify(self.nn, to_verify)
