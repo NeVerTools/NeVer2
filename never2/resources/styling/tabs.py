@@ -6,6 +6,7 @@ This module contains the custom widget and methods for a tab layout
 Author: Stefano Demarchi
 
 """
+
 from PyQt6.QtWidgets import QTabWidget, QWidget, QFormLayout
 
 from never2.resources.styling.custom import CustomComboBox, CustomTextBox
@@ -66,6 +67,20 @@ class CustomTabWidget(QTabWidget):
             # Add the tab to the widget
             self.addTab(tabs[-1], name)
 
-    def get_params(self) -> tuple:
-        # For each tab the parameter key should be 'TABNAME:PARAMNAME'
-        pass
+    def get_params(self) -> tuple[str, dict]:
+        """
+        This method returns a clean dictionary associating the parameters value
+        of the current tab, as well as the tab name
+
+        Returns
+        -------
+        tuple[str, dict]
+
+        """
+
+        params = {}
+
+        for k, v in self.widgets_dict.items():
+            params[k] = v.currentText()
+
+        return list(self.content_dict['Verification strategy'].keys())[self.currentIndex()], params
