@@ -79,8 +79,10 @@ class CustomTabWidget(QTabWidget):
         """
 
         params = {}
+        strategy_name = list(self.content_dict['Verification strategy'].keys())[self.currentIndex()]
 
         for k, v in self.widgets_dict.items():
-            params[k] = v.currentText()
+            if strategy_name in k:
+                params[k.replace(f'{strategy_name}:', '')] = v.currentText()
 
-        return list(self.content_dict['Verification strategy'].keys())[self.currentIndex()], params
+        return strategy_name, params

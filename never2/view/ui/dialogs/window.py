@@ -24,7 +24,7 @@ from pynever.datasets import Dataset
 from pynever.networks import NeuralNetwork, SequentialNetwork
 from pynever.strategies.training import PytorchTraining, PytorchMetrics
 from pynever.strategies.verification.algorithms import SSLPVerification, SSBPVerification
-from pynever.strategies.verification.parameters import SSBPVerificationParameters, SSLPVerificationParameters
+from pynever.strategies.verification.parameters import VerificationParameters
 from pynever.strategies.verification.properties import VnnLibProperty
 
 from never2 import RES_DIR, ROOT_DIR
@@ -693,21 +693,37 @@ class VerificationWindow(BaseWindow):
         # Property read, delete file
         os.remove(path)
 
-        # TODO associate get_params() with VerificationParameters via function and use no indexes
-        match self.verification_tabs.currentIndex():
-            case 0:  # SSLP
-                params = SSLPVerificationParameters(*self.verification_tabs.get_params())
-                self.strategy = SSLPVerification(params)
+        strategy, raw_params = self.verification_tabs.get_params()
 
-            case 1:  # SSBP
-                params = SSBPVerificationParameters()
-                self.strategy = SSBPVerification(params)
+        match strategy:
+            case 'SSLP':
+                self.strategy = SSLPVerification(self.get_verification_params(raw_params))
+
+            case 'SSBP':
+                self.strategy = SSBPVerification(self.get_verification_params(raw_params))
 
             case _:
-                params = SSLPVerificationParameters(*self.verification_tabs.get_params())
-                self.strategy = SSLPVerification(params)
+                self.strategy = SSLPVerification(self.get_verification_params(raw_params))
 
         # Launch verification
         self.strategy.verify(self.nn, to_verify)
         self.verify_btn.setEnabled(False)
         self.cancel_btn.setText('Close')
+
+    def get_verification_params(self, raw_params: dict) -> VerificationParameters:
+        """
+        This method translates the parameters read from the verification dialog
+        to the corresponding VerificationParameters object.
+
+        Parameters
+        ----------
+        raw_params : dict
+            The dictionary of the dialog parameters
+
+        Returns
+        -------
+        VerificationParameters
+
+        """
+
+        pass
