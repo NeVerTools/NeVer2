@@ -52,14 +52,13 @@ class CustomTabWidget(QTabWidget):
                 if 'allowed' in params_dict[param].keys():
                     self.widgets_dict[f'{name}:{param}'] = CustomComboBox()
                     self.widgets_dict[f'{name}:{param}'].addItems(params_dict[param]['allowed'])
+                    self.widgets_dict[f'{name}:{param}'].setCurrentIndex(
+                        params_dict[param]['allowed'].index(params_dict[param]['value']))
 
                 elif params_dict[param]['type'] == 'int':
                     self.widgets_dict[f'{name}:{param}'] = CustomTextBox()
+                    self.widgets_dict[f'{name}:{param}'].setText(str(params_dict[param]['value']))
                     self.widgets_dict[f'{name}:{param}'].setValidator(ArithmeticValidator.INT)
-
-                elif params_dict[param]['type'] == 'list of ints':
-                    self.widgets_dict[f'{name}:{param}'] = CustomTextBox()
-                    self.widgets_dict[f'{name}:{param}'].setValidator(ArithmeticValidator.TENSOR)
 
                 # Add the widget
                 cur_layout.addRow(param, self.widgets_dict[f'{name}:{param}'])
