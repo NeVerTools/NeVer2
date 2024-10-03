@@ -6,8 +6,10 @@ This module contains the custom widget and methods for a tab layout
 Author: Stefano Demarchi
 
 """
+from PyQt6.QtWidgets import QTabWidget, QWidget, QFormLayout
 
-from PyQt6.QtWidgets import QTabWidget, QWidget, QFormLayout, QLineEdit
+from never2.resources.styling.custom import CustomComboBox, CustomTextBox
+from never2.utils.validator import ArithmeticValidator
 
 
 class CustomTabWidget(QTabWidget):
@@ -15,6 +17,7 @@ class CustomTabWidget(QTabWidget):
     def __init__(self, content: dict = None, parent=None):
         super().__init__(parent)
         self.content_dict = content
+        self.widgets_dict = {}
 
         # Init tabs
         self.build_tabs()
@@ -25,15 +28,45 @@ class CustomTabWidget(QTabWidget):
 
         """
 
-        page = QWidget(self)
-        layout = QFormLayout()
-        page.setLayout(layout)
-        layout.addRow('Phone Number:', QLineEdit(self))
-        layout.addRow('Email Address:', QLineEdit(self))
-        layout.addRow('Email Address:', QLineEdit(self))
+        tabs = []
+        layouts = []
 
-        self.addTab(page, 'Tab 1')
+        # Add a new tab for each algorithm (key of the values for 'Verification Strategy')
+        algo_names = [name for name in self.content_dict['Verification strategy'].keys()]
+
+        for name in algo_names:
+            # Make a new layout and tab
+            layouts.append(QFormLayout())
+            tabs.append(QWidget(self))
+
+            cur_layout = layouts[-1]
+
+            # Refer to the last added in the loop
+            tabs[-1].setLayout(cur_layout)
+
+            params_dict = self.content_dict['Verification strategy'][name]['params']
+
+            # Populate the tab
+            for param in params_dict.keys():
+                # Create the correct widget for entry (ComboBox or Line)
+                if 'allowed' in params_dict[param].keys():
+                    self.widgets_dict[f'{name}:{param}'] = CustomComboBox()
+                    self.widgets_dict[f'{name}:{param}'].addItems(params_dict[param]['allowed'])
+
+                elif params_dict[param]['type'] == 'int':
+                    self.widgets_dict[f'{name}:{param}'] = CustomTextBox()
+                    self.widgets_dict[f'{name}:{param}'].setValidator(ArithmeticValidator.INT)
+
+                elif params_dict[param]['type'] == 'list of ints':
+                    self.widgets_dict[f'{name}:{param}'] = CustomTextBox()
+                    self.widgets_dict[f'{name}:{param}'].setValidator(ArithmeticValidator.TENSOR)
+
+                # Add the widget
+                cur_layout.addRow(param, self.widgets_dict[f'{name}:{param}'])
+
+            # Add the tab to the widget
+            self.addTab(tabs[-1], name)
 
     def get_params(self) -> tuple:
+        # For each tab the parameter key should be 'TABNAME:PARAMNAME'
         pass
-

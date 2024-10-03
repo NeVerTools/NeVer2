@@ -693,6 +693,7 @@ class VerificationWindow(BaseWindow):
         # Property read, delete file
         os.remove(path)
 
+        # TODO associate get_params() with VerificationParameters via function and use no indexes
         match self.verification_tabs.currentIndex():
             case 0:  # SSLP
                 params = SSLPVerificationParameters(*self.verification_tabs.get_params())

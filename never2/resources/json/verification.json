@@ -6,7 +6,7 @@
           "name": "heuristic",
           "value": "Complete",
           "allowed": "[Complete, Approximate, Mixed]",
-          "type": "radio",
+          "type": "str",
           "description": "The algorithm employed for the abstract propagation. Complete performs exact abstract interpretation, Approximate performs incomplete abstract interpretation and Mixed_N refine N neurons per layer"
         },
         "Neurons to refine per layer": {
