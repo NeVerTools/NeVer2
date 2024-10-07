@@ -700,9 +700,15 @@ class VerificationWindow(BaseWindow):
         strategy, raw_params = self.verification_tabs.get_params()
         match strategy:
             case 'SSLP':
+                abst_logger = logging.getLogger('pynever.strategies.abstraction.layers')
+                abst_logger.setLevel(logging.INFO)
+                abst_logger.addHandler(log_textbox)
                 self.strategy = SSLPVerification(self.get_verification_params(strategy, raw_params))
 
             case 'SSBP':
+                bp_logger = logging.getLogger("pynever.strategies.bounds_propagation")
+                bp_logger.setLevel(logging.INFO)
+                bp_logger.addHandler(log_textbox)
                 self.strategy = SSBPVerification(self.get_verification_params(strategy, raw_params))
 
             case _:
@@ -733,15 +739,22 @@ class VerificationWindow(BaseWindow):
 
         match strategy:
             case 'SSLP':
-                heuristic = raw_params['heuristic']
+                match raw_params['heuristic']:
+                    case 'Complete':
+                        heuristic = 'complete'
+                    case 'Approximate':
+                        heuristic = 'overapprox'
+                    case 'Mixed':
+                        heuristic = 'mixed'
+
                 neurons = None
                 approx_levels = None
 
                 if heuristic != 'complete':
-                    approx_levels = raw_params['approx_levels']
+                    approx_levels = int(raw_params['approx_levels'])
 
                 if heuristic == 'mixed':
-                    neurons = raw_params['neurons_to_refine']
+                    neurons = int(raw_params['neurons_to_refine'])
 
                 return SSLPVerificationParameters(heuristic, neurons, approx_levels)
 
