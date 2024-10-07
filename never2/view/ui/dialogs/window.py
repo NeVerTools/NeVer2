@@ -24,18 +24,20 @@ from pynever.datasets import Dataset
 from pynever.networks import NeuralNetwork, SequentialNetwork
 from pynever.strategies.training import PytorchTraining, PytorchMetrics
 from pynever.strategies.verification.algorithms import SSLPVerification, SSBPVerification
-from pynever.strategies.verification.parameters import VerificationParameters
+from pynever.strategies.verification.parameters import VerificationParameters, SSLPVerificationParameters, \
+    SSBPVerificationParameters
 from pynever.strategies.verification.properties import VnnLibProperty
+from pynever.strategies.verification.ssbp.constants import RefinementStrategy, BoundsBackend, IntersectionStrategy
 
 from never2 import RES_DIR, ROOT_DIR
 from never2.resources.styling.custom import CustomComboBox, CustomTextBox, CustomLabel, CustomButton, \
     CustomLoggerTextArea
-from never2.resources.styling.tabs import CustomTabWidget
 from never2.utils import rep, file
 from never2.utils.validator import ArithmeticValidator
 from never2.view.ui.dialogs.action import ComposeTransformDialog
 from never2.view.ui.dialogs.dialog import GenericDatasetDialog
 from never2.view.ui.dialogs.message import MessageDialog, MessageType
+from never2.view.ui.dialogs.tabs import VerificationTabWidget
 
 
 class BaseWindow(QtWidgets.QDialog):
@@ -650,7 +652,7 @@ class VerificationWindow(BaseWindow):
         # Content
         tab_layout = QHBoxLayout()
 
-        self.verification_tabs = CustomTabWidget(self.params)
+        self.verification_tabs = VerificationTabWidget(self.params)
 
         tab_layout.addWidget(self.verification_tabs)
         self.layout.addLayout(tab_layout)
@@ -672,6 +674,7 @@ class VerificationWindow(BaseWindow):
     def set_and_launch_verification(self) -> None:
         """
         This method launches the verification of the network
+        based on the selection in the interface
 
         """
 
@@ -693,30 +696,32 @@ class VerificationWindow(BaseWindow):
         # Property read, delete file
         os.remove(path)
 
+        # Retrieve verification parameters
         strategy, raw_params = self.verification_tabs.get_params()
-
         match strategy:
             case 'SSLP':
-                self.strategy = SSLPVerification(self.get_verification_params(raw_params))
+                self.strategy = SSLPVerification(self.get_verification_params(strategy, raw_params))
 
             case 'SSBP':
-                self.strategy = SSBPVerification(self.get_verification_params(raw_params))
+                self.strategy = SSBPVerification(self.get_verification_params(strategy, raw_params))
 
             case _:
-                self.strategy = SSLPVerification(self.get_verification_params(raw_params))
+                raise NotImplementedError(f'The selected strategy {strategy} is not yet implemented')
 
         # Launch verification
         self.strategy.verify(self.nn, to_verify)
         self.verify_btn.setEnabled(False)
         self.cancel_btn.setText('Close')
 
-    def get_verification_params(self, raw_params: dict) -> VerificationParameters:
+    def get_verification_params(self, strategy: str, raw_params: dict) -> VerificationParameters:
         """
         This method translates the parameters read from the verification dialog
         to the corresponding VerificationParameters object.
 
         Parameters
         ----------
+        strategy : str
+            The name of the verification strategy
         raw_params : dict
             The dictionary of the dialog parameters
 
@@ -726,4 +731,50 @@ class VerificationWindow(BaseWindow):
 
         """
 
-        pass
+        match strategy:
+            case 'SSLP':
+                heuristic = raw_params['heuristic']
+                neurons = None
+                approx_levels = None
+
+                if heuristic != 'complete':
+                    approx_levels = raw_params['approx_levels']
+
+                if heuristic == 'mixed':
+                    neurons = raw_params['neurons_to_refine']
+
+                return SSLPVerificationParameters(heuristic, neurons, approx_levels)
+
+            case 'SSBP':
+                match raw_params['heuristic']:
+                    case 'Sequential':
+                        refinement = RefinementStrategy.SEQUENTIAL
+                    case 'Lowest approximation':
+                        refinement = RefinementStrategy.LOWEST_APPROX
+                    case 'Lowest approximation in layer':
+                        refinement = RefinementStrategy.LOWEST_APPROX_CURRENT_LAYER
+                    case 'Input bounds change':
+                        refinement = RefinementStrategy.INPUT_BOUNDS_CHANGE
+
+                match raw_params['bounds']:
+                    case 'Symbolic':
+                        bounds = BoundsBackend.SYMBOLIC
+
+                # match raw_params['bounds_direction']:
+                #     case 'Forwards':
+                #         direction = BoundsDirection.FORWARDS
+                #     case 'Backwards':
+                #         direction = BoundsDirection.BACKWARDS
+
+                match raw_params['intersection']:
+                    case 'Star LP':
+                        intersection = IntersectionStrategy.STAR_LP
+                    case 'Adaptive':
+                        intersection = IntersectionStrategy.ADAPTIVE
+
+                timeout = int(raw_params['timeout'])
+
+                return SSBPVerificationParameters(refinement, bounds, intersection, timeout)
+
+            case _:
+                raise NotImplementedError(f'The selected strategy {strategy} is not yet implemented')

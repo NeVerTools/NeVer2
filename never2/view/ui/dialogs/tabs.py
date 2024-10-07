@@ -13,7 +13,7 @@ from never2.resources.styling.custom import CustomComboBox, CustomTextBox
 from never2.utils.validator import ArithmeticValidator
 
 
-class CustomTabWidget(QTabWidget):
+class VerificationTabWidget(QTabWidget):
 
     def __init__(self, content: dict = None, parent=None):
         super().__init__(parent)
@@ -49,20 +49,22 @@ class CustomTabWidget(QTabWidget):
 
             # Populate the tab
             for param in params_dict.keys():
+                param_name = params_dict[param]['name']
+
                 # Create the correct widget for entry (ComboBox or Line)
                 if 'allowed' in params_dict[param].keys():
-                    self.widgets_dict[f'{name}:{param}'] = CustomComboBox()
-                    self.widgets_dict[f'{name}:{param}'].addItems(params_dict[param]['allowed'])
-                    self.widgets_dict[f'{name}:{param}'].setCurrentIndex(
+                    self.widgets_dict[f'{name}:{param_name}'] = CustomComboBox()
+                    self.widgets_dict[f'{name}:{param_name}'].addItems(params_dict[param]['allowed'])
+                    self.widgets_dict[f'{name}:{param_name}'].setCurrentIndex(
                         params_dict[param]['allowed'].index(params_dict[param]['value']))
 
                 elif params_dict[param]['type'] == 'int':
-                    self.widgets_dict[f'{name}:{param}'] = CustomTextBox()
-                    self.widgets_dict[f'{name}:{param}'].setText(str(params_dict[param]['value']))
-                    self.widgets_dict[f'{name}:{param}'].setValidator(ArithmeticValidator.INT)
+                    self.widgets_dict[f'{name}:{param_name}'] = CustomTextBox()
+                    self.widgets_dict[f'{name}:{param_name}'].setText(str(params_dict[param]['value']))
+                    self.widgets_dict[f'{name}:{param_name}'].setValidator(ArithmeticValidator.INT)
 
                 # Add the widget
-                cur_layout.addRow(param, self.widgets_dict[f'{name}:{param}'])
+                cur_layout.addRow(param, self.widgets_dict[f'{name}:{param_name}'])
 
             # Add the tab to the widget
             self.addTab(tabs[-1], name)
@@ -83,6 +85,6 @@ class CustomTabWidget(QTabWidget):
 
         for k, v in self.widgets_dict.items():
             if strategy_name in k:
-                params[k.replace(f'{strategy_name}:', '')] = v.currentText()
+                params[k.replace(f'{strategy_name}:', '')] = v.text()
 
         return strategy_name, params
