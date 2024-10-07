@@ -199,7 +199,7 @@ class Project:
             self.nn = handler.read_network(self.filename[0])
 
             if isinstance(self.nn, SequentialNetwork) and self.nn.get_input_id() == '':
-                self.nn.set_input_id('X')
+                self.nn.input_ids = {'X': self.nn.get_first_node().identifier}
 
             QApplication.restoreOverrideCursor()
 
