@@ -129,7 +129,7 @@ class Scene:
         self.project = project
 
         in_dim = project.nn.get_first_node().get_input_dim()
-        self.input_block.set_identifier(project.nn.input_id)
+        self.input_block.set_identifier(project.nn.get_input_id())
         self.input_block.set_dimension(in_dim)
 
         node = project.nn.get_first_node()

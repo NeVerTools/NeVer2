@@ -198,8 +198,8 @@ class Project:
             QApplication.setOverrideCursor(Qt.CursorShape.WaitCursor)
             self.nn = handler.read_network(self.filename[0])
 
-            if isinstance(self.nn, SequentialNetwork) and self.nn.input_id == '':
-                self.nn.input_id = 'X'
+            if isinstance(self.nn, SequentialNetwork) and self.nn.get_input_id() == '':
+                self.nn.set_input_id('X')
 
             QApplication.restoreOverrideCursor()
 

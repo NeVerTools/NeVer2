@@ -191,7 +191,7 @@ class InputHandler:
 
         if self.extension in FileFormat.SUPPORTED_NETWORK_FORMATS['ONNX']:
             model_proto = onnx.load(path)
-            self.alt_repr = ONNXNetwork(net_id, model_proto, True)
+            self.alt_repr = ONNXNetwork(net_id, model_proto)
 
         elif self.extension in FileFormat.SUPPORTED_NETWORK_FORMATS['PyTorch']:
             if not torch.cuda.is_available():
@@ -199,7 +199,7 @@ class InputHandler:
             else:
                 module = torch.load(path)
 
-            self.alt_repr = PyTorchNetwork(net_id, module, True)
+            self.alt_repr = PyTorchNetwork(net_id, module)
 
         # Convert the network
         if self.alt_repr is None:
