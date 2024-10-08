@@ -104,28 +104,6 @@ $ python NeVer2/never2.py
 
 Note that each time you want to run __NeVer2__ you'll need to activate the Conda environment.
 
-## Usage
-
-__NeVer2__ is conceived as a GUI where the process of building, training and verifying a
-neural network can be managed in a single environment, but it also provides a CLI usage 
-for verifying [VNN-LIB](www.vnnlib.org) properties on ONNX models without resorting to the
-full-fledged interface.
-Typing
-
-```bash
-python NeVer2/never2.py -verify <property>.smt2 <network>.onnx [complete | approximate | mixed1 | mixed2]
-```
-
-executes the verification procedure for the property specified in the SMT file on the network
-specified in the ONNX file. The verification strategy is one among the following:
-
-* _complete_: uses the exact algorithm (for small-sized networks)
-* _approximate_: uses the over-approximate algorithm
-* _mixed1_: uses the mixed algorithm refining 1 neuron per layer
-* _mixed2_: uses the mixed algorithm refining 2 neurons per layer
-
-Details on the algorithms can be found in [our Best Paper @ECMS 2022](https://www.scs-europe.net/dlib/2022/ecms2022acceptedpapers/0310_dis_ecms2022_0075.pdf)
-
 ---
 # Contributors
 
