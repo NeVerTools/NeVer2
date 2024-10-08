@@ -5,9 +5,9 @@ with open('README.md', 'r', encoding='utf-8') as fh:
 
 setuptools.setup(
     name='NeVer2',
-    version='2.0-alpha',
-    author='Dario Guidotti, Stefano Demarchi',
-    author_email='dguidotti@uniss.it, stefano.demarchi@edu.unige.it',
+    version='2.0.0',
+    author='Stefano Demarchi',
+    author_email='stefano.demarchi@edu.unige.it',
     license='GNU General Public License with Commons Clause License Condition v1.0',
     description='Tool for the creation, conversion, training and verification of Neural Network models.',
     long_description=long_description,
@@ -15,11 +15,11 @@ setuptools.setup(
     url='https://github.com/NeVerTools/NeVer2',
     packages=setuptools.find_packages(),
     classifiers=[
-        'Programming Language:: Python:: 3.9',
-        'Development Status:: 3 - Alpha',
+        'Programming Language:: Python:: 3.11',
+        'Development Status:: 4 - Beta',
         'Topic:: Scientific/Engineering:: Artificial Intelligence',
         'Operating System:: OS Independent',
     ],
-    python_requires='>=3.9',
+    python_requires='>=3.11',
     install_requires=['pynever', 'PyQt6'],
 )
