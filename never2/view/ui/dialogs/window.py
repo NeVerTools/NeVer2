@@ -22,17 +22,22 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QFileDialog
 from pynever.datasets import Dataset
 from pynever.networks import NeuralNetwork, SequentialNetwork
-from pynever.strategies import smt_reading, verification
 from pynever.strategies.training import PytorchTraining, PytorchMetrics
+from pynever.strategies.verification.algorithms import SSLPVerification, SSBPVerification
+from pynever.strategies.verification.parameters import VerificationParameters, SSLPVerificationParameters, \
+    SSBPVerificationParameters
+from pynever.strategies.verification.properties import VnnLibProperty
+from pynever.strategies.verification.ssbp.constants import RefinementStrategy, BoundsBackend, IntersectionStrategy
 
 from never2 import RES_DIR, ROOT_DIR
 from never2.resources.styling.custom import CustomComboBox, CustomTextBox, CustomLabel, CustomButton, \
     CustomLoggerTextArea
 from never2.utils import rep, file
 from never2.utils.validator import ArithmeticValidator
-from never2.view.ui.dialogs.action import ComposeTransformDialog, MixedVerificationDialog
+from never2.view.ui.dialogs.action import ComposeTransformDialog
 from never2.view.ui.dialogs.dialog import GenericDatasetDialog
 from never2.view.ui.dialogs.message import MessageDialog, MessageType
+from never2.view.ui.dialogs.tabs import VerificationTabWidget
 
 
 class BaseWindow(QtWidgets.QDialog):
@@ -113,7 +118,7 @@ class BaseWindow(QtWidgets.QDialog):
 
             sub_key = next(iter(widget_dict[first_level]))
 
-            if type(widget_dict[first_level][sub_key]) == dict:
+            if isinstance(widget_dict[first_level][sub_key], dict):
 
                 self.widgets[first_level] = CustomComboBox()
                 for second_level in widget_dict[first_level].keys():
@@ -623,15 +628,13 @@ class VerificationWindow(BaseWindow):
         The current network in the main window, already trained
     properties : dict
         Dictionary of properties to verify on the nn
-    params : dict
-        Dictionary of parameters to load in the window
     strategy : VerificationStrategy
         The verification class to use in the verification procedure
+    params : dict
+        Dictionary of parameters to load in the window
 
     Methods
     ----------
-    update_methodology(str)
-        Procedure to select the verification strategy.
     execute_verification()
         Procedure to launch the verification.
 
@@ -642,67 +645,42 @@ class VerificationWindow(BaseWindow):
 
         self.nn = nn
         self.properties = properties
-        self.strategy = None
+        self.strategy = None  # VerificationStrategy
 
         self.params = rep.read_json(RES_DIR + '/json/verification.json')
 
-        def activation_cb(methodology: str):
-            return lambda: self.update_methodology(self.widgets['Verification methodology'].currentText())
+        # Content
+        tab_layout = QHBoxLayout()
 
-        body_layout = self.create_widget_layout(self.params, cb_f=activation_cb)
-        self.layout.addLayout(body_layout)
+        self.verification_tabs = VerificationTabWidget(self.params)
+
+        tab_layout.addWidget(self.verification_tabs)
+        self.layout.addLayout(tab_layout)
 
         # Buttons
         btn_layout = QHBoxLayout()
+
         self.cancel_btn = CustomButton('Cancel')
         self.cancel_btn.clicked.connect(self.close)
         self.verify_btn = CustomButton('Verify network', primary=True)
-        self.verify_btn.clicked.connect(self.execute_verification)
+        self.verify_btn.clicked.connect(self.set_and_launch_verification)
+
         btn_layout.addWidget(self.cancel_btn)
         btn_layout.addWidget(self.verify_btn)
         self.layout.addLayout(btn_layout)
 
         self.render_layout()
 
-    def update_methodology(self, methodology: str) -> None:
-        """
-        Function to set up the verification strategy based on the user choice.
-
-        Parameters
-        ----------
-        methodology : str
-            Verification methodology.
-
-        """
-
-        if methodology == 'Complete':
-            ver_params = [[10000] for _ in range(self.nn.count_relu_layers())]
-        elif methodology == 'Over-approximated':
-            ver_params = [[0] for _ in range(self.nn.count_relu_layers())]
-        else:
-            dialog = MixedVerificationDialog()
-            dialog.exec()
-            ver_params = [[dialog.n_neurons] for _ in range(self.nn.count_relu_layers())]
-
-        self.strategy = verification.NeverVerification('best_n_neurons', ver_params)
-
-    def execute_verification(self) -> None:
+    def set_and_launch_verification(self) -> None:
         """
         This method launches the verification of the network
+        based on the selection in the interface
 
         """
 
-        if self.strategy is None:
-            err_dialog = MessageDialog('No verification methodology selected.', MessageType.ERROR)
-            err_dialog.exec()
-            return
-
-        # Save properties
+        # Set up verification property
         path = 'never2/' + self.__repr__().split(' ')[-1].replace('>', '') + '.smt2'
         file.write_smt_property(path, self.properties, 'Real')
-
-        input_name = list(self.properties.keys())[0]
-        output_name = list(self.properties.keys())[-1]
 
         # Add logger text box
         log_textbox = CustomLoggerTextArea(self)
@@ -713,14 +691,103 @@ class VerificationWindow(BaseWindow):
 
         logger.info('***** NeVer 2 - VERIFICATION *****')
 
-        # Load NeVerProperty from file
-        parser = smt_reading.SmtPropertyParser(path, input_name, output_name)
-        to_verify = verification.NeVerProperty(*parser.parse_property())
-
+        # Load property from file
+        to_verify = VnnLibProperty(path)
         # Property read, delete file
         os.remove(path)
+
+        # Retrieve verification parameters
+        strategy, raw_params = self.verification_tabs.get_params()
+        match strategy:
+            case 'SSLP':
+                abst_logger = logging.getLogger('pynever.strategies.abstraction.layers')
+                abst_logger.setLevel(logging.INFO)
+                abst_logger.addHandler(log_textbox)
+                self.strategy = SSLPVerification(self.get_verification_params(strategy, raw_params))
+
+            case 'SSBP':
+                bp_logger = logging.getLogger("pynever.strategies.bounds_propagation")
+                bp_logger.setLevel(logging.INFO)
+                bp_logger.addHandler(log_textbox)
+                self.strategy = SSBPVerification(self.get_verification_params(strategy, raw_params))
+
+            case _:
+                raise NotImplementedError(f'The selected strategy {strategy} is not yet implemented')
 
         # Launch verification
         self.strategy.verify(self.nn, to_verify)
         self.verify_btn.setEnabled(False)
         self.cancel_btn.setText('Close')
+
+    def get_verification_params(self, strategy: str, raw_params: dict) -> VerificationParameters:
+        """
+        This method translates the parameters read from the verification dialog
+        to the corresponding VerificationParameters object.
+
+        Parameters
+        ----------
+        strategy : str
+            The name of the verification strategy
+        raw_params : dict
+            The dictionary of the dialog parameters
+
+        Returns
+        -------
+        VerificationParameters
+
+        """
+
+        match strategy:
+            case 'SSLP':
+                match raw_params['heuristic']:
+                    case 'Complete':
+                        heuristic = 'complete'
+                    case 'Approximate':
+                        heuristic = 'overapprox'
+                    case 'Mixed':
+                        heuristic = 'mixed'
+
+                neurons = None
+                approx_levels = None
+
+                if heuristic != 'complete':
+                    approx_levels = int(raw_params['approx_levels'])
+
+                if heuristic == 'mixed':
+                    neurons = int(raw_params['neurons_to_refine'])
+
+                return SSLPVerificationParameters(heuristic, neurons, approx_levels)
+
+            case 'SSBP':
+                match raw_params['heuristic']:
+                    case 'Sequential':
+                        refinement = RefinementStrategy.SEQUENTIAL
+                    case 'Lowest approximation':
+                        refinement = RefinementStrategy.LOWEST_APPROX
+                    case 'Lowest approximation in layer':
+                        refinement = RefinementStrategy.LOWEST_APPROX_CURRENT_LAYER
+                    case 'Input bounds change':
+                        refinement = RefinementStrategy.INPUT_BOUNDS_CHANGE
+
+                match raw_params['bounds']:
+                    case 'Symbolic':
+                        bounds = BoundsBackend.SYMBOLIC
+
+                # match raw_params['bounds_direction']:
+                #     case 'Forwards':
+                #         direction = BoundsDirection.FORWARDS
+                #     case 'Backwards':
+                #         direction = BoundsDirection.BACKWARDS
+
+                match raw_params['intersection']:
+                    case 'Star LP':
+                        intersection = IntersectionStrategy.STAR_LP
+                    case 'Adaptive':
+                        intersection = IntersectionStrategy.ADAPTIVE
+
+                timeout = int(raw_params['timeout'])
+
+                return SSBPVerificationParameters(refinement, bounds, intersection, timeout)
+
+            case _:
+                raise NotImplementedError(f'The selected strategy {strategy} is not yet implemented')

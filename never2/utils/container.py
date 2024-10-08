@@ -16,10 +16,8 @@ class PropertyContainer:
     ----------
     smt_string : str
         String in the SMT format describing the property
-
     variables : list
         Variables used in the property
-
     name : str
         String associated to the property type
 

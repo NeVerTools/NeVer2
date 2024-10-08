@@ -71,6 +71,7 @@ class Socket:
             if get_classname(self.block_ref) == 'FunctionalBlock':
                 if self.block_ref.title == 'Input':
                     self.block_ref.input_sockets.remove(self)
+
                 else:
                     self.block_ref.output_sockets.remove(self)
 
