@@ -9,7 +9,7 @@ Author: Stefano Demarchi
 
 from PyQt6.QtWidgets import QTabWidget, QWidget, QFormLayout
 
-from never2.resources.styling.custom import CustomComboBox, CustomTextBox
+from never2.resources.styling.custom import CustomComboBox, CustomTextBox, CustomLabel
 from never2.utils.validator import ArithmeticValidator
 
 
@@ -64,7 +64,9 @@ class VerificationTabWidget(QTabWidget):
                     self.widgets_dict[f'{name}:{param_name}'].setValidator(ArithmeticValidator.INT)
 
                 # Add the widget
-                cur_layout.addRow(param, self.widgets_dict[f'{name}:{param_name}'])
+                field_label = CustomLabel(param)
+                field_label.setToolTip(params_dict[param]['description'])
+                cur_layout.addRow(field_label, self.widgets_dict[f'{name}:{param_name}'])
 
             # Add the tab to the widget
             self.addTab(tabs[-1], name)

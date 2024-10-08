@@ -7,7 +7,7 @@
           "value": "Complete",
           "allowed": "[Complete,Approximate,Mixed]",
           "type": "str",
-          "description": "The algorithm employed for the abstract propagation. Complete performs exact abstract interpretation, Approximate performs incomplete abstract interpretation and Mixed_N refine N neurons per layer"
+          "description": "The algorithm employed for the abstract propagation.\nComplete performs exact abstract interpretation,\nApproximate performs incomplete abstract interpretation and\nMixed refines N neurons per layer"
         },
         "Neurons to refine per layer": {
           "name": "neurons_to_refine",
@@ -19,7 +19,7 @@
           "name": "approx_levels",
           "value": "1",
           "type": "int",
-          "description": "Level of approximation for sigmoid-like functions, corresponding to the number of separation points in the triangular approximation"
+          "description": "Level of approximation for sigmoid-like functions, corresponding to the number\nof separation points in the triangular approximation"
         }
       }
     },
@@ -30,7 +30,7 @@
           "value": "Sequential",
           "allowed": "[Sequential,Lowest approximation,Lowest approximation in layer,Input bounds change]",
           "type": "str",
-          "description": "Branching heuristic to employ in the refinement. Sequential refinement refines each neuron in the order they appear in the network; Lowest approx selects the neuron that contributes with the lowest approximation; Lowest approx - current layer selects the neuron that contributes with the lowest approximation in the layer; Input bounds change selects the neuron that contributes most to change the input bounds when refined"
+          "description": "Branching heuristic to employ in the refinement.\nSequential refinement refines each neuron in the order they appear in the network;\nLowest approx selects the neuron that contributes with the lowest approximation;\nLowest approx - current layer selects the neuron that contributes with the lowest approximation in the layer;\nInput bounds change selects the neuron that contributes most to change the input bounds when refined"
         },
         "Bounds propagation": {
           "name": "bounds",
