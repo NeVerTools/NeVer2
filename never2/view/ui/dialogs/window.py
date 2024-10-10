@@ -24,7 +24,7 @@ from pynever.datasets import Dataset
 from pynever.networks import NeuralNetwork, SequentialNetwork
 from pynever.strategies.training import PytorchTraining, PytorchMetrics
 from pynever.strategies.verification.algorithms import SSLPVerification, SSBPVerification
-from pynever.strategies.verification.parameters import VerificationParameters, SSLPVerificationParameters, \
+from pynever.strategies.verification.parameters import SSLPVerificationParameters, \
     SSBPVerificationParameters
 from pynever.strategies.verification.properties import VnnLibProperty
 from pynever.strategies.verification.ssbp.constants import RefinementStrategy, BoundsBackend, IntersectionStrategy
@@ -719,7 +719,8 @@ class VerificationWindow(BaseWindow):
         self.verify_btn.setEnabled(False)
         self.cancel_btn.setText('Close')
 
-    def get_verification_params(self, strategy: str, raw_params: dict) -> VerificationParameters:
+    def get_verification_params(self, strategy: str, raw_params: dict[str, str]) \
+            -> SSLPVerificationParameters | SSBPVerificationParameters:
         """
         This method translates the parameters read from the verification dialog
         to the corresponding VerificationParameters object.
@@ -733,12 +734,13 @@ class VerificationWindow(BaseWindow):
 
         Returns
         -------
-        VerificationParameters
+        SSLPVerificationParameters | SSBPVerificationParameters
 
         """
 
         match strategy:
             case 'SSLP':
+
                 match raw_params['heuristic']:
                     case 'Complete':
                         heuristic = 'complete'
@@ -746,6 +748,8 @@ class VerificationWindow(BaseWindow):
                         heuristic = 'overapprox'
                     case 'Mixed':
                         heuristic = 'mixed'
+                    case _:
+                        heuristic = 'complete'
 
                 neurons = None
                 approx_levels = None
@@ -759,6 +763,7 @@ class VerificationWindow(BaseWindow):
                 return SSLPVerificationParameters(heuristic, neurons, approx_levels)
 
             case 'SSBP':
+
                 match raw_params['heuristic']:
                     case 'Sequential':
                         refinement = RefinementStrategy.SEQUENTIAL
@@ -768,9 +773,13 @@ class VerificationWindow(BaseWindow):
                         refinement = RefinementStrategy.LOWEST_APPROX_CURRENT_LAYER
                     case 'Input bounds change':
                         refinement = RefinementStrategy.INPUT_BOUNDS_CHANGE
+                    case _:
+                        refinement = RefinementStrategy.SEQUENTIAL
 
                 match raw_params['bounds']:
                     case 'Symbolic':
+                        bounds = BoundsBackend.SYMBOLIC
+                    case _:
                         bounds = BoundsBackend.SYMBOLIC
 
                 # match raw_params['bounds_direction']:
@@ -778,12 +787,16 @@ class VerificationWindow(BaseWindow):
                 #         direction = BoundsDirection.FORWARDS
                 #     case 'Backwards':
                 #         direction = BoundsDirection.BACKWARDS
+                #     case _:
+                #         direction = BoundsDirection.FORWARDS
 
                 match raw_params['intersection']:
                     case 'Star LP':
                         intersection = IntersectionStrategy.STAR_LP
                     case 'Adaptive':
                         intersection = IntersectionStrategy.ADAPTIVE
+                    case _:
+                        intersection = IntersectionStrategy.STAR_LP
 
                 timeout = int(raw_params['timeout'])
 
