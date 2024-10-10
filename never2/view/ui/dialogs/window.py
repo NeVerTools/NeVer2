@@ -27,7 +27,8 @@ from pynever.strategies.verification.algorithms import SSLPVerification, SSBPVer
 from pynever.strategies.verification.parameters import SSLPVerificationParameters, \
     SSBPVerificationParameters
 from pynever.strategies.verification.properties import VnnLibProperty
-from pynever.strategies.verification.ssbp.constants import RefinementStrategy, BoundsBackend, IntersectionStrategy
+from pynever.strategies.verification.ssbp.constants import RefinementStrategy, BoundsBackend, IntersectionStrategy, \
+    BoundsDirection
 
 from never2 import RES_DIR, ROOT_DIR
 from never2.resources.styling.custom import CustomComboBox, CustomTextBox, CustomLabel, CustomButton, \
@@ -782,13 +783,13 @@ class VerificationWindow(BaseWindow):
                     case _:
                         bounds = BoundsBackend.SYMBOLIC
 
-                # match raw_params['bounds_direction']:
-                #     case 'Forwards':
-                #         direction = BoundsDirection.FORWARDS
-                #     case 'Backwards':
-                #         direction = BoundsDirection.BACKWARDS
-                #     case _:
-                #         direction = BoundsDirection.FORWARDS
+                match raw_params['bounds_direction']:
+                    case 'Forwards':
+                        direction = BoundsDirection.FORWARDS
+                    case 'Backwards':
+                        direction = BoundsDirection.BACKWARDS
+                    case _:
+                        direction = BoundsDirection.FORWARDS
 
                 match raw_params['intersection']:
                     case 'Star LP':
@@ -800,7 +801,7 @@ class VerificationWindow(BaseWindow):
 
                 timeout = int(raw_params['timeout'])
 
-                return SSBPVerificationParameters(refinement, bounds, intersection, timeout)
+                return SSBPVerificationParameters(refinement, bounds, direction, intersection, timeout)
 
             case _:
                 raise NotImplementedError(f'The selected strategy {strategy} is not yet implemented')
