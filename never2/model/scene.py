@@ -135,13 +135,14 @@ class Scene:
         node = project.nn.get_first_node()
         last_node = project.nn.get_last_node()
 
+        # TODO check for ResNet
         for i in range(len(project.nn.nodes)):
             load_dict, node_id = NodeFactory.create_datanode(node)
             is_last = True if node_id == last_node.identifier else False
 
             signature = str(load_dict['category']) + ':' + str(load_dict['name'])
-            self.add_layer_block(self.editor_widget_ref.block_data[load_dict['category']][load_dict['name']],
-                                 signature, node_id, load_dict)
+            self.append_layer_block(self.editor_widget_ref.block_data[load_dict['category']][load_dict['name']],
+                                    signature, node_id, load_dict)
 
             if not is_last:
                 node = project.nn.get_next_node(node)
@@ -185,16 +186,19 @@ class Scene:
                 prop_dict[self.output_block.get_identifier()] = PropertyContainer(new_smt_string, new_variable_list)
                 prop_dict.pop(self.project.nn.get_last_node().identifier)
 
-            for k, v in prop_dict.items():
-                if k == self.input_block.get_identifier():
-                    self.add_property_block('Generic SMT', self.input_block, v)
-                elif k == self.output_block.get_identifier() or k == self.project.nn.get_last_node().identifier:
-                    self.add_property_block('Generic SMT', self.output_block, v)
+            # Add properties to the scene
+            in_id = self.input_block.get_identifier()
+            out_id = self.output_block.get_identifier()
+            if in_id in prop_dict.keys():
+                self.add_property_block('Generic SMT', self.input_block, prop_dict[in_id])
 
-    def add_layer_block(self, block_data: dict, block_sign: str,
-                        block_id: str = None, load_dict: dict = None) -> LayerBlock | None:
+            if out_id in prop_dict.keys() or out_id == self.project.nn.get_last_node().identifier:
+                self.add_property_block('Generic SMT', self.output_block, prop_dict[out_id])
+
+    def append_layer_block(self, block_data: dict, block_sign: str,
+                           block_id: str = None, load_dict: dict = None) -> LayerBlock | None:
         """
-        This method adds a layer block in the Scene and draws it in the View
+        This method adds a layer block after the last existing one in the Scene and draws it in the View
 
         Parameters
         ----------
