@@ -97,7 +97,7 @@ class EditorWidget(QWidget):
 
         """
 
-        self.scene.add_layer_block(block_data, block_sign)
+        self.scene.append_layer_block(block_data, block_sign)
 
     def save_prompt_dialog(self) -> Optional[ConfirmDialog]:
         """

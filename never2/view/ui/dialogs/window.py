@@ -755,11 +755,17 @@ class VerificationWindow(BaseWindow):
                 neurons = None
                 approx_levels = None
 
-                if heuristic != 'complete':
-                    approx_levels = int(raw_params['approx_levels'])
-
                 if heuristic == 'mixed':
-                    neurons = int(raw_params['neurons_to_refine'])
+                    if ',' in raw_params['neurons_to_refine']:
+                        neurons = [int(x) for x in raw_params['neurons_to_refine'].split(',')]
+                    else:
+                        neurons = int(raw_params['neurons_to_refine'])
+
+                if heuristic != 'complete':
+                    if ',' in raw_params['approx_levels']:
+                        approx_levels = [int(x) for x in raw_params['approx_levels'].split(',')]
+                    else:
+                        approx_levels = int(raw_params['approx_levels'])
 
                 return SSLPVerificationParameters(heuristic, neurons, approx_levels)
 
