@@ -7,7 +7,7 @@ Author: Andrea Gimelli, Giacomo Rosato, Stefano Demarchi
 
 """
 
-import numpy as np
+import torch
 from PyQt6.QtWidgets import QGraphicsItem
 from pynever.nodes import ConcreteLayerNode
 
@@ -154,7 +154,8 @@ class Scene:
         """
 
         if len(prop_dict.keys()) <= 2:  # At most one pre-condition and one post-condition
-            available_list = [self.input_block.get_identifier(), self.output_block.get_identifier(),
+            # This list is used to allow a custom input name and 'X' as the property name
+            available_list = ['X', self.input_block.get_identifier(), self.output_block.get_identifier(),
                               self.project.nn.get_last_node().identifier]
 
             # Check variables compatibility
@@ -163,7 +164,7 @@ class Scene:
                     raise Exception('This property appears to be defined on another network!\n'
                                     f'Unknown variable: {prop_id}')
 
-                if prop_id == self.input_block.get_identifier():
+                if prop_id in [self.input_block.get_identifier(), 'X']:
                     if not prop_value.check_variables_size(self.input_block.get_dimension()):
                         raise Exception('The number of input variables is not consistent between\n'
                                         'the property and the network!')
@@ -191,6 +192,8 @@ class Scene:
             out_id = self.output_block.get_identifier()
             if in_id in prop_dict.keys():
                 self.add_property_block('Generic SMT', self.input_block, prop_dict[in_id])
+            else:
+                self.add_property_block('Generic SMT', self.input_block, prop_dict['X'])
 
             if out_id in prop_dict.keys() or out_id == self.project.nn.get_last_node().identifier:
                 self.add_property_block('Generic SMT', self.output_block, prop_dict[out_id])
@@ -372,8 +375,8 @@ class Scene:
                 if isinstance(q_wdg, CustomLabel):
                     if hasattr(added_node, param_name):
                         node_param = getattr(added_node, param_name)
-                        if isinstance(node_param, np.ndarray):
-                            sh = node_param.shape
+                        if isinstance(node_param, torch.Tensor):
+                            sh = tuple(node_param.shape)
                             q_wdg.setText(rep.tuple2text(sh))
                         else:
                             q_wdg.setText(str(node_param))

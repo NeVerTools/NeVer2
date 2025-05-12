@@ -58,7 +58,8 @@ class PropertyContainer:
         elif isinstance(shape, tuple):
             n = 0
             for e in shape:
-                n += e
+                if e != 1:
+                    n += e
             return len(self.variables) == n
         else:
             return False
