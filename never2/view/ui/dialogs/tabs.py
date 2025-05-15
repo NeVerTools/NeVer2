@@ -22,6 +22,7 @@ class VerificationTabWidget(QTabWidget):
         self.widgets_dict = {}
 
         self.qss_file = open(RES_DIR + '/styling/qss/style.qss').read()
+        self.setStyleSheet(self.qss_file)
 
         # Init tabs
         self.build_tabs()
@@ -47,7 +48,6 @@ class VerificationTabWidget(QTabWidget):
 
             # Refer to the last added in the loop
             tabs[-1].setLayout(cur_layout)
-            tabs[-1].setStyleSheet(self.qss_file)
 
             params_dict = self.content_dict['Verification strategy'][name]['params']
 
