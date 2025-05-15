@@ -9,6 +9,7 @@ Author: Stefano Demarchi
 
 from PyQt6.QtWidgets import QTabWidget, QWidget, QFormLayout
 
+from never2 import RES_DIR
 from never2.resources.styling.custom import CustomComboBox, CustomTextBox, CustomLabel
 from never2.utils.validator import ArithmeticValidator
 
@@ -19,6 +20,8 @@ class VerificationTabWidget(QTabWidget):
         super().__init__(parent)
         self.content_dict = content
         self.widgets_dict = {}
+
+        self.qss_file = open(RES_DIR + '/styling/qss/style.qss').read()
 
         # Init tabs
         self.build_tabs()
@@ -44,6 +47,7 @@ class VerificationTabWidget(QTabWidget):
 
             # Refer to the last added in the loop
             tabs[-1].setLayout(cur_layout)
+            tabs[-1].setStyleSheet(self.qss_file)
 
             params_dict = self.content_dict['Verification strategy'][name]['params']
 
