@@ -63,7 +63,7 @@ class Scene:
         # Project with pynever NN object and interfaces
         self.project = Project(self)
 
-    def init_io(self) -> tuple[Block, Block]:
+    def init_io(self) -> tuple[FunctionalBlock, FunctionalBlock]:
         """
         This method creates the input and output blocks, which are permanent
 
@@ -339,7 +339,7 @@ class Scene:
             dialog = MessageDialog('No network defined for adding a property', MessageType.ERROR)
             dialog.exec()
 
-    def add_edge(self, prev: Block, cur: Block) -> Edge:
+    def add_edge(self, prev: Block, cur: Block) -> Edge | None:
         """
         Add and draw the edge connecting two blocks
 
@@ -352,8 +352,7 @@ class Scene:
 
         """
 
-        if self.blocks_count > 0:
-            return Edge(self, prev, cur)
+        return Edge(self, prev, cur) if self.blocks_count > 0 else None
 
     @staticmethod
     def update_block_params(added_block: LayerBlock, added_node: ConcreteLayerNode) -> None:
