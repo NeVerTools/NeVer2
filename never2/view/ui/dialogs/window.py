@@ -22,7 +22,7 @@ from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QFileDialog
 from pynever.datasets import Dataset
 from pynever.networks import NeuralNetwork, SequentialNetwork
-from pynever.strategies.training import PytorchTraining, PytorchMetrics
+from pynever.strategies.training import PytorchTraining, PytorchMetrics, PytorchTesting
 from pynever.strategies.verification.algorithms import SSLPVerification, SSBPVerification
 from pynever.strategies.verification.parameters import SSLPVerificationParameters, \
     SSBPVerificationParameters
@@ -612,6 +612,17 @@ class TrainingWindow(BaseWindow):
                 if self.nn.identifier == '':
                     os.remove('.pth.tar')
 
+                # Testing
+                metric_params = dict()
+                if self.metric == 'Precision Metric:MSE Loss':
+                    metric_params[self.gui_params['Precision Metric:MSE Loss']['Reduction']['name']] \
+                        = self.gui_params['Precision Metric:MSE Loss']['Reduction']['value']
+                test_strategy = PytorchTesting(metrics,
+                                               metric_params,
+                                               self.params['Training batch size']['value'],
+                                               device=cuda_device)
+                test_strategy.test(self.nn, data)
+
             except Exception as e:
                 self.nn = None
                 dialog = MessageDialog('Training error:\n' + str(e), MessageType.ERROR)
@@ -727,7 +738,6 @@ class VerificationWindow(BaseWindow):
 
         # Launch verification
         self.strategy.verify(self.nn, to_verify)
-        self.verify_btn.setEnabled(False)
         self.cancel_btn.setText('Close')
 
     def get_verification_params(self, strategy: str, raw_params: dict[str, str]) \
