@@ -14,8 +14,7 @@ from never2.resources.styling.custom import CustomComboBox, CustomTextBox, Custo
 from never2.utils.validator import ArithmeticValidator
 
 
-class VerificationTabWidget(QTabWidget):
-
+class CustomTabWidget(QTabWidget):
     def __init__(self, content: dict = None, parent=None):
         super().__init__(parent)
         self.content_dict = content
@@ -23,6 +22,22 @@ class VerificationTabWidget(QTabWidget):
 
         self.qss_file = open(RES_DIR + '/styling/qss/style.qss').read()
         self.setStyleSheet(self.qss_file)
+
+
+class TrainingTabWidget(CustomTabWidget):
+    def __init__(self, content: dict = None, parent=None):
+        super().__init__(content, parent)
+
+        self.build_tabs()
+
+    def build_tabs(self):
+        """Builder"""
+
+
+class VerificationTabWidget(CustomTabWidget):
+
+    def __init__(self, content: dict = None, parent=None):
+        super().__init__(content, parent)
 
         # Init tabs
         self.build_tabs()
