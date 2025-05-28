@@ -9,16 +9,25 @@ Author: Stefano Demarchi
 
 from PyQt6.QtWidgets import QTabWidget, QWidget, QFormLayout
 
+from never2 import RES_DIR
 from never2.resources.styling.custom import CustomComboBox, CustomTextBox, CustomLabel
 from never2.utils.validator import ArithmeticValidator
 
 
-class VerificationTabWidget(QTabWidget):
-
+class CustomTabWidget(QTabWidget):
     def __init__(self, content: dict = None, parent=None):
         super().__init__(parent)
         self.content_dict = content
         self.widgets_dict = {}
+
+        self.qss_file = open(RES_DIR + '/styling/qss/style.qss').read()
+        self.setStyleSheet(self.qss_file)
+
+
+class VerificationTabWidget(CustomTabWidget):
+
+    def __init__(self, content: dict = None, parent=None):
+        super().__init__(content, parent)
 
         # Init tabs
         self.build_tabs()

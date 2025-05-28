@@ -136,10 +136,14 @@ class Block:
     def has_input(self) -> bool:
         if self.input_sockets:
             return self.input_sockets[-1].edge is not None
+        else:
+            return False
 
     def has_output(self) -> bool:
         if self.output_sockets:
             return self.output_sockets[-1].edge is not None
+        else:
+            return False
 
     def init_sockets(self, inputs, outputs) -> None:
         """

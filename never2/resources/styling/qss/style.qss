@@ -31,6 +31,25 @@ QTreeView::item:selected {
     selection-background-color: transparent;
 }
 
+QTabWidget {
+    background-color: #2c2c2c;
+    padding: 15px;
+}
+
+QTabBar::tab {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    height: 25px;
+    background-color: #4b4e52;
+    padding-left: 10px;
+    padding-right: 10px;
+    color: white;
+}
+
+QTabBar::tab::selected {
+    background-color: #157172;
+}
+
 QPushButton {
     color: white;
     border-radius: 5px;
@@ -38,7 +57,7 @@ QPushButton {
     background-color: #304153;
 }
 
-QPushButton:hover:!pressed {
+QPushButton:hover:pressed {
     border: 1px solid #304153;
     background-color: #34475b;
 }
