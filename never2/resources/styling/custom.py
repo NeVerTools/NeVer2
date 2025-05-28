@@ -8,9 +8,9 @@ Author: Stefano Demarchi
 """
 import logging
 
-from PyQt6 import QtCore, QtWidgets
-from PyQt6.QtCore import Qt, QObject
-from PyQt6.QtWidgets import QLabel, QComboBox, QLineEdit, QPlainTextEdit, QPushButton, QListWidget, QAbstractItemView
+from PyQt6.QtCore import Qt, QObject, pyqtSignal
+from PyQt6.QtWidgets import QLabel, QComboBox, QLineEdit, QPlainTextEdit, QPushButton, QListWidget, QAbstractItemView, \
+    QDialog, QVBoxLayout
 
 import never2.resources.styling.display as disp
 import never2.resources.styling.palette as palette
@@ -110,25 +110,29 @@ class CustomTextArea(QPlainTextEdit):
 class CustomLoggingHandler(QObject, logging.Handler):
     """Custom logging handler to emit signals."""
 
-    log_signal = QtCore.pyqtSignal(str)
+    log_signal = pyqtSignal(str)
+
+    def __init__(self):
+        QObject.__init__(self)
+        logging.Handler.__init__(self)
 
     def emit(self, record):
         msg = self.format(record)
         self.log_signal.emit(msg)
 
 
-class CustomLoggerDialog(QtWidgets.QDialog):
+class CustomLoggerDialog(QDialog):
     """Dialog to display log messages."""
 
     def __init__(self, title: str, parent=None):
         super(CustomLoggerDialog, self).__init__(parent)
         self.setWindowTitle(title)
-        self.setGeometry(100, 100, 400, 200)
+        self.resize(400, 300)
 
         self.log_text_edit = CustomTextArea(parent=parent)
         self.log_text_edit.setReadOnly(True)
 
-        layout = QtWidgets.QVBoxLayout(self)
+        layout = QVBoxLayout(self)
         layout.addWidget(self.log_text_edit)
         self.setLayout(layout)
 

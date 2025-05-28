@@ -18,7 +18,7 @@ import torch.nn.functional as fun
 import torch.optim as opt
 import torchvision.transforms as tr
 from PyQt6 import QtWidgets
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QObject, pyqtSignal, QThread
 from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QFileDialog
 from pynever.datasets import Dataset
 from pynever.networks import NeuralNetwork, SequentialNetwork
@@ -605,7 +605,18 @@ class TrainingWindow(BaseWindow):
                                              verbose_rate=self.params['Verbosity level'].get('value', None))
             try:
                 log_dialog.show()
-                self.nn = train_strategy.train(self.nn, data)
+
+                # Worker in a separate thread
+                self.thread = QThread()
+                self.worker = AsyncWorker(train_strategy.train, (self.nn, data))
+                self.worker.moveToThread(self.thread)
+
+                self.thread.started.connect(self.worker.run)
+                self.worker.finished.connect(self.thread.quit)
+                self.worker.finished.connect(self.worker.deleteLater)
+                self.thread.finished.connect(self.thread.deleteLater)
+
+                self.thread.start()
                 self.is_nn_trained = True
 
                 # Delete checkpoint if the network isn't saved
@@ -736,8 +747,17 @@ class VerificationWindow(BaseWindow):
         # Open logger dialog
         log_dialog.show()
 
-        # Launch verification
-        self.strategy.verify(self.nn, to_verify)
+        # Worker in a separate thread
+        self.thread = QThread()
+        self.worker = AsyncWorker(self.strategy.verify, (self.nn, to_verify))
+        self.worker.moveToThread(self.thread)
+
+        self.thread.started.connect(self.worker.run)
+        self.worker.finished.connect(self.thread.quit)
+        self.worker.finished.connect(self.worker.deleteLater)
+        self.thread.finished.connect(self.thread.deleteLater)
+
+        self.thread.start()
         self.cancel_btn.setText('Close')
 
     def get_verification_params(self, strategy: str, raw_params: dict[str, str]) \
@@ -824,3 +844,17 @@ class VerificationWindow(BaseWindow):
 
             case _:
                 raise NotImplementedError(f'The selected strategy {strategy} is not yet implemented')
+
+
+class AsyncWorker(QObject):
+    """A class to run a task using a separate worker"""
+    finished = pyqtSignal()
+
+    def __init__(self, task: Callable, params: tuple = None):
+        super().__init__()
+        self.task = task
+        self.params = params
+
+    def run(self):
+        self.task(*self.params)
+        self.finished.emit()
