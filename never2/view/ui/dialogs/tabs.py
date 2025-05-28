@@ -24,16 +24,6 @@ class CustomTabWidget(QTabWidget):
         self.setStyleSheet(self.qss_file)
 
 
-class TrainingTabWidget(CustomTabWidget):
-    def __init__(self, content: dict = None, parent=None):
-        super().__init__(content, parent)
-
-        self.build_tabs()
-
-    def build_tabs(self):
-        """Builder"""
-
-
 class VerificationTabWidget(CustomTabWidget):
 
     def __init__(self, content: dict = None, parent=None):

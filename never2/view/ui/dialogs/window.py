@@ -432,19 +432,20 @@ class TrainingWindow(BaseWindow):
 
         """
 
-        if name == 'MNIST':
-            self.dataset_path = ROOT_DIR + '/data/MNIST/'
-        elif name == 'Fashion MNIST':
-            self.dataset_path = ROOT_DIR + '/data/fMNIST/'
-        else:
-            datapath = QFileDialog.getOpenFileName(None, 'Select data source...', '')
-            self.dataset_path = datapath[0]
+        match name:
+            case 'MNIST':
+                self.dataset_path = ROOT_DIR + '/data/MNIST/'
+            case 'Fashion MNIST':
+                self.dataset_path = ROOT_DIR + '/data/fMNIST/'
+            case _:
+                datapath = QFileDialog.getOpenFileName(None, 'Select data source...', '')
+                self.dataset_path = datapath[0]
 
-            # Get additional parameters via dialog
-            if self.dataset_path != '':
-                dialog = GenericDatasetDialog()
-                dialog.exec()
-                self.dataset_params = dialog.params
+                # Get additional parameters via dialog
+                if self.dataset_path != '':
+                    dialog = GenericDatasetDialog()
+                    dialog.exec()
+                    self.dataset_params = dialog.params
 
     def setup_transform(self, sel_t: str) -> None:
         """
@@ -457,41 +458,45 @@ class TrainingWindow(BaseWindow):
 
         """
 
-        if sel_t == 'No transform':
-            self.dataset_transform = tr.Compose([])
-        elif sel_t == 'Convolutional MNIST':
-            self.dataset_transform = tr.Compose([tr.ToTensor(), tr.Normalize(1, 0.5)])
-        elif sel_t == 'Fully Connected MNIST':
-            self.dataset_transform = tr.Compose([tr.ToTensor(),
-                                                 tr.Normalize(1, 0.5),
-                                                 tr.Lambda(lambda x: torch.flatten(x))])
-        else:
-            dialog = ComposeTransformDialog()
-            dialog.exec()
-            self.dataset_transform = tr.Compose(dialog.trList)
+        match sel_t:
+            case 'No transform':
+                self.dataset_transform = tr.Compose([])
+            case 'Convolutional MNIST':
+                self.dataset_transform = tr.Compose([tr.ToTensor(), tr.Normalize(1, 0.5)])
+            case 'Fully Connected MNIST':
+                self.dataset_transform = tr.Compose([tr.ToTensor(),
+                                                     tr.Normalize(1, 0.5),
+                                                     tr.Lambda(lambda x: torch.flatten(x))])
+            case _:
+                dialog = ComposeTransformDialog()
+                dialog.exec()
+                self.dataset_transform = tr.Compose(dialog.trList)
 
-    def load_dataset(self) -> Dataset:
+    def load_dataset(self) -> Dataset | None:
         """
         This method initializes the selected dataset object,
         given the path loaded before.
 
         Returns
         ----------
-        Dataset
-            The dataset object.
+        Dataset | None
+            The dataset object, if loaded correctly.
 
         """
 
-        if self.dataset_path == ROOT_DIR + '/data/MNIST/':
-            return dt.TorchMNIST(self.dataset_path, True, self.dataset_transform)
-        elif self.dataset_path == ROOT_DIR + '/data/fMNIST/':
-            return dt.TorchFMNIST(self.dataset_path, True, self.dataset_transform)
-        elif self.dataset_path != '':
-            return dt.GenericFileDataset(self.dataset_path,
-                                         self.nn.get_input_len(),
-                                         self.dataset_params['data_type'],
-                                         self.dataset_params['delimiter'],
-                                         self.dataset_transform)
+        match self.dataset_path:
+            case x if x == f'{ROOT_DIR}/data/MNIST/':
+                return dt.TorchMNIST(self.dataset_path, True, self.dataset_transform)
+            case x if x == f'{ROOT_DIR}/data/fMNIST/':
+                return dt.TorchFMNIST(self.dataset_path, True, self.dataset_transform)
+            case '':
+                return dt.GenericFileDataset(self.dataset_path,
+                                             self.nn.get_input_len(),
+                                             self.dataset_params['data_type'],
+                                             self.dataset_params['delimiter'],
+                                             self.dataset_transform)
+            case _:
+                return None
 
     def execute_training(self) -> None:
         """
@@ -581,10 +586,7 @@ class TrainingWindow(BaseWindow):
 
         if start_epoch > -1:
             # Init train strategy
-            if self.params['Cuda']['value'] == 'True':
-                cuda_device = 'cuda'
-            else:
-                cuda_device = 'cpu'
+            cuda_device = 'cuda' if self.params['Cuda']['value'] == 'True' else 'cpu'
             train_strategy = PytorchTraining(opt.Adam, opt_params,
                                              loss,
                                              self.params['Epochs']['value'],
