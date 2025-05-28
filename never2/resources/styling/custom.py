@@ -8,7 +8,8 @@ Author: Stefano Demarchi
 """
 import logging
 
-from PyQt6.QtCore import Qt, QObject, pyqtSignal
+from PyQt6 import QtCore, QtWidgets
+from PyQt6.QtCore import Qt, QObject
 from PyQt6.QtWidgets import QLabel, QComboBox, QLineEdit, QPlainTextEdit, QPushButton, QListWidget, QAbstractItemView
 
 import never2.resources.styling.display as disp
@@ -106,21 +107,33 @@ class CustomTextArea(QPlainTextEdit):
                            '}')
 
 
-class CustomLoggerTextArea(logging.Handler, QObject):
-    appendPlainText = pyqtSignal(str)
+class CustomLoggingHandler(QObject, logging.Handler):
+    """Custom logging handler to emit signals."""
 
-    def __init__(self, parent):
-        super().__init__()
-        QObject.__init__(self)
+    log_signal = QtCore.pyqtSignal(str)
 
-        self.widget = CustomTextArea(parent=parent)
-        self.widget.setReadOnly(True)
-        self.widget.setFixedHeight(150)
-        self.appendPlainText.connect(self.widget.appendPlainText)
-
-    def emit(self, record: logging.LogRecord) -> None:
+    def emit(self, record):
         msg = self.format(record)
-        self.appendPlainText.emit(msg)
+        self.log_signal.emit(msg)
+
+
+class CustomLoggerDialog(QtWidgets.QDialog):
+    """Dialog to display log messages."""
+
+    def __init__(self, title: str, parent=None):
+        super(CustomLoggerDialog, self).__init__(parent)
+        self.setWindowTitle(title)
+        self.setGeometry(100, 100, 400, 200)
+
+        self.log_text_edit = CustomTextArea(parent=parent)
+        self.log_text_edit.setReadOnly(True)
+
+        layout = QtWidgets.QVBoxLayout(self)
+        layout.addWidget(self.log_text_edit)
+        self.setLayout(layout)
+
+    def add_log_message(self, message):
+        self.log_text_edit.appendPlainText(message)
 
 
 class CustomListBox(QListWidget):

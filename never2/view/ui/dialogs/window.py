@@ -32,7 +32,7 @@ from pynever.strategies.verification.ssbp.constants import RefinementStrategy, B
 
 from never2 import RES_DIR, ROOT_DIR
 from never2.resources.styling.custom import CustomComboBox, CustomTextBox, CustomLabel, CustomButton, \
-    CustomLoggerTextArea
+    CustomLoggingHandler, CustomLoggerDialog
 from never2.utils import rep, file
 from never2.utils.validator import ArithmeticValidator
 from never2.view.ui.dialogs.action import ComposeTransformDialog
@@ -534,12 +534,14 @@ class TrainingWindow(BaseWindow):
         # Load dataset
         data = self.load_dataset()
 
-        # Add logger text box
-        log_textbox = CustomLoggerTextArea(self)
+        # Add logger dialog
+        log_dialog = CustomLoggerDialog('Training log', self)
+        handler = CustomLoggingHandler()
+        handler.log_signal.connect(log_dialog.add_log_message)
+
         logger = logging.getLogger('pynever.strategies.training')
-        logger.addHandler(log_textbox)
         logger.setLevel(logging.INFO)
-        self.layout.addWidget(log_textbox.widget)
+        logger.addHandler(handler)
 
         logger.info('***** NeVer 2 - TRAINING *****')
 
@@ -602,6 +604,7 @@ class TrainingWindow(BaseWindow):
                                              checkpoints_root=self.params['Checkpoints root'].get('value', ''),
                                              verbose_rate=self.params['Verbosity level'].get('value', None))
             try:
+                log_dialog.show()
                 self.nn = train_strategy.train(self.nn, data)
                 self.is_nn_trained = True
 
@@ -685,12 +688,14 @@ class VerificationWindow(BaseWindow):
         path = 'never2/' + self.__repr__().split(' ')[-1].replace('>', '') + '.smt2'
         file.write_smt_property(path, self.properties, 'Real')
 
-        # Add logger text box
-        log_textbox = CustomLoggerTextArea(self)
+        # Add logger dialog
+        log_dialog = CustomLoggerDialog('Verification log', self)
+        handler = CustomLoggingHandler()
+        handler.log_signal.connect(log_dialog.add_log_message)
+
         logger = logging.getLogger('pynever.strategies.verification')
-        logger.addHandler(log_textbox)
         logger.setLevel(logging.INFO)
-        self.layout.addWidget(log_textbox.widget)
+        logger.addHandler(handler)
 
         logger.info('***** NeVer 2 - VERIFICATION *****')
 
@@ -705,17 +710,20 @@ class VerificationWindow(BaseWindow):
             case 'SSLP':
                 abst_logger = logging.getLogger('pynever.strategies.abstraction.layers')
                 abst_logger.setLevel(logging.INFO)
-                abst_logger.addHandler(log_textbox)
+                abst_logger.addHandler(handler)
                 self.strategy = SSLPVerification(self.get_verification_params(strategy, raw_params))
 
             case 'SSBP':
                 bp_logger = logging.getLogger("pynever.strategies.bounds_propagation")
                 bp_logger.setLevel(logging.INFO)
-                bp_logger.addHandler(log_textbox)
+                bp_logger.addHandler(handler)
                 self.strategy = SSBPVerification(self.get_verification_params(strategy, raw_params))
 
             case _:
                 raise NotImplementedError(f'The selected strategy {strategy} is not yet implemented')
+
+        # Open logger dialog
+        log_dialog.show()
 
         # Launch verification
         self.strategy.verify(self.nn, to_verify)
@@ -755,7 +763,6 @@ class VerificationWindow(BaseWindow):
                         heuristic = 'complete'
 
                 neurons = None
-                approx_levels = None
 
                 if heuristic == 'mixed':
                     if ',' in raw_params['neurons_to_refine']:
@@ -763,13 +770,7 @@ class VerificationWindow(BaseWindow):
                     else:
                         neurons = int(raw_params['neurons_to_refine'])
 
-                if heuristic != 'complete':
-                    if ',' in raw_params['approx_levels']:
-                        approx_levels = [int(x) for x in raw_params['approx_levels'].split(',')]
-                    else:
-                        approx_levels = int(raw_params['approx_levels'])
-
-                return SSLPVerificationParameters(heuristic, neurons, approx_levels)
+                return SSLPVerificationParameters(heuristic, neurons)
 
             case 'SSBP':
 
