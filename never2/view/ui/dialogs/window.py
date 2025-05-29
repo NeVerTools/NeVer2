@@ -7,7 +7,6 @@ of learning and verification.
 Author: Stefano Demarchi
 
 """
-
 import logging
 import os
 from typing import Callable
@@ -39,6 +38,15 @@ from never2.view.ui.dialogs.action import ComposeTransformDialog
 from never2.view.ui.dialogs.dialog import GenericDatasetDialog
 from never2.view.ui.dialogs.message import MessageDialog, MessageType
 from never2.view.ui.dialogs.tabs import VerificationTabWidget
+
+
+class Params:
+    """Static parameters used as keys for training parameters"""
+
+    OPTIMIZER = 'Optimization algorithm'
+    SCHEDULER = 'Learning rate scheduling'
+    LOSS = 'Loss function measure'
+    PRECISION = 'Precision Metric'
 
 
 class BaseWindow(QtWidgets.QDialog):
@@ -304,9 +312,9 @@ class TrainingWindow(BaseWindow):
         """
 
         self.clear_grid()
-        if 'Loss Function' in caller:
+        if Params.LOSS in caller:
             self.loss_f = caller
-        elif 'Precision Metric' in caller:
+        elif Params.PRECISION in caller:
             self.metric = caller
 
         for first_level in self.params.keys():
@@ -489,14 +497,12 @@ class TrainingWindow(BaseWindow):
                 return dt.TorchMNIST(self.dataset_path, True, self.dataset_transform)
             case x if x == f'{ROOT_DIR}/data/fMNIST/':
                 return dt.TorchFMNIST(self.dataset_path, True, self.dataset_transform)
-            case '':
+            case _:
                 return dt.GenericFileDataset(self.dataset_path,
                                              self.nn.get_input_len(),
                                              self.dataset_params['data_type'],
                                              self.dataset_params['delimiter'],
                                              self.dataset_transform)
-            case _:
-                return None
 
     def execute_training(self) -> None:
         """
@@ -509,13 +515,13 @@ class TrainingWindow(BaseWindow):
 
         if self.dataset_path == '':
             err_message = 'No dataset selected.'
-        elif self.widgets['Optimizer'].currentIndex() == -1:
+        elif self.widgets[Params.OPTIMIZER].currentIndex() == -1:
             err_message = 'No optimizer selected.'
-        elif self.widgets['Scheduler'].currentIndex() == -1:
+        elif self.widgets[Params.SCHEDULER].currentIndex() == -1:
             err_message = 'No scheduler selected.'
-        elif self.widgets['Loss Function'].currentIndex() == -1:
+        elif self.widgets[Params.LOSS].currentIndex() == -1:
             err_message = 'No loss function selected.'
-        elif self.widgets['Precision Metric'].currentIndex() == -1:
+        elif self.widgets[Params.PRECISION].currentIndex() == -1:
             err_message = 'No metrics selected.'
         elif 'value' not in self.params['Epochs'].keys():
             err_message = 'No epochs selected.'
@@ -547,31 +553,31 @@ class TrainingWindow(BaseWindow):
 
         # Create optimizer dictionary of parameters
         opt_params = dict()
-        for k, v in self.gui_params['Optimizer:Adam'].items():
+        for k, v in self.gui_params[f'{Params.OPTIMIZER}:Adam'].items():
             opt_params[v['name']] = v['value']
 
         # Create scheduler dictionary of parameters
         sched_params = dict()
-        for k, v in self.gui_params['Scheduler:ReduceLROnPlateau'].items():
+        for k, v in self.gui_params[f'{Params.SCHEDULER}:ReduceLROnPlateau'].items():
             sched_params[v['name']] = v['value']
 
         # Init loss function
-        if self.loss_f == 'Loss Function:Cross Entropy':
+        if self.loss_f == f'{Params.LOSS}:Cross Entropy':
             loss = torch.nn.CrossEntropyLoss()
-            if self.gui_params['Loss Function:Cross Entropy']['Weight']['value'] != '':
-                loss.weight = self.gui_params['Loss Function:Cross Entropy']['Weight']['value']
-            loss.ignore_index = self.gui_params['Loss Function:Cross Entropy']['Ignore index']['value']
-            loss.reduction = self.gui_params['Loss Function:Cross Entropy']['Reduction']['value']
+            if self.gui_params[f'{Params.LOSS}:Cross Entropy']['Weight']['value'] != '':
+                loss.weight = self.gui_params[f'{Params.LOSS}:Cross Entropy']['Weight']['value']
+            loss.ignore_index = self.gui_params[f'{Params.LOSS}:Cross Entropy']['Ignore index']['value']
+            loss.reduction = self.gui_params[f'{Params.LOSS}:Cross Entropy']['Reduction']['value']
         else:
             loss = fun.mse_loss
-            loss.reduction = self.gui_params['Loss Function:MSE Loss']['Reduction']['value']
+            loss.reduction = self.gui_params[f'{Params.LOSS}:MSE Loss']['Reduction']['value']
 
         # Init metrics
-        if self.metric == 'Precision Metric:Inaccuracy':
+        if self.metric == f'{Params.PRECISION}:Inaccuracy':
             metrics = PytorchMetrics.inaccuracy
         else:
             metrics = fun.mse_loss
-            metrics.reduction = self.gui_params['Precision Metric:MSE Loss']['Reduction']['value']
+            metrics.reduction = self.gui_params[f'{Params.PRECISION}:MSE Loss']['Reduction']['value']
 
         # Checkpoint loading
         checkpoints_path = self.params['Checkpoints root'].get('value', '') + self.nn.identifier + '.pth.tar'
@@ -624,15 +630,15 @@ class TrainingWindow(BaseWindow):
                     os.remove('.pth.tar')
 
                 # Testing
-                metric_params = dict()
-                if self.metric == 'Precision Metric:MSE Loss':
-                    metric_params[self.gui_params['Precision Metric:MSE Loss']['Reduction']['name']] \
-                        = self.gui_params['Precision Metric:MSE Loss']['Reduction']['value']
-                test_strategy = PytorchTesting(metrics,
-                                               metric_params,
-                                               self.params['Training batch size']['value'],
-                                               device=cuda_device)
-                test_strategy.test(self.nn, data)
+                # metric_params = dict()
+                # if self.metric == f'{Params.PRECISION}:MSE Loss':
+                #     metric_params[self.gui_params[f'{Params.PRECISION}:MSE Loss']['Reduction']['name']] \
+                #         = self.gui_params[f'{Params.PRECISION}:MSE Loss']['Reduction']['value']
+                # test_strategy = PytorchTesting(metrics,
+                #                                metric_params,
+                #                                self.params['Training batch size']['value'],
+                #                                device=cuda_device)
+                # test_strategy.test(self.nn, data)
 
             except Exception as e:
                 self.nn = None
