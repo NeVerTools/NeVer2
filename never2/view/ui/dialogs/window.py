@@ -21,7 +21,7 @@ from PyQt6.QtCore import Qt, QObject, pyqtSignal, QThread
 from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QFileDialog
 from pynever.datasets import Dataset
 from pynever.networks import NeuralNetwork, SequentialNetwork
-from pynever.strategies.training import PytorchTraining, PytorchMetrics, PytorchTesting
+from pynever.strategies.training import PytorchTraining, PytorchMetrics
 from pynever.strategies.verification.algorithms import SSLPVerification, SSBPVerification
 from pynever.strategies.verification.parameters import SSLPVerificationParameters, \
     SSBPVerificationParameters
@@ -31,7 +31,7 @@ from pynever.strategies.verification.ssbp.constants import RefinementStrategy, B
 
 from never2 import RES_DIR, ROOT_DIR
 from never2.resources.styling.custom import CustomComboBox, CustomTextBox, CustomLabel, CustomButton, \
-    CustomLoggingHandler, CustomLoggerDialog
+    CustomLoggingHandler, CustomLoggerTextArea
 from never2.utils import rep, file
 from never2.utils.validator import ArithmeticValidator
 from never2.view.ui.dialogs.action import ComposeTransformDialog
@@ -541,9 +541,10 @@ class TrainingWindow(BaseWindow):
         data = self.load_dataset()
 
         # Add logger dialog
-        log_dialog = CustomLoggerDialog('Training log', self)
+        log_textbox = CustomLoggerTextArea(self)
         handler = CustomLoggingHandler()
-        handler.log_signal.connect(log_dialog.add_log_message)
+        handler.log_signal.connect(log_textbox.appendPlainText)
+        self.layout.addWidget(log_textbox)
 
         logger = logging.getLogger('pynever.strategies.training')
         logger.setLevel(logging.INFO)
@@ -610,44 +611,42 @@ class TrainingWindow(BaseWindow):
                                              checkpoints_root=self.params['Checkpoints root'].get('value', ''),
                                              verbose_rate=self.params['Verbosity level'].get('value', None))
             try:
-                log_dialog.show()
-
                 # Worker in a separate thread
                 self.thread = QThread()
                 self.worker = AsyncWorker(train_strategy.train, (self.nn, data))
                 self.worker.moveToThread(self.thread)
 
                 self.thread.started.connect(self.worker.run)
-                self.worker.finished.connect(self.thread.quit)
-                self.worker.finished.connect(self.worker.deleteLater)
-                self.thread.finished.connect(self.thread.deleteLater)
+                self.worker.finished.connect(self.cleanup_thread)
+                self.worker.error.connect(self.error)
+                self.worker.error.connect(self.cleanup_thread)
 
                 self.thread.start()
                 self.is_nn_trained = True
 
                 # Delete checkpoint if the network isn't saved
-                if self.nn.identifier == '':
+                if self.nn.identifier == 'net':
                     os.remove('.pth.tar')
 
-                # Testing
-                # metric_params = dict()
-                # if self.metric == f'{Params.PRECISION}:MSE Loss':
-                #     metric_params[self.gui_params[f'{Params.PRECISION}:MSE Loss']['Reduction']['name']] \
-                #         = self.gui_params[f'{Params.PRECISION}:MSE Loss']['Reduction']['value']
-                # test_strategy = PytorchTesting(metrics,
-                #                                metric_params,
-                #                                self.params['Training batch size']['value'],
-                #                                device=cuda_device)
-                # test_strategy.test(self.nn, data)
-
             except Exception as e:
-                self.nn = None
-                dialog = MessageDialog('Training error:\n' + str(e), MessageType.ERROR)
-                dialog.exec()
-                self.close()
+                self.error(str(e))
 
         self.train_btn.setEnabled(False)
         self.cancel_btn.setText('Close')
+
+    def cleanup_thread(self):
+        """Utility method to terminate threads correctly"""
+        self.thread.quit()
+        self.thread.wait()
+        self.worker.deleteLater()
+        self.thread.deleteLater()
+
+    def error(self, msg: str = ''):
+        """Display error message"""
+        self.nn = None
+        dialog = MessageDialog('Training error:\n' + msg, MessageType.ERROR)
+        dialog.exec()
+        self.close()
 
 
 class VerificationWindow(BaseWindow):
@@ -717,9 +716,10 @@ class VerificationWindow(BaseWindow):
         file.write_smt_property(path, self.properties, 'Real')
 
         # Add logger dialog
-        log_dialog = CustomLoggerDialog('Verification log', self)
+        log_textbox = CustomLoggerTextArea(self)
         handler = CustomLoggingHandler()
-        handler.log_signal.connect(log_dialog.add_log_message)
+        handler.log_signal.connect(log_textbox.appendPlainText)
+        self.layout.addWidget(log_textbox)
 
         logger = logging.getLogger('pynever.strategies.verification')
         logger.setLevel(logging.INFO)
@@ -750,21 +750,36 @@ class VerificationWindow(BaseWindow):
             case _:
                 raise NotImplementedError(f'The selected strategy {strategy} is not yet implemented')
 
-        # Open logger dialog
-        log_dialog.show()
+        try:
+            # Worker in a separate thread
+            self.thread = QThread()
+            self.worker = AsyncWorker(self.strategy.verify, (self.nn, to_verify))
+            self.worker.moveToThread(self.thread)
 
-        # Worker in a separate thread
-        self.thread = QThread()
-        self.worker = AsyncWorker(self.strategy.verify, (self.nn, to_verify))
-        self.worker.moveToThread(self.thread)
+            self.thread.started.connect(self.worker.run)
+            self.worker.finished.connect(self.cleanup_thread)
+            self.worker.error.connect(self.error)
+            self.worker.error.connect(self.cleanup_thread)
 
-        self.thread.started.connect(self.worker.run)
-        self.worker.finished.connect(self.thread.quit)
-        self.worker.finished.connect(self.worker.deleteLater)
-        self.thread.finished.connect(self.thread.deleteLater)
+            self.thread.start()
 
-        self.thread.start()
+        except Exception as e:
+            self.error(str(e))
+
         self.cancel_btn.setText('Close')
+
+    def cleanup_thread(self):
+        """Utility method to terminate threads correctly"""
+        self.thread.quit()
+        self.thread.wait()
+        self.worker.deleteLater()
+        self.thread.deleteLater()
+
+    def error(self, msg: str = ''):
+        """Display error message"""
+        dialog = MessageDialog('Verification error:\n' + msg, MessageType.ERROR)
+        dialog.exec()
+        self.close()
 
     def get_verification_params(self, strategy: str, raw_params: dict[str, str]) \
             -> SSLPVerificationParameters | SSBPVerificationParameters:
@@ -855,6 +870,7 @@ class VerificationWindow(BaseWindow):
 class AsyncWorker(QObject):
     """A class to run a task using a separate worker"""
     finished = pyqtSignal()
+    error = pyqtSignal(str)
 
     def __init__(self, task: Callable, params: tuple = None):
         super().__init__()
@@ -862,5 +878,8 @@ class AsyncWorker(QObject):
         self.params = params
 
     def run(self):
-        self.task(*self.params)
-        self.finished.emit()
+        try:
+            self.task(*self.params)
+            self.finished.emit()
+        except Exception as e:
+            self.error.emit(str(e))
