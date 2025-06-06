@@ -7,7 +7,6 @@ of learning and verification.
 Author: Stefano Demarchi
 
 """
-
 import logging
 import os
 from typing import Callable
@@ -18,11 +17,11 @@ import torch.nn.functional as fun
 import torch.optim as opt
 import torchvision.transforms as tr
 from PyQt6 import QtWidgets
-from PyQt6.QtCore import Qt
+from PyQt6.QtCore import Qt, QObject, pyqtSignal, QThread
 from PyQt6.QtWidgets import QVBoxLayout, QHBoxLayout, QGridLayout, QFileDialog
 from pynever.datasets import Dataset
 from pynever.networks import NeuralNetwork, SequentialNetwork
-from pynever.strategies.training import PytorchTraining, PytorchMetrics
+from pynever.strategies.training import PytorchTraining, PytorchMetrics, PytorchTesting
 from pynever.strategies.verification.algorithms import SSLPVerification, SSBPVerification
 from pynever.strategies.verification.parameters import SSLPVerificationParameters, \
     SSBPVerificationParameters
@@ -32,13 +31,22 @@ from pynever.strategies.verification.ssbp.constants import RefinementStrategy, B
 
 from never2 import RES_DIR, ROOT_DIR
 from never2.resources.styling.custom import CustomComboBox, CustomTextBox, CustomLabel, CustomButton, \
-    CustomLoggingHandler, CustomLoggerDialog
+    CustomLoggingHandler, CustomLoggerTextArea
 from never2.utils import rep, file
 from never2.utils.validator import ArithmeticValidator
 from never2.view.ui.dialogs.action import ComposeTransformDialog
 from never2.view.ui.dialogs.dialog import GenericDatasetDialog
 from never2.view.ui.dialogs.message import MessageDialog, MessageType
 from never2.view.ui.dialogs.tabs import VerificationTabWidget
+
+
+class Params:
+    """Static parameters used as keys for training parameters"""
+
+    OPTIMIZER = 'Optimization algorithm'
+    SCHEDULER = 'Learning rate scheduling'
+    LOSS = 'Loss function measure'
+    PRECISION = 'Precision Metric'
 
 
 class BaseWindow(QtWidgets.QDialog):
@@ -181,6 +189,8 @@ class TrainingWindow(BaseWindow):
         or not.
     dataset_path : str
         The dataset path to train the network.
+    testset_path : str
+        The testset path to test the network.
     dataset_params : dict
         Additional parameters for generic datasets.
     dataset_transform : Transform
@@ -203,9 +213,11 @@ class TrainingWindow(BaseWindow):
         Procedure to update the parameters.
     setup_dataset(str)
         Procedure to prepare the dataset loading.
+    setup_testset(str)
+        Procedure to prepare the testset loading.
     setup_transform(str)
         Procedure to add a transform to the dataset.
-    load_dataset()
+    load_dataset(bool)
         Procedure to load the dataset.
     execute_training()
         Procedure to launch the training.
@@ -219,6 +231,7 @@ class TrainingWindow(BaseWindow):
         self.nn = nn
         self.is_nn_trained = False
         self.dataset_path = ''
+        self.testset_path = ''
         self.dataset_params = dict()
         self.dataset_transform = tr.Compose([])
         self.params = rep.read_json(RES_DIR + '/json/training.json')
@@ -239,6 +252,15 @@ class TrainingWindow(BaseWindow):
             .connect(lambda: self.setup_dataset(self.widgets['dataset'].currentText()))
         dataset_layout.addWidget(CustomLabel('Dataset'))
         dataset_layout.addWidget(self.widgets['dataset'])
+
+        self.widgets['testset'] = CustomComboBox()
+        self.widgets['testset'].addItems(['MNIST', 'Fashion MNIST', 'Custom data source...'])
+        self.widgets['testset'].setCurrentIndex(-1)
+        self.widgets['testset'].activated \
+            .connect(lambda: self.setup_testset(self.widgets['testset'].currentText()))
+        dataset_layout.addWidget(CustomLabel('Test set'))
+        dataset_layout.addWidget(self.widgets['testset'])
+
         self.layout.addLayout(dataset_layout)
 
         transform_layout = QHBoxLayout()
@@ -304,9 +326,9 @@ class TrainingWindow(BaseWindow):
         """
 
         self.clear_grid()
-        if 'Loss Function' in caller:
+        if Params.LOSS in caller:
             self.loss_f = caller
-        elif 'Precision Metric' in caller:
+        elif Params.PRECISION in caller:
             self.metric = caller
 
         for first_level in self.params.keys():
@@ -447,6 +469,28 @@ class TrainingWindow(BaseWindow):
                     dialog.exec()
                     self.dataset_params = dialog.params
 
+    def setup_testset(self, name: str) -> None:
+        """
+        This method reacts to the selection of a test set in the
+        testset combo box. Depending on the selection, the correct
+        path is saved and any additional parameters are asked.
+
+        Parameters
+        ----------
+        name : str
+            The test set name.
+
+        """
+
+        match name:
+            case 'MNIST':
+                self.testset_path = ROOT_DIR + '/data/MNIST/'
+            case 'Fashion MNIST':
+                self.testset_path = ROOT_DIR + '/data/fMNIST/'
+            case _:
+                datapath = QFileDialog.getOpenFileName(None, 'Select data source...', '')
+                self.testset_path = datapath[0]
+
     def setup_transform(self, sel_t: str) -> None:
         """
         This method prepares the dataset transform based on the user choice
@@ -472,10 +516,15 @@ class TrainingWindow(BaseWindow):
                 dialog.exec()
                 self.dataset_transform = tr.Compose(dialog.trList)
 
-    def load_dataset(self) -> Dataset | None:
+    def load_dataset(self, train: bool = True) -> Dataset | None:
         """
         This method initializes the selected dataset object,
         given the path loaded before.
+
+        Parameters
+        ----------
+        train : bool
+            Flag to load the training set or the test set.
 
         Returns
         ----------
@@ -484,19 +533,19 @@ class TrainingWindow(BaseWindow):
 
         """
 
-        match self.dataset_path:
+        path = self.dataset_path if train else self.testset_path
+
+        match path:
             case x if x == f'{ROOT_DIR}/data/MNIST/':
-                return dt.TorchMNIST(self.dataset_path, True, self.dataset_transform)
+                return dt.TorchMNIST(path, train, self.dataset_transform)
             case x if x == f'{ROOT_DIR}/data/fMNIST/':
-                return dt.TorchFMNIST(self.dataset_path, True, self.dataset_transform)
-            case '':
-                return dt.GenericFileDataset(self.dataset_path,
+                return dt.TorchFMNIST(path, train, self.dataset_transform)
+            case _:
+                return dt.GenericFileDataset(path,
                                              self.nn.get_input_len(),
                                              self.dataset_params['data_type'],
                                              self.dataset_params['delimiter'],
                                              self.dataset_transform)
-            case _:
-                return None
 
     def execute_training(self) -> None:
         """
@@ -507,15 +556,17 @@ class TrainingWindow(BaseWindow):
 
         err_message = ''
 
-        if self.dataset_path == '':
+        if not self.dataset_path:
             err_message = 'No dataset selected.'
-        elif self.widgets['Optimizer'].currentIndex() == -1:
+        elif not self.testset_path:
+            err_message = 'No test set selected.'
+        elif self.widgets[Params.OPTIMIZER].currentIndex() == -1:
             err_message = 'No optimizer selected.'
-        elif self.widgets['Scheduler'].currentIndex() == -1:
+        elif self.widgets[Params.SCHEDULER].currentIndex() == -1:
             err_message = 'No scheduler selected.'
-        elif self.widgets['Loss Function'].currentIndex() == -1:
+        elif self.widgets[Params.LOSS].currentIndex() == -1:
             err_message = 'No loss function selected.'
-        elif self.widgets['Precision Metric'].currentIndex() == -1:
+        elif self.widgets[Params.PRECISION].currentIndex() == -1:
             err_message = 'No metrics selected.'
         elif 'value' not in self.params['Epochs'].keys():
             err_message = 'No epochs selected.'
@@ -526,18 +577,20 @@ class TrainingWindow(BaseWindow):
         elif 'value' not in self.params['Validation batch size'].keys():
             err_message = 'No validation batch size selected.'
 
-        if err_message != '':
+        if err_message:
             err_dialog = MessageDialog(err_message, MessageType.ERROR)
             err_dialog.exec()
             self.close()
 
         # Load dataset
-        data = self.load_dataset()
+        training_data = self.load_dataset()
+        test_data = self.load_dataset(train=False)
 
         # Add logger dialog
-        log_dialog = CustomLoggerDialog('Training log', self)
+        log_textbox = CustomLoggerTextArea(self)
         handler = CustomLoggingHandler()
-        handler.log_signal.connect(log_dialog.add_log_message)
+        handler.log_signal.connect(log_textbox.appendPlainText)
+        self.layout.addWidget(log_textbox)
 
         logger = logging.getLogger('pynever.strategies.training')
         logger.setLevel(logging.INFO)
@@ -547,31 +600,31 @@ class TrainingWindow(BaseWindow):
 
         # Create optimizer dictionary of parameters
         opt_params = dict()
-        for k, v in self.gui_params['Optimizer:Adam'].items():
+        for k, v in self.gui_params[f'{Params.OPTIMIZER}:Adam'].items():
             opt_params[v['name']] = v['value']
 
         # Create scheduler dictionary of parameters
         sched_params = dict()
-        for k, v in self.gui_params['Scheduler:ReduceLROnPlateau'].items():
+        for k, v in self.gui_params[f'{Params.SCHEDULER}:ReduceLROnPlateau'].items():
             sched_params[v['name']] = v['value']
 
         # Init loss function
-        if self.loss_f == 'Loss Function:Cross Entropy':
+        if self.loss_f == f'{Params.LOSS}:Cross Entropy':
             loss = torch.nn.CrossEntropyLoss()
-            if self.gui_params['Loss Function:Cross Entropy']['Weight']['value'] != '':
-                loss.weight = self.gui_params['Loss Function:Cross Entropy']['Weight']['value']
-            loss.ignore_index = self.gui_params['Loss Function:Cross Entropy']['Ignore index']['value']
-            loss.reduction = self.gui_params['Loss Function:Cross Entropy']['Reduction']['value']
+            if self.gui_params[f'{Params.LOSS}:Cross Entropy']['Weight']['value'] != '':
+                loss.weight = self.gui_params[f'{Params.LOSS}:Cross Entropy']['Weight']['value']
+            loss.ignore_index = self.gui_params[f'{Params.LOSS}:Cross Entropy']['Ignore index']['value']
+            loss.reduction = self.gui_params[f'{Params.LOSS}:Cross Entropy']['Reduction']['value']
         else:
             loss = fun.mse_loss
-            loss.reduction = self.gui_params['Loss Function:MSE Loss']['Reduction']['value']
+            loss.reduction = self.gui_params[f'{Params.LOSS}:MSE Loss']['Reduction']['value']
 
         # Init metrics
-        if self.metric == 'Precision Metric:Inaccuracy':
+        if self.metric == f'{Params.PRECISION}:Inaccuracy':
             metrics = PytorchMetrics.inaccuracy
         else:
             metrics = fun.mse_loss
-            metrics.reduction = self.gui_params['Precision Metric:MSE Loss']['Reduction']['value']
+            metrics.reduction = self.gui_params[f'{Params.PRECISION}:MSE Loss']['Reduction']['value']
 
         # Checkpoint loading
         checkpoints_path = self.params['Checkpoints root'].get('value', '') + self.nn.identifier + '.pth.tar'
@@ -603,23 +656,50 @@ class TrainingWindow(BaseWindow):
                                              train_patience=self.params['Train patience'].get('value', None),
                                              checkpoints_root=self.params['Checkpoints root'].get('value', ''),
                                              verbose_rate=self.params['Verbosity level'].get('value', None))
+            test_strategy = PytorchTesting(metrics, dict(), self.params['Validation batch size']['value'])
             try:
-                log_dialog.show()
-                self.nn = train_strategy.train(self.nn, data)
+                # Worker in a separate thread
+                self.thread = QThread()
+                self.train_worker = AsyncWorker(train_strategy.train, (self.nn, training_data))
+                self.train_worker.moveToThread(self.thread)
+                self.test_worker = AsyncWorker(test_strategy.test, (self.nn, test_data))
+                self.test_worker.moveToThread(self.thread)
+
+                self.thread.started.connect(self.train_worker.run)
+                self.train_worker.finished.connect(self.test_worker.run)
+                self.test_worker.finished.connect(self.cleanup_thread)
+                self.train_worker.error.connect(self.error)
+                self.train_worker.error.connect(self.cleanup_thread)
+                self.test_worker.error.connect(self.error)
+                self.test_worker.error.connect(self.cleanup_thread)
+
+                self.thread.start()
                 self.is_nn_trained = True
 
                 # Delete checkpoint if the network isn't saved
-                if self.nn.identifier == '':
+                if self.nn.identifier == 'net':
                     os.remove('.pth.tar')
 
             except Exception as e:
-                self.nn = None
-                dialog = MessageDialog('Training error:\n' + str(e), MessageType.ERROR)
-                dialog.exec()
-                self.close()
+                self.error(str(e))
 
         self.train_btn.setEnabled(False)
         self.cancel_btn.setText('Close')
+
+    def cleanup_thread(self):
+        """Utility method to terminate threads correctly"""
+        self.thread.quit()
+        self.thread.wait()
+        self.train_worker.deleteLater()
+        self.test_worker.deleteLater()
+        self.thread.deleteLater()
+
+    def error(self, msg: str = ''):
+        """Display error message"""
+        self.nn = None
+        dialog = MessageDialog('Training error:\n' + msg, MessageType.ERROR)
+        dialog.exec()
+        self.close()
 
 
 class VerificationWindow(BaseWindow):
@@ -689,9 +769,10 @@ class VerificationWindow(BaseWindow):
         file.write_smt_property(path, self.properties, 'Real')
 
         # Add logger dialog
-        log_dialog = CustomLoggerDialog('Verification log', self)
+        log_textbox = CustomLoggerTextArea(self)
         handler = CustomLoggingHandler()
-        handler.log_signal.connect(log_dialog.add_log_message)
+        handler.log_signal.connect(log_textbox.appendPlainText)
+        self.layout.addWidget(log_textbox)
 
         logger = logging.getLogger('pynever.strategies.verification')
         logger.setLevel(logging.INFO)
@@ -722,13 +803,36 @@ class VerificationWindow(BaseWindow):
             case _:
                 raise NotImplementedError(f'The selected strategy {strategy} is not yet implemented')
 
-        # Open logger dialog
-        log_dialog.show()
+        try:
+            # Worker in a separate thread
+            self.thread = QThread()
+            self.worker = AsyncWorker(self.strategy.verify, (self.nn, to_verify))
+            self.worker.moveToThread(self.thread)
 
-        # Launch verification
-        self.strategy.verify(self.nn, to_verify)
-        self.verify_btn.setEnabled(False)
+            self.thread.started.connect(self.worker.run)
+            self.worker.finished.connect(self.cleanup_thread)
+            self.worker.error.connect(self.error)
+            self.worker.error.connect(self.cleanup_thread)
+
+            self.thread.start()
+
+        except Exception as e:
+            self.error(str(e))
+
         self.cancel_btn.setText('Close')
+
+    def cleanup_thread(self):
+        """Utility method to terminate threads correctly"""
+        self.thread.quit()
+        self.thread.wait()
+        self.worker.deleteLater()
+        self.thread.deleteLater()
+
+    def error(self, msg: str = ''):
+        """Display error message"""
+        dialog = MessageDialog('Verification error:\n' + msg, MessageType.ERROR)
+        dialog.exec()
+        self.close()
 
     def get_verification_params(self, strategy: str, raw_params: dict[str, str]) \
             -> SSLPVerificationParameters | SSBPVerificationParameters:
@@ -814,3 +918,21 @@ class VerificationWindow(BaseWindow):
 
             case _:
                 raise NotImplementedError(f'The selected strategy {strategy} is not yet implemented')
+
+
+class AsyncWorker(QObject):
+    """A class to run a task using a separate worker"""
+    finished = pyqtSignal()
+    error = pyqtSignal(str)
+
+    def __init__(self, task: Callable, params: tuple = None):
+        super().__init__()
+        self.task = task
+        self.params = params
+
+    def run(self):
+        try:
+            self.task(*self.params)
+            self.finished.emit()
+        except Exception as e:
+            self.error.emit(str(e))

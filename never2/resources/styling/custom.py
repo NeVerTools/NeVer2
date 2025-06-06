@@ -8,8 +8,7 @@ Author: Stefano Demarchi
 """
 import logging
 
-from PyQt6 import QtCore, QtWidgets
-from PyQt6.QtCore import Qt, QObject
+from PyQt6.QtCore import Qt, QObject, pyqtSignal
 from PyQt6.QtWidgets import QLabel, QComboBox, QLineEdit, QPlainTextEdit, QPushButton, QListWidget, QAbstractItemView
 
 import never2.resources.styling.display as disp
@@ -61,7 +60,7 @@ class CustomLabel(QLabel):
 
 
 class CustomComboBox(QComboBox):
-    def __init__(self, color: str = 'white', context: str = 'LayerBlock'):
+    def __init__(self, context: str = 'LayerBlock'):
         super(CustomComboBox, self).__init__()
 
         if context == 'LayerBlock':
@@ -81,7 +80,7 @@ class CustomComboBox(QComboBox):
 
 
 class CustomTextBox(QLineEdit):
-    def __init__(self, text: str = '', color: str = 'white', context: str = None):
+    def __init__(self, text: str = '', context: str = None):
         super(CustomTextBox, self).__init__()
         self.setText(text)
 
@@ -107,33 +106,13 @@ class CustomTextArea(QPlainTextEdit):
                            '}')
 
 
-class CustomLoggingHandler(QObject, logging.Handler):
-    """Custom logging handler to emit signals."""
+class CustomLoggerTextArea(CustomTextArea):
+    """Custom text area to display log messages."""
 
-    log_signal = QtCore.pyqtSignal(str)
-
-    def emit(self, record):
-        msg = self.format(record)
-        self.log_signal.emit(msg)
-
-
-class CustomLoggerDialog(QtWidgets.QDialog):
-    """Dialog to display log messages."""
-
-    def __init__(self, title: str, parent=None):
-        super(CustomLoggerDialog, self).__init__(parent)
-        self.setWindowTitle(title)
-        self.setGeometry(100, 100, 400, 200)
-
-        self.log_text_edit = CustomTextArea(parent=parent)
-        self.log_text_edit.setReadOnly(True)
-
-        layout = QtWidgets.QVBoxLayout(self)
-        layout.addWidget(self.log_text_edit)
-        self.setLayout(layout)
-
-    def add_log_message(self, message):
-        self.log_text_edit.appendPlainText(message)
+    def __init__(self, parent=None):
+        super().__init__(parent=parent)
+        self.setReadOnly(True)
+        self.setFixedHeight(150)
 
 
 class CustomListBox(QListWidget):
@@ -147,3 +126,17 @@ class CustomListBox(QListWidget):
                            'QListWidget::placeholder {' +
                            'color: ' + palette.GREY_4 + ';' +
                            '}')
+
+
+class CustomLoggingHandler(QObject, logging.Handler):
+    """Custom logging handler to emit signals."""
+
+    log_signal = pyqtSignal(str)
+
+    def __init__(self):
+        QObject.__init__(self)
+        logging.Handler.__init__(self)
+
+    def emit(self, record):
+        msg = self.format(record)
+        self.log_signal.emit(msg)

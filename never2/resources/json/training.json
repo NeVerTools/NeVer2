@@ -84,12 +84,6 @@
         "type": "float",
         "value": "1e-8",
         "description": "Minimal decay applied to lr. If the difference between new and old lr\nis smaller than eps, the update is ignored."
-      },
-      "Verbose": {
-        "name": "verbose",
-        "type": "bool",
-        "value": "False",
-        "description": "If True, prints a message to stdout for each update."
       }
     }
   },
