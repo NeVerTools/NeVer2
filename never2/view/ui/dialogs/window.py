@@ -676,10 +676,6 @@ class TrainingWindow(BaseWindow):
                 self.thread.start()
                 self.is_nn_trained = True
 
-                # Delete checkpoint if the network isn't saved
-                if self.nn.identifier == 'net':
-                    os.remove('.pth.tar')
-
             except Exception as e:
                 self.error(str(e))
 
@@ -819,6 +815,7 @@ class VerificationWindow(BaseWindow):
         except Exception as e:
             self.error(str(e))
 
+        self.verify_btn.setEnabled(False)
         self.cancel_btn.setText('Close')
 
     def cleanup_thread(self):
