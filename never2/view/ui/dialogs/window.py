@@ -925,18 +925,14 @@ class AsyncWorker(QObject):
     finished = pyqtSignal()
     error = pyqtSignal(str)
 
-    def __init__(self, task: Callable | list[Callable], params: tuple = None):
+    def __init__(self, task: Callable, params: tuple = None):
         super().__init__()
         self.task = task
         self.params = params
 
     def run(self):
         try:
-            if isinstance(self.task, list):
-                for t in self.task:
-                    t(*self.params)
-            else:
-                self.task(*self.params)
+            self.task(*self.params)
             self.finished.emit()
         except Exception as e:
             self.error.emit(str(e))
