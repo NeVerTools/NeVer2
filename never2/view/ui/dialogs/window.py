@@ -660,21 +660,15 @@ class TrainingWindow(BaseWindow):
             try:
                 # Worker in a separate thread
                 self.thread = QThread()
-                self.train_worker = AsyncWorker(train_strategy.train, (self.nn, training_data))
-                self.train_worker.moveToThread(self.thread)
-                self.test_worker = AsyncWorker(test_strategy.test, (self.nn, test_data))
-                self.test_worker.moveToThread(self.thread)
+                self.worker = AsyncWorker(self.train_and_test, (train_strategy, training_data,
+                                                                test_strategy, test_data))
+                self.worker.moveToThread(self.thread)
 
-                self.thread.started.connect(self.train_worker.run)
-                self.train_worker.finished.connect(self.test_worker.run)
-                self.test_worker.finished.connect(self.cleanup_thread)
-                self.train_worker.error.connect(self.error)
-                self.train_worker.error.connect(self.cleanup_thread)
-                self.test_worker.error.connect(self.error)
-                self.test_worker.error.connect(self.cleanup_thread)
+                self.thread.started.connect(self.worker.run)
+                self.worker.finished.connect(self.cleanup_thread)
+                self.worker.error.connect(self.error)
 
                 self.thread.start()
-                self.is_nn_trained = True
 
             except Exception as e:
                 self.error(str(e))
@@ -682,16 +676,23 @@ class TrainingWindow(BaseWindow):
         self.train_btn.setEnabled(False)
         self.cancel_btn.setText('Close')
 
+    def train_and_test(self, train_strategy: PytorchTraining, training_data: Dataset,
+                       test_strategy: PytorchTesting, test_data: Dataset):
+        """Procedure to execute in sequence training and testing"""
+        self.nn = train_strategy.train(self.nn, training_data)
+        self.is_nn_trained = True
+        test_strategy.test(self.nn, test_data)
+
     def cleanup_thread(self):
         """Utility method to terminate threads correctly"""
         self.thread.quit()
         self.thread.wait()
-        self.train_worker.deleteLater()
-        self.test_worker.deleteLater()
+        self.worker.deleteLater()
         self.thread.deleteLater()
 
     def error(self, msg: str = ''):
         """Display error message"""
+        self.cleanup_thread()
         self.nn = None
         dialog = MessageDialog('Training error:\n' + msg, MessageType.ERROR)
         dialog.exec()
@@ -808,7 +809,6 @@ class VerificationWindow(BaseWindow):
             self.thread.started.connect(self.worker.run)
             self.worker.finished.connect(self.cleanup_thread)
             self.worker.error.connect(self.error)
-            self.worker.error.connect(self.cleanup_thread)
 
             self.thread.start()
 
@@ -827,6 +827,7 @@ class VerificationWindow(BaseWindow):
 
     def error(self, msg: str = ''):
         """Display error message"""
+        self.cleanup_thread()
         dialog = MessageDialog('Verification error:\n' + msg, MessageType.ERROR)
         dialog.exec()
         self.close()
