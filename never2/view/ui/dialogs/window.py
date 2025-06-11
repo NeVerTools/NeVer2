@@ -250,7 +250,7 @@ class TrainingWindow(BaseWindow):
         self.widgets['dataset'].setCurrentIndex(-1)
         self.widgets['dataset'].activated \
             .connect(lambda: self.setup_dataset(self.widgets['dataset'].currentText()))
-        dataset_layout.addWidget(CustomLabel('Dataset'))
+        dataset_layout.addWidget(CustomLabel('Training set'))
         dataset_layout.addWidget(self.widgets['dataset'])
 
         self.widgets['testset'] = CustomComboBox()
