@@ -16,6 +16,7 @@ from PyQt6.QtWidgets import QMainWindow
 
 import never2.resources.styling.dimension as dim
 from never2 import APP_NAME, RES_DIR
+from never2.view.ui.dialogs.message import MessageDialog, MessageType
 from never2.view.ui.main_widget import EditorWidget
 
 
@@ -131,12 +132,19 @@ class MainWindow(QMainWindow):
 
             # LEARNING submenu triggers training
             menu_actions['Learning:Train...'].triggered.connect(self.editor_widget.train_network)
+            menu_actions['Learning:Prune...'].triggered.connect(MainWindow.wip_dialog)
 
             # VERIFICATION submenu triggers verification
             menu_actions['Verification:Verify...'].triggered.connect(self.editor_widget.verify_network)
+            menu_actions['Verification:Repair...'].triggered.connect(MainWindow.wip_dialog)
 
             # HELP
             menu_actions['Help:Open guide'].triggered.connect(open_guide)
+
+    @staticmethod
+    def wip_dialog():
+        dialog = MessageDialog('Feature in development', MessageType.MESSAGE)
+        dialog.exec()
 
     def quit(self):
         self.editor_widget.save_prompt_dialog()
