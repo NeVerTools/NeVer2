@@ -31,6 +31,56 @@
         "value": "False",
         "description": "Whether to use the AMSGrad variant of this algorithm\nfrom the paper 'On the Convergence of Adam and beyond'."
       }
+    },
+    "SGD": {
+      "Learning Rate": {
+        "name": "lr",
+        "type": "float",
+        "value": "1e-3",
+        "description": "Learning rate."
+      },
+      "Momentum": {
+        "name": "momentum",
+        "type": "float",
+        "value": "0",
+        "description": "Momentum factor."
+      },
+      "Dampening": {
+        "name": "dampening",
+        "type": "float",
+        "value": "0",
+        "description": "Momentum dampening."
+      },
+      "Nesterov": {
+        "name": "nesterov",
+        "type": "bool",
+        "value": "False",
+        "description": "Enables Nesterov momentum."
+      },
+      "Maximize": {
+        "name": "maximize",
+        "type": "bool",
+        "value": "False",
+        "description": "Maximize the objective."
+      },
+      "Foreach": {
+        "name": "foreach",
+        "type": "bool",
+        "value": "False",
+        "description": "Use foreach implementation of optimizer."
+      },
+      "Differentiable": {
+        "name": "differentiable",
+        "type": "bool",
+        "value": "False",
+        "description": "Whether autograd should occur through the optimizer step."
+      },
+      "Fused": {
+        "name": "fused",
+        "type": "bool",
+        "value": "False",
+        "description": "Whether the fused implementation is used."
+      }
     }
   },
   "Learning rate scheduling": {
