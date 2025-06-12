@@ -135,6 +135,34 @@
         "value": "1e-8",
         "description": "Minimal decay applied to lr. If the difference between new and old lr\nis smaller than eps, the update is ignored."
       }
+    },
+    "LRScheduler": {
+      "Last epoch": {
+        "name": "last_epoch",
+        "type": "int",
+        "value": "-1",
+        "description": "The index of the last epoch"
+      }
+    },
+    "StepLR": {
+       "Step size": {
+        "name": "step_size",
+        "type": "int",
+        "value": "30",
+        "description": "Period of learning rate decay"
+      },
+      "Gamma": {
+        "name": "gamma",
+        "type": "float",
+        "value": "0.1",
+        "description": "Multiplicative factor of learning rate decay"
+      },
+      "Last epoch": {
+        "name": "last_epoch",
+        "type": "int",
+        "value": "-1",
+        "description": "The index of the last epoch"
+      }
     }
   },
   "Loss function measure": {

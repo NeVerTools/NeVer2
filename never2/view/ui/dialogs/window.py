@@ -641,6 +641,8 @@ class TrainingWindow(BaseWindow):
                 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau
             case 'LRScheduler':
                 scheduler = torch.optim.lr_scheduler.LRScheduler
+            case 'StepLR':
+                scheduler = torch.optim.lr_scheduler.StepLR
             case _:
                 scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau
 
