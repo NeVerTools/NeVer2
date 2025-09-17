@@ -313,7 +313,7 @@ class EditBoxPropertyDialog(PropertyDialog):
         symbol = self.property_block.ref_block.get_identifier()
 
         for i in range(len(self.lower_bounds)):
-            smt_string += f'(assert (<= (* -1 {symbol}_{i}) {-self.lower_bounds[i]}))\n'
+            smt_string += f'(assert (>= {symbol}_{i} {self.lower_bounds[i]}))\n'
             smt_string += f'(assert (<= {symbol}_{i} {self.upper_bounds[i]}))\n'
 
         return smt_string

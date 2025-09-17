@@ -106,14 +106,21 @@ def write_smt_property(path: str, props: dict, dtype: str) -> None:
     # Create and write file
     with open(path, "w") as f:
         # Variables
-        for p in props.values():
+        out_var_name = 'Y'
+        for k, p in props.items():
             for v in p.variables:
                 f.write(f"(declare-const {v} {dtype})\n")
+            out_var_name = k
         f.write("\n")
 
         # Constraints
-        for p in props.values():
-            f.write(p.smt_string + "\n")
+        for v_name, p in props.items():
+            if v_name == out_var_name:
+                f.write('(assert (or\n(and\n')
+                f.write('\n'.join([s.lstrip('(assert')[:-1] for s in p.smt_string.split('\n')]))
+                f.write(')))')
+            else:
+                f.write(f'{p.smt_string}\n')
 
 
 class InputHandler:
