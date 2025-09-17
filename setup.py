@@ -5,7 +5,7 @@ with open('README.md', 'r', encoding='utf-8') as fh:
 
 setuptools.setup(
     name='NeVer2',
-    version='2.0.3',
+    version='2.0.4',
     author='Stefano Demarchi',
     author_email='stefano.demarchi@edu.unige.it',
     license='GNU General Public License with Commons Clause License Condition v1.0',
