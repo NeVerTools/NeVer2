@@ -49,6 +49,24 @@ class Params:
     PRECISION = 'Precision Metric'
 
 
+class AsyncWorker(QObject):
+    """A class to run a task using a separate worker"""
+    finished = pyqtSignal()
+    error = pyqtSignal(str)
+
+    def __init__(self, task: Callable, params: tuple = None):
+        super().__init__()
+        self.task = task
+        self.params = params
+
+    def run(self):
+        try:
+            self.task(*self.params)
+            self.finished.emit()
+        except Exception as e:
+            self.error.emit(str(e))
+
+
 class BaseWindow(QtWidgets.QDialog):
     """
     Base class for grouping common elements of the windows.
@@ -599,14 +617,34 @@ class TrainingWindow(BaseWindow):
         logger.info('***** NeVer 2 - TRAINING *****')
 
         # Create optimizer dictionary of parameters
+        opt_name = self.widgets[Params.OPTIMIZER].currentText()
         opt_params = dict()
-        for k, v in self.gui_params[f'{Params.OPTIMIZER}:Adam'].items():
+        for k, v in self.gui_params[f'{Params.OPTIMIZER}:{opt_name}'].items():
             opt_params[v['name']] = v['value']
 
+        match opt_name:
+            case 'Adam':
+                optimizer = opt.Adam
+            case 'SGD':
+                optimizer = opt.SGD
+            case _:
+                optimizer = opt.Adam
+
         # Create scheduler dictionary of parameters
+        sched_name = self.widgets[Params.SCHEDULER].currentText()
         sched_params = dict()
-        for k, v in self.gui_params[f'{Params.SCHEDULER}:ReduceLROnPlateau'].items():
+        for k, v in self.gui_params[f'{Params.SCHEDULER}:{sched_name}'].items():
             sched_params[v['name']] = v['value']
+
+        match sched_name:
+            case 'ReduceLROnPlateau':
+                scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau
+            case 'LRScheduler':
+                scheduler = torch.optim.lr_scheduler.LRScheduler
+            case 'StepLR':
+                scheduler = torch.optim.lr_scheduler.StepLR
+            case _:
+                scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau
 
         # Init loss function
         if self.loss_f == f'{Params.LOSS}:Cross Entropy':
@@ -642,17 +680,14 @@ class TrainingWindow(BaseWindow):
         if start_epoch > -1:
             # Init train strategy
             cuda_device = 'cuda' if self.params['Cuda']['value'] == 'True' else 'cpu'
-            train_strategy = PytorchTraining(opt.Adam, opt_params,
+            train_strategy = PytorchTraining(optimizer, opt_params,
                                              loss,
                                              self.params['Epochs']['value'],
                                              self.params['Validation percentage']['value'] / 100,
                                              self.params['Training batch size']['value'],
-                                             self.params['Validation batch size']['value'],
-                                             True,
-                                             opt.lr_scheduler.ReduceLROnPlateau,
-                                             sched_params,
-                                             metrics,
-                                             device=cuda_device,
+                                             self.params['Validation batch size']['value'], True,
+                                             scheduler, sched_params,
+                                             metrics, device=cuda_device,
                                              train_patience=self.params['Train patience'].get('value', None),
                                              checkpoints_root=self.params['Checkpoints root'].get('value', ''),
                                              verbose_rate=self.params['Verbosity level'].get('value', None))
@@ -916,21 +951,3 @@ class VerificationWindow(BaseWindow):
 
             case _:
                 raise NotImplementedError(f'The selected strategy {strategy} is not yet implemented')
-
-
-class AsyncWorker(QObject):
-    """A class to run a task using a separate worker"""
-    finished = pyqtSignal()
-    error = pyqtSignal(str)
-
-    def __init__(self, task: Callable, params: tuple = None):
-        super().__init__()
-        self.task = task
-        self.params = params
-
-    def run(self):
-        try:
-            self.task(*self.params)
-            self.finished.emit()
-        except Exception as e:
-            self.error.emit(str(e))

@@ -52,12 +52,6 @@
           "value": "1",
           "type": "int",
           "description": "Number of neurons to refine exactly in each layer when using the Mixed heuristic"
-        },
-        "Non-linear approximation levels": {
-          "name": "approx_levels",
-          "value": "1",
-          "type": "int",
-          "description": "Level of approximation for sigmoid-like functions, corresponding to the number\nof separation points in the triangular approximation"
         }
       }
     }
