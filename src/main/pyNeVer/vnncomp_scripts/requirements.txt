@@ -1,0 +1,6 @@
+numpy
+onnx
+torch
+torchvision
+ortools
+multipledispatch

@@ -1,0 +1,236 @@
+<mxfile host="65bd71144e">
+    <diagram id="mMeEkXBCfGznwz5Kh-PO" name="Page-1">
+        <mxGraphModel dx="4688" dy="2652" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="1100" pageHeight="850" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="117" value="" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="-310" y="-390" width="1760" height="1680" as="geometry"/>
+                </mxCell>
+                <mxCell id="15" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="2" target="4" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="35" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="2" target="3" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="36" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="2" target="5" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="2" value="Input Layer" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="70" y="290" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="37" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="3" target="6" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="38" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="3" target="7" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="Layer&lt;div&gt;&lt;font style=&quot;font-size: 8px;&quot;&gt;local Id = 1&lt;/font&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="180" y="210" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="16" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="4" target="7" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="39" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="4" target="6" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="40" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="4" target="8" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="Layer&lt;div&gt;&lt;span style=&quot;color: rgb(63, 63, 63); font-size: 8px;&quot;&gt;local Id = 2&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="180" y="290" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="41" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="5" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="310" y="405.16666666666674" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="5" value="Layer&lt;div&gt;&lt;span style=&quot;color: rgb(63, 63, 63); font-size: 8px;&quot;&gt;local Id = 3&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="180" y="380" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="44" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="6" target="10" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="45" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="6" target="11" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="Layer&lt;div&gt;&lt;span style=&quot;color: rgb(63, 63, 63); font-size: 8px;&quot;&gt;local Id = 1&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="310" y="210" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="17" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="7" target="10" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="Layer&lt;div&gt;&lt;span style=&quot;color: rgb(63, 63, 63); font-size: 8px;&quot;&gt;local Id = 2&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="310" y="290" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="42" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="8" target="9" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="Layer&lt;div&gt;&lt;span style=&quot;color: rgb(63, 63, 63); font-size: 8px;&quot;&gt;local Id = 3&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="310" y="380" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="47" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="9" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="550" y="320" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="9" value="Layer&lt;div&gt;&lt;span style=&quot;color: rgb(63, 63, 63); font-size: 8px;&quot;&gt;local Id = 1&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="440" y="210" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="10" target="12" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" value="Layer&lt;div&gt;&lt;span style=&quot;color: rgb(63, 63, 63); font-size: 8px;&quot;&gt;local Id = 2&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="440" y="290" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="46" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="11" target="12" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="Layer&lt;div&gt;&lt;span style=&quot;color: rgb(63, 63, 63); font-size: 8px;&quot;&gt;local Id = 3&lt;/span&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="440" y="380" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="Output" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="550" y="290" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="20" target="22" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="33" value="Input_1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="19" vertex="1" connectable="0">
+                    <mxGeometry x="-0.0611" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="20" value="Input Layer" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="80" y="-245" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="22" target="24" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="34" value="Output_1" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" parent="21" vertex="1" connectable="0">
+                    <mxGeometry x="-0.2958" y="2" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="22" value="Layer&lt;div&gt;&lt;font style=&quot;font-size: 8px;&quot;&gt;(type ELU)&lt;/font&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="190" y="-245" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="23" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="24" target="26" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="24" value="Layer" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="320" y="-245" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="25" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="26" target="27" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="26" value="Layer" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="450" y="-245" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="27" value="Output" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="560" y="-245" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="28" value="&lt;font style=&quot;font-size: 24px;&quot;&gt;Sequential Neural Networks&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="190" y="-330" width="320" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="32" style="edgeStyle=none;html=1;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" parent="1" source="29" target="22" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="29" value="Conversion strategy :&amp;nbsp;&lt;div&gt;from internal to ONNX :&amp;nbsp;&lt;/div&gt;&lt;div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;b&gt;input:&lt;/b&gt; &quot;input_1&quot;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;b&gt;output:&lt;/b&gt; &quot;output_1&quot;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&lt;b&gt;op_type: &lt;/b&gt;&quot;Elu&quot;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;attribute {&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&amp;nbsp; name: &quot;alpha&quot;&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&amp;nbsp; f: 1.0&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;&amp;nbsp; type: FLOAT&lt;/div&gt;&lt;div style=&quot;text-align: left;&quot;&gt;}&lt;/div&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="150" y="-140" width="150" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="48" value="&lt;b&gt;&lt;font style=&quot;font-size: 18px;&quot;&gt;&lt;u&gt;Conversion Strategies ?&lt;/u&gt;&lt;/font&gt;&lt;/b&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="-30" y="443" width="230" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="49" value="&lt;font style=&quot;font-size: 24px;&quot;&gt;Non Sequential Neural Networks Form 1&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="105" y="120" width="450" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="77" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="80" target="86" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="100" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="80" target="98" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="101" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="80" target="99" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="80" value="Input Layer" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="770" y="285" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="83" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="86" target="91" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="86" value="Layer" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="880" y="285" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="90" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="91" target="95" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="105" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="91" target="104" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="91" value="Layer" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="1010" y="285" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="94" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="95" target="97" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="95" value="Layer" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="1140" y="285" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="97" value="Output" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="1250" y="285" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="102" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="98" target="91" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="98" value="Layer" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="880" y="190" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="103" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;" parent="1" source="99" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="1010" y="310" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="99" value="Layer" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="880" y="380" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="106" style="edgeStyle=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="104" target="97" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="104" value="Layer" style="rounded=1;whiteSpace=wrap;html=1;absoluteArcSize=1;arcSize=14;strokeWidth=2;" parent="1" vertex="1">
+                    <mxGeometry x="1140" y="380" width="50" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="107" value="&lt;font style=&quot;font-size: 9px;&quot;&gt;There can be two&amp;nbsp;&lt;/font&gt;&lt;div&gt;&lt;font style=&quot;font-size: 8px;&quot;&gt;different outputs ?&lt;/font&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="1000" y="335" width="100" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="108" value="&lt;font style=&quot;font-size: 24px;&quot;&gt;Non Sequential Neural Networks Form 2&lt;/font&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="800" y="110" width="450" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="109" value="&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;u&gt;Conversion strategy 1 :&lt;/u&gt;&lt;/font&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;font style=&quot;font-size: 14px;&quot;&gt;&lt;i&gt;Exemple for a depth 2 node:&lt;/i&gt;&lt;/font&gt;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;&lt;b&gt;inputs&lt;/b&gt;: [&quot;input_2_1&quot;,&quot;input_2_2&quot;]&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;&lt;b&gt;output&lt;/b&gt; : [output_3_1]&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;&lt;b&gt;op_type&lt;/b&gt; : &quot;&amp;lt;typeOP&amp;gt;&quot;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;&lt;b&gt;attribute&lt;/b&gt; : {&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;&lt;span style=&quot;white-space: pre;&quot;&gt;&#x9;&lt;/span&gt;&amp;lt;attribute of the op type&amp;gt;;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;font-size: 14px;&quot;&gt;}&lt;/span&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=#000000;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="-110" y="483" width="230" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="110" value="Depth 1" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="130" y="168" width="70" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="111" value="Depth 2" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="260" y="168" width="70" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="112" value="Depth 3" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=none;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="400" y="168" width="70" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="114" value="" style="edgeStyle=none;html=1;" parent="1" source="113" target="109" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="113" value="&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;span style=&quot;background-color: transparent;&quot;&gt;In the input_x_y/output_x_y&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;x stands for the depth of the node/output&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;y stands for the local Id of the node&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=#000000;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="150" y="483" width="240" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="116" value="" style="edgeStyle=none;html=1;" parent="1" source="115" target="109" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="115" value="&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;b&gt;To implement :&amp;nbsp;&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;- A way to assign local id&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;- A surcharge of the __add methods&amp;nbsp;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;to accept list&amp;lt;str&amp;gt; inputs&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;- A graph traversal algorithm that sort&amp;nbsp;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;the nodes according to their depth&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;b&gt;Advantages :&amp;nbsp;&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;- Easy to organize and to decrypt :&amp;nbsp;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;depth parser algorithm&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;- We keep all the functionalities and&amp;nbsp;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;basically the same organization, only&amp;nbsp;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;the input is changed to a list of input&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;- As we keep the same organization,&amp;nbsp;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;it&#39;s coherent with the code and easy to&amp;nbsp;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;modify.&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;b&gt;&lt;br&gt;&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;b&gt;Inconvenient :&amp;nbsp;&lt;/b&gt;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;- The internal representation need to&amp;nbsp;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;go through an adapter to add the depth&amp;nbsp;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;and local Id, I don&#39;t know if the current&amp;nbsp;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;architecture is easily modulable, if not,&amp;nbsp;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;the surcharge of the __add methods might&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;be harder than expected and more complicated&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;- To identify the nodes depth, we need a graph&amp;nbsp;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;traversal algorithm that outputs an list of depth&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;and within each depth there&#39;ll be the nodes id&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;(I already know how to do one). Depending on&amp;nbsp;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;the NN Structures, it might be time consuming&amp;nbsp;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;(And on top of that we use Python soo...)&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;&lt;br&gt;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;- As already said, this implementation requires&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;a surcharg of the add function, that means we have&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;double the already existing codes, that&#39;ll take a lot of&amp;nbsp;&lt;/div&gt;&lt;div style=&quot;text-align: justify;&quot;&gt;space and time although it shouldn&#39;t be difficult.&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;resizable=0;points=[];autosize=1;strokeColor=#000000;fillColor=none;" parent="1" vertex="1">
+                    <mxGeometry x="-130" y="710" width="300" height="520" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>

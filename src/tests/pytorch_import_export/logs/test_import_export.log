@@ -1,0 +1,20 @@
+pytorch_networks\net10_traced.pt: SKIPPED - NotImplementedError: Method squeeze not implemented during the import of acyclic networks
+pytorch_networks\net11_traced.pt: PASSED
+pytorch_networks\net12_traced.pt: PASSED
+pytorch_networks\net13_traced.pt: PASSED
+pytorch_networks\net14_traced.pt: PASSED
+pytorch_networks\net15_traced.pt: PASSED
+pytorch_networks\net16_traced.pt: PASSED
+pytorch_networks\net17_traced.pt: PASSED
+pytorch_networks\net18_traced.pt: PASSED
+pytorch_networks\net19_traced.pt: PASSED
+pytorch_networks\net1_traced.pt: PASSED
+pytorch_networks\net20_traced.pt: PASSED
+pytorch_networks\net2_traced.pt: PASSED
+pytorch_networks\net3_traced.pt: PASSED
+pytorch_networks\net4_traced.pt: PASSED
+pytorch_networks\net5_traced.pt: PASSED
+pytorch_networks\net6_traced.pt: SKIPPED - NotImplementedError: Method squeeze not implemented during the import of acyclic networks
+pytorch_networks\net7_traced.pt: PASSED
+pytorch_networks\net8_traced.pt: PASSED
+pytorch_networks\net9_traced.pt: PASSED

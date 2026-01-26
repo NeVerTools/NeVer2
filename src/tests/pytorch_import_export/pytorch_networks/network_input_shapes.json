@@ -1,0 +1,106 @@
+{
+    "net1_traced.pt": [
+        1,
+        10
+    ],
+    "net2_traced.pt": [
+        1,
+        8
+    ],
+    "net3_traced.pt": [
+        1,
+        3,
+        32,
+        32
+    ],
+    "net4_traced.pt": [
+        1,
+        4,
+        20
+    ],
+    "net5_traced.pt": [
+        1,
+        1,
+        10,
+        10,
+        10
+    ],
+    "net6_traced.pt": [
+        1,
+        12
+    ],
+    "net7_traced.pt": [
+        1,
+        3,
+        32,
+        32
+    ],
+    "net8_traced.pt": [
+        1,
+        6
+    ],
+    "net9_traced.pt": [
+        1,
+        1,
+        16,
+        16
+    ],
+    "net10_traced.pt": [
+        1,
+        5
+    ],
+    "net11_traced.pt": [
+        1,
+        1,
+        28,
+        28
+    ],
+    "net12_traced.pt": [
+        1,
+        3,
+        32,
+        32
+    ],
+    "net13_traced.pt": [
+        1,
+        4,
+        100
+    ],
+    "net14_traced.pt": [
+        1,
+        1,
+        10,
+        10,
+        10
+    ],
+    "net15_traced.pt": [
+        1,
+        100
+    ],
+    "net16_traced.pt": [
+        1,
+        3,
+        32,
+        32
+    ],
+    "net17_traced.pt": [
+        1,
+        1,
+        28,
+        28
+    ],
+    "net18_traced.pt": [
+        1,
+        20
+    ],
+    "net19_traced.pt": [
+        1,
+        3,
+        32,
+        32
+    ],
+    "net20_traced.pt": [
+        1,
+        10
+    ]
+}

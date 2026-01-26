@@ -1,6 +1,2 @@
-build/
-dist/
-*.pyc
-.idea/*
-**/logs/*
-!**/logs/placeholder.txt
+.se25-p06_venv
+.vscode
